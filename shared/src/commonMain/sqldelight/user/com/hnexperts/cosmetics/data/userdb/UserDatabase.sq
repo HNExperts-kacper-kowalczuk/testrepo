@@ -1,0 +1,71 @@
+CREATE TABLE user_profile (
+    id INTEGER NOT NULL PRIMARY KEY,
+    pregnancy_caution INTEGER NOT NULL DEFAULT 0,
+    fragrance_free INTEGER NOT NULL DEFAULT 0,
+    locale_preference TEXT NOT NULL DEFAULT 'system',
+    pinned_locale TEXT
+);
+
+CREATE TABLE user_avoid_ingredient (
+    ingredient_id TEXT NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE scan_history (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    scanned_at TEXT NOT NULL,
+    gtin TEXT,
+    product_id TEXT,
+    inci_raw TEXT NOT NULL,
+    rating TEXT NOT NULL,
+    source TEXT NOT NULL
+);
+
+CREATE TABLE user_shelf (
+    product_id TEXT,
+    gtin TEXT,
+    inci_raw TEXT NOT NULL,
+    saved_at TEXT NOT NULL
+);
+
+CREATE TABLE report_queue (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    gtin TEXT,
+    payload_json TEXT NOT NULL,
+    flushed INTEGER NOT NULL DEFAULT 0
+);
+
+selectProfile:
+SELECT *
+FROM user_profile
+WHERE id = 1;
+
+upsertProfile:
+INSERT OR REPLACE INTO user_profile(id, pregnancy_caution, fragrance_free, locale_preference, pinned_locale)
+VALUES (1, ?, ?, ?, ?);
+
+selectAvoidIds:
+SELECT ingredient_id
+FROM user_avoid_ingredient;
+
+insertAvoid:
+INSERT OR IGNORE INTO user_avoid_ingredient(ingredient_id)
+VALUES (?);
+
+deleteAvoid:
+DELETE FROM user_avoid_ingredient
+WHERE ingredient_id = ?;
+
+clearAvoid:
+DELETE FROM user_avoid_ingredient;
+
+insertHistory:
+INSERT INTO scan_history(scanned_at, gtin, product_id, inci_raw, rating, source)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectHistory:
+SELECT *
+FROM scan_history
+ORDER BY scanned_at DESC
+LIMIT 100;

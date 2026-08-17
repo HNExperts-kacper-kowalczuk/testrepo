@@ -1,0 +1,139 @@
+CREATE TABLE catalog_meta (
+    id INTEGER NOT NULL PRIMARY KEY,
+    catalog_version TEXT NOT NULL,
+    ruleset_version TEXT NOT NULL,
+    built_at TEXT NOT NULL,
+    region TEXT NOT NULL,
+    checksum TEXT NOT NULL,
+    supported_comment_locales TEXT NOT NULL
+);
+
+CREATE TABLE product (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT,
+    category TEXT,
+    inci_raw TEXT NOT NULL,
+    inci_hash TEXT,
+    usage TEXT,
+    source TEXT NOT NULL,
+    verified INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE product_barcode (
+    gtin TEXT NOT NULL PRIMARY KEY,
+    product_id TEXT NOT NULL
+);
+
+CREATE TABLE ingredient (
+    id TEXT NOT NULL PRIMARY KEY,
+    inci_name TEXT NOT NULL,
+    cas_numbers TEXT,
+    function_tags TEXT
+);
+
+CREATE TABLE ingredient_alias (
+    alias_normalized TEXT NOT NULL PRIMARY KEY,
+    ingredient_id TEXT NOT NULL
+);
+
+CREATE TABLE inci_comma_exception (
+    phrase_normalized TEXT NOT NULL PRIMARY KEY,
+    ingredient_id TEXT NOT NULL
+);
+
+CREATE TABLE ingredient_hazard (
+    ingredient_id TEXT NOT NULL PRIMARY KEY,
+    danger_level TEXT NOT NULL,
+    regulatory_tags TEXT NOT NULL,
+    restriction_json TEXT
+);
+
+CREATE TABLE ingredient_comment (
+    ingredient_id TEXT NOT NULL,
+    locale TEXT NOT NULL,
+    summary TEXT NOT NULL,
+    detail TEXT,
+    PRIMARY KEY (ingredient_id, locale)
+);
+
+selectMeta:
+SELECT *
+FROM catalog_meta
+WHERE id = 1;
+
+upsertMeta:
+INSERT OR REPLACE INTO catalog_meta(id, catalog_version, ruleset_version, built_at, region, checksum, supported_comment_locales)
+VALUES (1, ?, ?, ?, ?, ?, ?);
+
+insertProduct:
+INSERT OR REPLACE INTO product(id, name, brand, category, inci_raw, inci_hash, usage, source, verified)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insertBarcode:
+INSERT OR REPLACE INTO product_barcode(gtin, product_id)
+VALUES (?, ?);
+
+insertIngredient:
+INSERT OR REPLACE INTO ingredient(id, inci_name, cas_numbers, function_tags)
+VALUES (?, ?, ?, ?);
+
+insertAlias:
+INSERT OR REPLACE INTO ingredient_alias(alias_normalized, ingredient_id)
+VALUES (?, ?);
+
+insertCommaException:
+INSERT OR REPLACE INTO inci_comma_exception(phrase_normalized, ingredient_id)
+VALUES (?, ?);
+
+insertHazard:
+INSERT OR REPLACE INTO ingredient_hazard(ingredient_id, danger_level, regulatory_tags, restriction_json)
+VALUES (?, ?, ?, ?);
+
+insertComment:
+INSERT OR REPLACE INTO ingredient_comment(ingredient_id, locale, summary, detail)
+VALUES (?, ?, ?, ?);
+
+selectProductByGtin:
+SELECT product.id, product.name, product.brand, product.category, product.inci_raw, product.inci_hash, product.usage, product.source, product.verified
+FROM product
+JOIN product_barcode ON product.id = product_barcode.product_id
+WHERE product_barcode.gtin = ?;
+
+selectProductById:
+SELECT *
+FROM product
+WHERE id = ?;
+
+searchProducts:
+SELECT *
+FROM product
+WHERE name LIKE '%' || ? || '%'
+   OR IFNULL(brand, '') LIKE '%' || ? || '%'
+ORDER BY name
+LIMIT 50;
+
+selectAllProducts:
+SELECT *
+FROM product
+ORDER BY name;
+
+selectAllIngredients:
+SELECT *
+FROM ingredient;
+
+selectAllAliases:
+SELECT *
+FROM ingredient_alias;
+
+selectAllCommaExceptions:
+SELECT *
+FROM inci_comma_exception;
+
+selectAllHazards:
+SELECT *
+FROM ingredient_hazard;
+
+selectAllComments:
+SELECT *
+FROM ingredient_comment;

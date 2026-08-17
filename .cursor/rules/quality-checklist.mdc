@@ -1,0 +1,13 @@
+---
+description: Quality checklist that must be satisfied before every commit
+alwaysApply: true
+---
+
+Before every commit in this repository:
+
+1. Read `docs/quality-checklist.md`.
+2. Run `./scripts/check-quality.sh` and fix any failure.
+3. Confirm all 11 points against the diff (no god classes; DDD ports not SQL in UI; SOLID; re-read for mistakes; classes ≤500 lines; methods ≤250 and preferably ≤50; one method one thing; I/O and evaluation off Main; minSdk 26 and iOS 15.3; cancellation-safe threading; `AppFailure`/`Outcome` with verbose UI + logs).
+4. Run tests that cover the change (`./gradlew :shared:jvmTest` at minimum).
+
+Do not commit if any point fails. Do not treat the shell script as a substitute for the architecture and threading review.

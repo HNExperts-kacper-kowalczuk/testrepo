@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="app_name">INCI Scan</string>
+    <string name="tab_scan">Skan</string>
+    <string name="tab_search">Szukaj</string>
+    <string name="tab_history">Historia</string>
+    <string name="tab_more">Więcej</string>
+
+    <string name="scan_title">Skanuj kosmetyk</string>
+    <string name="scan_barcode_label">Kod kreskowy (EAN / UPC)</string>
+    <string name="scan_barcode_action">Szukaj kodu</string>
+    <string name="scan_inci_label">Skład INCI</string>
+    <string name="scan_inci_action">Oceń skład</string>
+    <string name="scan_camera_note">Skanowanie aparatem (kod i skład) pojawi się w kolejnej wersji. Na razie wpisz kod kreskowy albo wklej skład z opakowania.</string>
+    <string name="scan_hint_gtin">Spróbuj 5901234123457</string>
+    <string name="scan_invalid_barcode">To nie wygląda na poprawny kod kreskowy.</string>
+    <string name="scan_not_found_title">Brak produktu w katalogu offline</string>
+    <string name="scan_not_found_body">Możesz mimo to ocenić produkt, wpisując lub wklejając skład z opakowania.</string>
+    <string name="scan_empty_inci">Wklej lub wpisz przynajmniej jedną nazwę składnika.</string>
+    <string name="scan_working">Ocenianie…</string>
+
+    <string name="search_title">Katalog</string>
+    <string name="search_placeholder">Szukaj po nazwie lub marce</string>
+    <string name="search_empty">Brak produktów pasujących do zapytania.</string>
+
+    <string name="history_title">Ostatnie skany</string>
+    <string name="history_empty">Nie oceniono jeszcze żadnego produktu.</string>
+
+    <string name="result_title">Wynik</string>
+    <string name="result_missing">Brak oceny do pokazania. Najpierw zeskanuj produkt.</string>
+    <string name="result_not_suitable">Nieodpowiedni przy Twoich filtrach.</string>
+    <string name="result_suitable">Brak trafień z Twojej listy unikania.</string>
+    <string name="result_disclaimer">Tylko informacyjnie. To nie jest wyrób medyczny ani zamiennik składu, dermatologa albo oficjalnych załączników UE. Dane mogą się opóźniać względem przepisów.</string>
+    <string name="result_unverified">Skład z katalogu pochodzi z niezweryfikowanych danych społecznościowych.</string>
+    <string name="level_safe">Ogólnie akceptowalny</string>
+    <string name="level_low">Niskie zastrzeżenia</string>
+    <string name="level_moderate">Umiarkowane zastrzeżenia</string>
+    <string name="level_restricted">Stosowanie ograniczone</string>
+    <string name="level_high">Wysokie zastrzeżenia</string>
+    <string name="level_prohibited">Zakazany</string>
+    <string name="level_unknown">Nieznany</string>
+    <string name="finding_personal_avoid">Na Twojej liście unikania</string>
+    <string name="finding_unmatched">Brak w bazie wiedzy</string>
+    <string name="back">Wstecz</string>
+
+    <string name="prefs_title">Ustawienia</string>
+    <string name="prefs_pregnancy">Ostrożność w ciąży / podczas karmienia</string>
+    <string name="prefs_fragrance_free">Wolę bez zapachu</string>
+    <string name="prefs_language">Język komentarzy</string>
+    <string name="prefs_language_system">Jak system</string>
+    <string name="prefs_language_en">Angielski</string>
+    <string name="prefs_language_pl">Polski</string>
+    <string name="prefs_avoid_title">Unikaj wybranych składników</string>
+
+    <string name="ad_placeholder">Reklama</string>
+    <string name="common_retry">Ponów</string>
+    <string name="common_continue">Dalej</string>
+    <string name="error_catalog">Nie udało się wczytać katalogu offline.</string>
+    <string name="error_corrupt_catalog">Katalog offline wygląda na uszkodzony.</string>
+    <string name="error_database">Operacja na lokalnej bazie nie powiodła się.</string>
+    <string name="error_evaluation">Ocena składu nie powiodła się.</string>
+    <string name="error_unexpected">Coś poszło nie tak.</string>
+
+    <plurals name="result_unknown_count">
+        <item quantity="one">Nie rozpoznano %1$d nazwy — wynik może być niepełny.</item>
+        <item quantity="few">Nie rozpoznano %1$d nazw — wynik może być niepełny.</item>
+        <item quantity="many">Nie rozpoznano %1$d nazw — wynik może być niepełny.</item>
+        <item quantity="other">Nie rozpoznano %1$d nazw — wynik może być niepełny.</item>
+    </plurals>
+</resources>
