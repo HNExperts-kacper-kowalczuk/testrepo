@@ -25,24 +25,30 @@ class ResolveBarcodeTest {
     )
 
     @Test
-    fun rejectsShortValues() = runBlocking {
-        val lookup: BarcodeLookup = requireOk(resolveBarcode.invoke("123"))
-        assertIs<BarcodeLookup.Invalid>(lookup)
+    fun rejectsShortValues() {
+        runBlocking {
+            val lookup: BarcodeLookup = requireOk(resolveBarcode.invoke("123"))
+            assertIs<BarcodeLookup.Invalid>(lookup)
+        }
     }
 
     @Test
-    fun returnsNotFoundForUnknownGtin() = runBlocking {
-        val lookup: BarcodeLookup = requireOk(resolveBarcode.invoke("5901234000000"))
-        assertIs<BarcodeLookup.NotFound>(lookup)
-        assertEquals("5901234000000", lookup.gtin)
+    fun returnsNotFoundForUnknownGtin() {
+        runBlocking {
+            val lookup: BarcodeLookup = requireOk(resolveBarcode.invoke("5901234000000"))
+            assertIs<BarcodeLookup.NotFound>(lookup)
+            assertEquals("5901234000000", lookup.gtin)
+        }
     }
 
     @Test
-    fun findsProductAndStripsFormatting() = runBlocking {
-        val lookup: BarcodeLookup = requireOk(resolveBarcode.invoke("590-1234-12345-7"))
-        assertIs<BarcodeLookup.Found>(lookup)
-        assertEquals("5901234123457", lookup.gtin)
-        assertEquals("Gentle Cream Cleanser", lookup.product.name)
+    fun findsProductAndStripsFormatting() {
+        runBlocking {
+            val lookup: BarcodeLookup = requireOk(resolveBarcode.invoke("590-1234-12345-7"))
+            assertIs<BarcodeLookup.Found>(lookup)
+            assertEquals("5901234123457", lookup.gtin)
+            assertEquals("Gentle Cream Cleanser", lookup.product.name)
+        }
     }
 
     private class MemoryProducts(
