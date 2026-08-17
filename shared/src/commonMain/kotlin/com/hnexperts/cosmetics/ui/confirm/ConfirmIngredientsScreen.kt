@@ -40,6 +40,7 @@ import com.hnexperts.cosmetics.resources.confirm_unknown
 import com.hnexperts.cosmetics.scanning.domain.FuzzyDecision
 import com.hnexperts.cosmetics.scanning.domain.ReviewToken
 import com.hnexperts.cosmetics.ui.common.FailureBanner
+import com.hnexperts.cosmetics.ui.common.UsagePicker
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,6 +97,10 @@ fun ConfirmIngredientsScreen(
             TextButton(onClick = viewModel::addToken, enabled = !uiState.busy) {
                 Text(stringResource(Res.string.confirm_add))
             }
+            UsagePicker(
+                selected = uiState.usage,
+                onSelect = viewModel::setUsage
+            )
             Button(
                 onClick = viewModel::evaluate,
                 enabled = !uiState.busy && !draft.hasPendingFuzzy(),

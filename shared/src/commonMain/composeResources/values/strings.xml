@@ -57,7 +57,9 @@
     <string name="prefs_catalog_stamp">Version %1$s · built %2$s · %3$s</string>
     <string name="prefs_catalog_unknown">Catalog version is not available yet.</string>
     <string name="prefs_catalog_uptodate">This device already has the published catalog.</string>
-    <string name="prefs_catalog_update">A newer catalog (%1$s) is published. It will apply when a delta is bundled.</string>
+    <string name="prefs_catalog_update">A newer catalog (%1$s) is published. Apply it if a delta is bundled on this device.</string>
+    <string name="prefs_catalog_apply">Apply catalog update</string>
+    <string name="prefs_catalog_applied">The bundled catalog update was applied.</string>
     <string name="prefs_catalog_offline">Offline — showing the bundled catalog. Updates wait until you have a network connection.</string>
     <string name="prefs_catalog_check_action">Check for catalog updates</string>
     <string name="prefs_privacy">Ad privacy options</string>
@@ -67,6 +69,21 @@
     <string name="disclaimer_title">Before you scan</string>
     <string name="disclaimer_body">This app is an informational consumer tool. It is not a medical device and it is not a substitute for the printed ingredient list, a dermatologist, or official EU annexes. Ratings can lag regulatory updates. Unknown names are shown, never treated as safe. Ads never appear on the camera or ingredient review screens.</string>
     <string name="disclaimer_accept">I understand</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_scan_title">What a scan does</string>
+    <string name="onboarding_scan_body">Point the camera at a barcode or the printed INCI list (skład). Lookup and scoring stay on this device. You can also type a GTIN or paste the list if the camera cannot read the pack.</string>
+    <string name="onboarding_unknown_title">Unknown is not safe</string>
+    <string name="onboarding_unknown_body">If a name is not in the knowledge base, it is listed as Unknown. Results can be incomplete. Edit OCR mistakes before you evaluate. Community catalog formulas are marked unverified.</string>
+
+    <string name="usage_prompt">How is this product used?</string>
+    <string name="usage_leave_on">Leave-on</string>
+    <string name="usage_rinse_off">Rinse-off</string>
+    <string name="usage_spray">Spray</string>
+    <string name="usage_lip">Lips</string>
+    <string name="usage_eye">Eye area</string>
+    <string name="result_usage">Scored as %1$s.</string>
+    <string name="result_usage_assumed">Usage was not given, so the stricter leave-on reading was used.</string>
+    <string name="finding_usage_adjusted">Level adjusted for this product type.</string>
 
     <string name="result_rating_a11y">Overall rating: %1$s</string>
     <string name="finding_rating_a11y">Ingredient rating: %1$s</string>

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hnexperts.cosmetics.catalog.application.BarcodeLookup
 import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
@@ -60,19 +61,20 @@ class ScanViewModel(
                     source = "barcode",
                     productName = lookup.product.name,
                     brand = lookup.product.brand,
-                    gtin = lookup.gtin
+                    gtin = lookup.gtin,
+                    usage = ProductUsage.parse(lookup.product.usage)
                 )
             }
         }
     }
 
-    fun evaluateTypedList(inciRaw: String) {
+    fun evaluateTypedList(inciRaw: String, usage: ProductUsage = ProductUsage.UNKNOWN) {
         if (inciRaw.isBlank()) {
             state.update { current -> current.copy(emptyInci = true, invalidBarcode = false, failure = null) }
             return
         }
         startWork {
-            evaluateAndOpen(inciRaw = inciRaw, source = "manual")
+            evaluateAndOpen(inciRaw = inciRaw, source = "manual", usage = usage)
         }
     }
 
@@ -85,7 +87,8 @@ class ScanViewModel(
         source: String,
         productName: String? = null,
         brand: String? = null,
-        gtin: String? = null
+        gtin: String? = null,
+        usage: ProductUsage = ProductUsage.UNKNOWN
     ) {
         runUiAction(onFailure = ::showFailure) {
             evaluateProduct.invoke(
@@ -93,7 +96,8 @@ class ScanViewModel(
                 source = source,
                 productName = productName,
                 brand = brand,
-                gtin = gtin
+                gtin = gtin,
+                usage = usage
             )
         } ?: return
         state.update { current ->

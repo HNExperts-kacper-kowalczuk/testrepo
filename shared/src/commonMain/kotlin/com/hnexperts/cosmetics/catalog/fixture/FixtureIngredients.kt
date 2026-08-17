@@ -3,6 +3,7 @@ package com.hnexperts.cosmetics.catalog.fixture
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
 import com.hnexperts.cosmetics.hazards.domain.IngredientHazard
 import com.hnexperts.cosmetics.hazards.domain.LocalizedText
+import com.hnexperts.cosmetics.hazards.domain.UsageRestriction
 import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 
 internal object FixtureIngredients {
@@ -113,7 +114,8 @@ internal object FixtureIngredients {
             level = DangerLevel.LOW,
             tags = listOf("SOLVENT"),
             en = "Denatured alcohol. Can dry or irritate in leave-on products.",
-            pl = "Denaturowany alkohol. W produktach leave-on może wysuszać lub podrażniać."
+            pl = "Denaturowany alkohol. W produktach leave-on może wysuszać lub podrażniać.",
+            restriction = UsageRestriction(leaveOn = "MODERATE", rinseOff = "LOW")
         ),
         ing(
             id = "hexanediol",
@@ -150,7 +152,8 @@ internal object FixtureIngredients {
             level = DangerLevel.MODERATE,
             tags = listOf("SURFACTANT"),
             en = "Strong surfactant. Can irritate skin and eyes, especially in leave-on use.",
-            pl = "Silny środek powierzchniowo czynny. Może podrażniać skórę i oczy."
+            pl = "Silny środek powierzchniowo czynny. Może podrażniać skórę i oczy.",
+            restriction = UsageRestriction(leaveOn = "HIGH", rinseOff = "MODERATE")
         ),
         ing(
             id = "sodium-laureth-sulfate",
@@ -267,7 +270,8 @@ internal object FixtureIngredients {
             level = DangerLevel.HIGH,
             tags = listOf("PRESERVATIVE", "ANNEX_V"),
             en = "Strong sensitiser. Banned in leave-on cosmetics in the EU.",
-            pl = "Silny alergen. W UE zakazany w kosmetykach leave-on."
+            pl = "Silny alergen. W UE zakazany w kosmetykach leave-on.",
+            restriction = UsageRestriction(leaveOn = "PROHIBITED", rinseOff = "HIGH")
         ),
         ing(
             id = "methylchloroisothiazolinone",
@@ -276,7 +280,8 @@ internal object FixtureIngredients {
             level = DangerLevel.HIGH,
             tags = listOf("PRESERVATIVE", "ANNEX_V"),
             en = "Used with MIT in a restricted rinse-off mix. High allergy concern.",
-            pl = "Stosowany z MIT w ograniczonej mieszaninie do spłukiwania. Wysokie ryzyko alergii."
+            pl = "Stosowany z MIT w ograniczonej mieszaninie do spłukiwania. Wysokie ryzyko alergii.",
+            restriction = UsageRestriction(leaveOn = "PROHIBITED", rinseOff = "HIGH")
         ),
         ing(
             id = "butylparaben",
@@ -324,7 +329,8 @@ internal object FixtureIngredients {
         tags: List<String>,
         en: String,
         pl: String,
-        commaException: Boolean = false
+        commaException: Boolean = false,
+        restriction: UsageRestriction? = null
     ): FixtureIngredient {
         val functionTags: List<String> = tags.filter { tag ->
             tag != "ANNEX_II" && tag != "ANNEX_III" && tag != "ANNEX_IV" &&
@@ -347,7 +353,7 @@ internal object FixtureIngredients {
                 ingredientId = id,
                 dangerLevel = level,
                 regulatoryTags = regulatoryTags,
-                restrictionJson = null
+                restrictionJson = restriction?.let { item -> UsageRestriction.toJson(item) }
             ),
             comments = listOf(
                 LocalizedText(locale = "en", summary = en, detail = null),

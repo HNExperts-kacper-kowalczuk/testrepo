@@ -1,13 +1,18 @@
 package com.hnexperts.cosmetics.di
 
 import com.hnexperts.cosmetics.ads.application.AdsSession
+import com.hnexperts.cosmetics.catalog.application.ApplyCatalogDelta
+import com.hnexperts.cosmetics.catalog.application.BundledCatalogDeltaSource
 import com.hnexperts.cosmetics.catalog.application.BundledCatalogRemote
 import com.hnexperts.cosmetics.catalog.application.CatalogBootstrap
+import com.hnexperts.cosmetics.catalog.application.CatalogDeltaSource
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.application.CatalogMutationStore
 import com.hnexperts.cosmetics.catalog.application.CatalogRemote
 import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
 import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
 import com.hnexperts.cosmetics.catalog.data.CatalogSnapshotReader
+import com.hnexperts.cosmetics.catalog.data.CatalogWriter
 import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.concurrency.AppDispatchers
@@ -48,9 +53,12 @@ val appModule = module {
     single { ApplicationScope(get()) }
     single { CatalogDatabase(get<DatabaseDriverFactory>().createCatalogDriver()) }
     single { UserDatabase(get<DatabaseDriverFactory>().createUserDriver()) }
+    single { CatalogWriter(get()) }
     single { CatalogSeeder(get()) }
     single { CatalogSnapshotReader(get()) }
-    single<CatalogGateway> { CatalogBootstrap(get(), get(), get(), get()) }
+    single<CatalogMutationStore> { get<CatalogWriter>() }
+    single<CatalogDeltaSource> { BundledCatalogDeltaSource() }
+    single<CatalogGateway> { CatalogBootstrap(get(), get(), get(), get(), get()) }
     single<ProductRepository> { SqlProductRepository(get(), get()) }
     single<PreferencesStore> { SqlPreferencesRepository(get(), get()) }
     single<ScanHistoryRepository> { SqlHistoryRepository(get(), get()) }
@@ -64,6 +72,7 @@ val appModule = module {
     single { ScanBridge() }
     single<CatalogRemote> { BundledCatalogRemote() }
     single { CheckCatalogUpdates(get(), get(), get()) }
+    single { ApplyCatalogDelta(get(), get(), get(), get()) }
     single { AdsSession(get(), get(), get(), get()) }
 
     viewModelOf(::ScanViewModel)

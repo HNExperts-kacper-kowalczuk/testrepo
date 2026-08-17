@@ -25,6 +25,36 @@ class CheckCatalogUpdatesTest {
     }
 
     @Test
+    fun differentRemoteVersionIsUpdateAvailable() {
+        runBlocking {
+            val index: CatalogIndex = CatalogIndex.assemble(
+                CatalogSnapshot(
+                    meta = CatalogIntegrity.fixtureMeta(),
+                    ingredients = FixtureCatalog.ingredients.map { item -> item.ingredient },
+                    aliases = FixtureCatalog.aliasMap(),
+                    commaExceptions = FixtureCatalog.commaExceptions(),
+                    hazards = FixtureCatalog.ingredients.associate { item -> item.ingredient.id to item.hazard },
+                    comments = FixtureCatalog.ingredients.associate { item -> item.ingredient.id to item.comments }
+                )
+            )
+            val published = CatalogIntegrity.fixtureMeta().toManifest(
+                productCount = FixtureCatalog.products.size,
+                ingredientCount = FixtureCatalog.ingredients.size
+            ).copy(catalogVersion = "2099.01", checksum = "abc")
+            val check = CheckCatalogUpdates(
+                catalog = FixedCatalog(index),
+                remote = object : CatalogRemote {
+                    override suspend fun publishedManifest(): CatalogManifest = published
+                },
+                network = OnlineNetwork
+            )
+            val freshness: CatalogFreshness = requireOk(check.invoke())
+            assertIs<CatalogFreshness.UpdateAvailable>(freshness)
+            assertEquals("2099.01", freshness.published.catalogVersion)
+        }
+    }
+
+    @Test
     fun bundledManifestIsUpToDate() {
         runBlocking {
             val index: CatalogIndex = CatalogIndex.assemble(

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hnexperts.cosmetics.ads.application.AdsGate
 import com.hnexperts.cosmetics.ads.application.AdsSession
+import com.hnexperts.cosmetics.catalog.application.ApplyCatalogDelta
 import com.hnexperts.cosmetics.catalog.application.CatalogFreshness
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
@@ -38,6 +39,7 @@ data class PreferencesUiState(
     val freshness: CatalogFreshness? = null,
     val ads: AdsGate = AdsGate(),
     val historyCleared: Boolean = false,
+    val catalogApplied: Boolean = false,
     val failure: AppFailure? = null
 )
 
@@ -45,6 +47,7 @@ class PreferencesViewModel(
     private val repository: PreferencesStore,
     private val catalog: CatalogGateway,
     private val catalogUpdates: CheckCatalogUpdates,
+    private val applyCatalogDelta: ApplyCatalogDelta,
     private val adsSession: AdsSession,
     private val history: ScanHistoryRepository
 ) : ViewModel() {
@@ -128,6 +131,16 @@ class PreferencesViewModel(
         viewModelScope.launch {
             runUiAction(::showFailure) { history.clear() } ?: return@launch
             state.value = state.value.copy(historyCleared = true, failure = null)
+        }
+    }
+
+    fun applyCatalogUpdate() {
+        val freshness: CatalogFreshness.UpdateAvailable =
+            state.value.freshness as? CatalogFreshness.UpdateAvailable ?: return
+        viewModelScope.launch {
+            runUiAction(::showFailure) { applyCatalogDelta.invoke(freshness.published) } ?: return@launch
+            state.value = state.value.copy(catalogApplied = true, failure = null)
+            reload()
         }
     }
 

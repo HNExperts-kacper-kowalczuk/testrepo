@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Catalog pipeline stand-in for Phase 6.
-# Today the app seeds SQLite from FixtureCatalog and stamps catalog_meta with a SHA-256
-# of versions + ingredient/product ids (see CatalogIntegrity).
-# A later CI job should replace the fixture with CosIng-derived tables + an OBF GTIN dump,
-# write catalog.sqlite.gz, and publish a manifest with the same checksum fields.
+# Phase 6 catalog pipeline:
+# 1. Encode the CosIng-derived ingredient table + OBF-like product dump
+# 2. Validate HIGH/PROHIBITED comments in en+pl
+# 3. Write catalog-manifest.json and catalog.sqlite.gz
+# Swap catalog/sources/*.json for a larger regional dump without changing app code.
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-./gradlew :shared:jvmTest --tests com.hnexperts.cosmetics.catalog.domain.CatalogIntegrityTest --tests com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdatesTest
+./gradlew :shared:exportCatalogSources
+./gradlew :shared:jvmTest --tests com.hnexperts.cosmetics.catalog.pipeline.CatalogPipelineTest --tests com.hnexperts.cosmetics.catalog.application.ApplyCatalogDeltaTest --tests com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdatesTest --tests com.hnexperts.cosmetics.catalog.domain.CatalogIntegrityTest --tests com.hnexperts.cosmetics.catalog.data.CatalogWriterTest
 
 echo
-echo "Bundled catalog is the in-app fixture (EU, EN+PL comments)."
-echo "No CosIng/OBF dump is ingested in this repository yet; evaluation stays offline."
+echo "Wrote catalog/sources (CosIng-derived JSON + OBF JSON), catalog-manifest.json, and catalog/build/catalog.sqlite.gz."
+echo "The mobile app still seeds the same snapshot on first launch; optional sync applies a delta when one is bundled."

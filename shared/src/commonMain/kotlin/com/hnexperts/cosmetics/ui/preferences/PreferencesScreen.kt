@@ -25,6 +25,8 @@ import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.prefs_avoid_title
+import com.hnexperts.cosmetics.resources.prefs_catalog_apply
+import com.hnexperts.cosmetics.resources.prefs_catalog_applied
 import com.hnexperts.cosmetics.resources.prefs_catalog_check_action
 import com.hnexperts.cosmetics.resources.prefs_catalog_offline
 import com.hnexperts.cosmetics.resources.prefs_catalog_stamp
@@ -94,7 +96,11 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
                 onCheckedChange = { viewModel.toggleAvoid(ingredient.id) }
             )
         }
-        CatalogSection(uiState = uiState, onCheck = viewModel::reload)
+        CatalogSection(
+            uiState = uiState,
+            onCheck = viewModel::reload,
+            onApply = viewModel::applyCatalogUpdate
+        )
         if (uiState.ads.privacyOptionsRequired) {
             Button(onClick = viewModel::openPrivacyOptions, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(Res.string.prefs_privacy))
@@ -110,7 +116,11 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
 }
 
 @Composable
-private fun CatalogSection(uiState: PreferencesUiState, onCheck: () -> Unit) {
+private fun CatalogSection(
+    uiState: PreferencesUiState,
+    onCheck: () -> Unit,
+    onApply: () -> Unit
+) {
     Text(text = stringResource(Res.string.prefs_catalog_title), style = MaterialTheme.typography.titleMedium)
     val meta = uiState.catalogMeta
     if (meta == null) {
@@ -120,11 +130,17 @@ private fun CatalogSection(uiState: PreferencesUiState, onCheck: () -> Unit) {
     }
     when (val freshness: CatalogFreshness? = uiState.freshness) {
         is CatalogFreshness.UpToDate -> Text(text = stringResource(Res.string.prefs_catalog_uptodate))
-        is CatalogFreshness.UpdateAvailable -> Text(
-            text = stringResource(Res.string.prefs_catalog_update, freshness.published.catalogVersion)
-        )
+        is CatalogFreshness.UpdateAvailable -> {
+            Text(text = stringResource(Res.string.prefs_catalog_update, freshness.published.catalogVersion))
+            Button(onClick = onApply, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.prefs_catalog_apply))
+            }
+        }
         CatalogFreshness.Offline -> Text(text = stringResource(Res.string.prefs_catalog_offline))
         null -> Unit
+    }
+    if (uiState.catalogApplied) {
+        Text(text = stringResource(Res.string.prefs_catalog_applied))
     }
     Button(onClick = onCheck, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(Res.string.prefs_catalog_check_action))

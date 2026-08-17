@@ -57,7 +57,9 @@
     <string name="prefs_catalog_stamp">Wersja %1$s · zbudowano %2$s · %3$s</string>
     <string name="prefs_catalog_unknown">Wersja katalogu nie jest jeszcze dostępna.</string>
     <string name="prefs_catalog_uptodate">To urządzenie ma już opublikowany katalog.</string>
-    <string name="prefs_catalog_update">Jest nowszy katalog (%1$s). Zostanie wczytany, gdy pojawi się paczka różnic.</string>
+    <string name="prefs_catalog_update">Jest nowszy katalog (%1$s). Wczytaj go, jeśli na urządzeniu jest paczka różnic.</string>
+    <string name="prefs_catalog_apply">Wczytaj aktualizację katalogu</string>
+    <string name="prefs_catalog_applied">Zbundlowana aktualizacja katalogu została wczytana.</string>
     <string name="prefs_catalog_offline">Offline — pokazujemy katalog z aplikacji. Aktualizacje poczekają na sieć.</string>
     <string name="prefs_catalog_check_action">Sprawdź aktualizacje katalogu</string>
     <string name="prefs_privacy">Opcje prywatności reklam</string>
@@ -67,6 +69,21 @@
     <string name="disclaimer_title">Zanim zeskanujesz</string>
     <string name="disclaimer_body">To narzędzie informacyjne dla konsumenta. Nie jest wyrobem medycznym i nie zastępuje składu z etykiety, dermatologa ani oficjalnych załączników UE. Oceny mogą się opóźniać względem przepisów. Nierozpoznane nazwy są pokazywane, nigdy traktowane jako bezpieczne. Reklamy nie pojawiają się na ekranie aparatu ani przy potwierdzaniu składu.</string>
     <string name="disclaimer_accept">Rozumiem</string>
+    <string name="onboarding_next">Dalej</string>
+    <string name="onboarding_scan_title">Co robi skan</string>
+    <string name="onboarding_scan_body">Skieruj aparat na kod kreskowy albo skład INCI (skład). Wyszukiwanie i ocena zostają na tym urządzeniu. Możesz też wpisać GTIN albo wkleić skład, jeśli aparat nie odczyta opakowania.</string>
+    <string name="onboarding_unknown_title">Nieznany to nie bezpieczny</string>
+    <string name="onboarding_unknown_body">Jeśli nazwy nie ma w bazie wiedzy, jest oznaczona jako nieznana. Wynik może być niepełny. Popraw błędy OCR przed oceną. Składy z katalogu społecznościowego są oznaczone jako niezweryfikowane.</string>
+
+    <string name="usage_prompt">Jak używasz tego produktu?</string>
+    <string name="usage_leave_on">Leave-on</string>
+    <string name="usage_rinse_off">Spłukiwany</string>
+    <string name="usage_spray">Spray</string>
+    <string name="usage_lip">Usta</string>
+    <string name="usage_eye">Okolicę oczu</string>
+    <string name="result_usage">Oceniono jako %1$s.</string>
+    <string name="result_usage_assumed">Nie podano sposobu użycia, więc zastosowano ostrzejszą interpretację leave-on.</string>
+    <string name="finding_usage_adjusted">Poziom dostosowany do typu produktu.</string>
 
     <string name="result_rating_a11y">Ocena ogólna: %1$s</string>
     <string name="finding_rating_a11y">Ocena składnika: %1$s</string>

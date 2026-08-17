@@ -2,6 +2,7 @@ package com.hnexperts.cosmetics.ui.confirm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 
 data class ConfirmUiState(
     val draft: IngredientReviewDraft? = null,
+    val usage: ProductUsage = ProductUsage.LEAVE_ON,
     val busy: Boolean = false,
     val failure: AppFailure? = null,
     val navigateToResult: Boolean = false
@@ -92,6 +94,10 @@ class ConfirmIngredientsViewModel(
         }
     }
 
+    fun setUsage(usage: ProductUsage) {
+        state.update { current -> current.copy(usage = usage, failure = null) }
+    }
+
     fun evaluate() {
         val draft: IngredientReviewDraft = state.value.draft ?: return
         if (draft.hasPendingFuzzy()) {
@@ -121,7 +127,11 @@ class ConfirmIngredientsViewModel(
             state.update { current -> current.copy(busy = true, failure = null) }
             try {
                 runUiAction(::showFailure) {
-                    evaluateProduct.invoke(inciRaw = inciRaw, source = "ocr")
+                    evaluateProduct.invoke(
+                        inciRaw = inciRaw,
+                        source = "ocr",
+                        usage = state.value.usage
+                    )
                 } ?: return@launch
                 state.update { current -> current.copy(navigateToResult = true) }
             } finally {

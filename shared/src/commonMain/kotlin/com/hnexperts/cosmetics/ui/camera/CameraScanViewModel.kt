@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hnexperts.cosmetics.catalog.application.BarcodeLookup
 import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.platform.performScanHaptic
@@ -143,7 +144,8 @@ class CameraScanViewModel(
                         source = "barcode",
                         productName = lookup.product.name,
                         brand = lookup.product.brand,
-                        gtin = lookup.gtin
+                        gtin = lookup.gtin,
+                        usage = ProductUsage.parse(lookup.product.usage)
                     )
                 } ?: return
                 state.update { current -> current.copy(navigateToResult = true) }

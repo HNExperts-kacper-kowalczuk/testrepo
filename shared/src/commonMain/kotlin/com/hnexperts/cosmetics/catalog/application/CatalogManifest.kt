@@ -1,5 +1,8 @@
 package com.hnexperts.cosmetics.catalog.application
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CatalogManifest(
     val catalogVersion: String,
     val rulesetVersion: String,

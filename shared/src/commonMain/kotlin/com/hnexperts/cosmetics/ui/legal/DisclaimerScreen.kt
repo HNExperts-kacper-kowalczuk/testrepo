@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -24,6 +27,11 @@ import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.disclaimer_accept
 import com.hnexperts.cosmetics.resources.disclaimer_body
 import com.hnexperts.cosmetics.resources.disclaimer_title
+import com.hnexperts.cosmetics.resources.onboarding_next
+import com.hnexperts.cosmetics.resources.onboarding_scan_body
+import com.hnexperts.cosmetics.resources.onboarding_scan_title
+import com.hnexperts.cosmetics.resources.onboarding_unknown_body
+import com.hnexperts.cosmetics.resources.onboarding_unknown_title
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +39,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 data class DisclaimerUiState(
@@ -62,17 +71,30 @@ class DisclaimerViewModel(
     }
 }
 
+private data class OnboardingPage(
+    val title: StringResource,
+    val body: StringResource
+)
+
 @Composable
 fun DisclaimerScreen(
     viewModel: DisclaimerViewModel,
     onAccepted: () -> Unit
 ) {
     val uiState: DisclaimerUiState by viewModel.uiState.collectAsState()
+    var page: Int by remember { mutableStateOf(0) }
+    val pages: List<OnboardingPage> = listOf(
+        OnboardingPage(Res.string.onboarding_scan_title, Res.string.onboarding_scan_body),
+        OnboardingPage(Res.string.onboarding_unknown_title, Res.string.onboarding_unknown_body),
+        OnboardingPage(Res.string.disclaimer_title, Res.string.disclaimer_body)
+    )
     LaunchedEffect(uiState.accepted) {
         if (uiState.accepted) {
             onAccepted()
         }
     }
+    val current: OnboardingPage = pages[page]
+    val lastPage: Boolean = page == pages.lastIndex
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,15 +102,25 @@ fun DisclaimerScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = stringResource(Res.string.disclaimer_title), style = MaterialTheme.typography.headlineSmall)
-        Text(text = stringResource(Res.string.disclaimer_body), style = MaterialTheme.typography.bodyLarge)
+        Text(text = stringResource(current.title), style = MaterialTheme.typography.headlineSmall)
+        Text(text = stringResource(current.body), style = MaterialTheme.typography.bodyLarge)
         FailureBanner(failure = uiState.failure, onRetry = viewModel::accept)
         Button(
-            onClick = viewModel::accept,
+            onClick = {
+                if (lastPage) {
+                    viewModel.accept()
+                } else {
+                    page += 1
+                }
+            },
             enabled = !uiState.busy,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(Res.string.disclaimer_accept))
+            Text(
+                stringResource(
+                    if (lastPage) Res.string.disclaimer_accept else Res.string.onboarding_next
+                )
+            )
         }
     }
 }
