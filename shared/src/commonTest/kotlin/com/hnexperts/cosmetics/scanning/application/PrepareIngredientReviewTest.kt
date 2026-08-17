@@ -3,6 +3,7 @@ package com.hnexperts.cosmetics.scanning.application
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.catalog.application.CatalogIndex
 import com.hnexperts.cosmetics.catalog.application.CatalogSnapshot
+import com.hnexperts.cosmetics.catalog.domain.CatalogIntegrity
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
@@ -57,7 +58,7 @@ class PrepareIngredientReviewTest {
     private object FixedCatalogGateway : CatalogGateway {
         private val index: CatalogIndex = CatalogIndex.assemble(
             CatalogSnapshot(
-                rulesetVersion = FixtureCatalog.RULESET_VERSION,
+                meta = CatalogIntegrity.fixtureMeta(),
                 ingredients = FixtureCatalog.ingredients.map { item -> item.ingredient },
                 aliases = FixtureCatalog.aliasMap(),
                 commaExceptions = FixtureCatalog.commaExceptions(),

@@ -2,7 +2,12 @@ package com.hnexperts.cosmetics.ui.preferences
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.ads.application.AdsGate
+import com.hnexperts.cosmetics.ads.application.AdsSession
+import com.hnexperts.cosmetics.catalog.application.CatalogFreshness
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
+import com.hnexperts.cosmetics.catalog.domain.CatalogMeta
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
 import com.hnexperts.cosmetics.i18n.AppLocale
@@ -11,6 +16,7 @@ import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
+import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -28,12 +34,19 @@ data class PreferencesUiState(
         pinnedLocale = null
     ),
     val ingredients: List<Ingredient> = emptyList(),
+    val catalogMeta: CatalogMeta? = null,
+    val freshness: CatalogFreshness? = null,
+    val ads: AdsGate = AdsGate(),
+    val historyCleared: Boolean = false,
     val failure: AppFailure? = null
 )
 
 class PreferencesViewModel(
     private val repository: PreferencesStore,
-    private val catalog: CatalogGateway
+    private val catalog: CatalogGateway,
+    private val catalogUpdates: CheckCatalogUpdates,
+    private val adsSession: AdsSession,
+    private val history: ScanHistoryRepository
 ) : ViewModel() {
     private val state: MutableStateFlow<PreferencesUiState> = MutableStateFlow(PreferencesUiState())
     val uiState: StateFlow<PreferencesUiState> = state.asStateFlow()
@@ -41,6 +54,11 @@ class PreferencesViewModel(
 
     init {
         reload()
+        viewModelScope.launch {
+            adsSession.gate.collect { gate ->
+                state.value = state.value.copy(ads = gate)
+            }
+        }
     }
 
     fun reload() {
@@ -48,18 +66,23 @@ class PreferencesViewModel(
             coroutineScope {
                 val storedDeferred = async { repository.load() }
                 val indexDeferred = async { catalog.awaitIndex() }
-                val combined: Outcome<Pair<StoredPreferences, List<Ingredient>>> = Outcome.zip(
-                    storedDeferred.await(),
-                    when (val index = indexDeferred.await()) {
-                        is Outcome.Ok -> Outcome.Ok(index.value.ingredientsSorted)
-                        is Outcome.Err -> index
-                    }
-                )
+                val freshnessDeferred = async { catalogUpdates.invoke() }
+                val stored: Outcome<StoredPreferences> = storedDeferred.await()
+                val index = indexDeferred.await()
+                val freshness = freshnessDeferred.await()
+                val ingredientsOutcome: Outcome<List<Ingredient>> = when (index) {
+                    is Outcome.Ok -> Outcome.Ok(index.value.ingredientsSorted)
+                    is Outcome.Err -> index
+                }
+                val combined: Outcome<Pair<StoredPreferences, List<Ingredient>>> =
+                    Outcome.zip(stored, ingredientsOutcome)
                 when (combined) {
-                    is Outcome.Ok -> state.value = PreferencesUiState(
+                    is Outcome.Ok -> state.value = state.value.copy(
                         stored = combined.value.first,
                         ingredients = combined.value.second,
-                        failure = null
+                        catalogMeta = (index as? Outcome.Ok)?.value?.meta,
+                        freshness = freshness.getOrNull(),
+                        failure = (freshness as? Outcome.Err)?.failure
                     )
                     is Outcome.Err -> state.value = state.value.copy(failure = combined.failure)
                 }
@@ -91,6 +114,20 @@ class PreferencesViewModel(
                 current.profile.avoidedIngredientIds + ingredientId
             }
             current.copy(profile = current.profile.copy(avoidedIngredientIds = next))
+        }
+    }
+
+    fun openPrivacyOptions() {
+        viewModelScope.launch {
+            adsSession.openPrivacyOptions()
+            adsSession.refresh()
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            runUiAction(::showFailure) { history.clear() } ?: return@launch
+            state.value = state.value.copy(historyCleared = true, failure = null)
         }
     }
 

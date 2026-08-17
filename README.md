@@ -14,16 +14,17 @@ Working now:
 - Still-image INCI OCR and a confirm-ingredients screen (edit / add / remove; fuzzy matches must be accepted or rejected)
 - INCI matching (aliases, `1,2-Hexanediol`, fuzzy OCR typos)
 - Hazard scoring + personal avoid-list (fragrance-free, pregnancy caution)
-- SQLDelight catalog + user preferences/history
+- SQLDelight catalog + user preferences/history, SHA-256 catalog checksum, last-updated stamp
 - Compose Multiplatform UI: Scan, Camera, Confirm, Search, History, Preferences, Result
+- First-launch disclaimer; rating colour dots also have TalkBack labels
 - EN/PL string resources and localized ingredient comments
-- Reserved ad banner slot (hidden until network + consent; never on Scan, camera, or OCR review)
+- AdMob test banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, or on no-fill; never on Scan, camera, OCR review, or Preferences
 - Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
 Not in this slice yet (see `docs/plan.md` and `docs/further-additions.md`):
 
-- Real AdMob SDK
-- Full regional product dump
+- Production AdMob unit IDs (debug uses Google sample IDs)
+- Full CosIng + Open Beauty Facts regional dump (pipeline stub: `scripts/build-catalog.sh`)
 
 ## Run
 

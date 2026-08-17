@@ -54,6 +54,8 @@ kotlin {
             implementation(libs.mlkit.barcode)
             implementation(libs.mlkit.text)
             implementation(libs.kotlinx.coroutines.play.services)
+            implementation(libs.play.services.ads)
+            implementation(libs.user.messaging.platform)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)

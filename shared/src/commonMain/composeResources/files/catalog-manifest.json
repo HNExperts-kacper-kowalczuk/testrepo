@@ -1,0 +1,8 @@
+{
+  "catalogVersion": "2026.08-fixture",
+  "rulesetVersion": "2026.08-fixture",
+  "builtAt": "2026-08-17T00:00:00Z",
+  "region": "EU",
+  "checksumSource": "CatalogIntegrity.fixtureChecksum()",
+  "note": "Checksum is computed at seed time from versions plus sorted ingredient and product ids. A later CosIng/OBF pipeline should write the same fields after generating catalog.sqlite."
+}

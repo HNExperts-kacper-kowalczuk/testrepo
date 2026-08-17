@@ -1,5 +1,11 @@
 package com.hnexperts.cosmetics.di
 
+import com.hnexperts.cosmetics.ads.android.AndroidAdsInitializer
+import com.hnexperts.cosmetics.ads.android.AndroidConsentClient
+import com.hnexperts.cosmetics.ads.android.AndroidNetworkMonitor
+import com.hnexperts.cosmetics.ads.domain.AdsInitializer
+import com.hnexperts.cosmetics.ads.domain.ConsentClient
+import com.hnexperts.cosmetics.ads.domain.NetworkMonitor
 import com.hnexperts.cosmetics.data.AndroidDatabaseDriverFactory
 import com.hnexperts.cosmetics.data.DatabaseDriverFactory
 import com.hnexperts.cosmetics.scanning.android.MlKitIngredientListRecognizer
@@ -11,4 +17,7 @@ import org.koin.dsl.module
 actual fun platformModule(): Module = module {
     single<DatabaseDriverFactory> { AndroidDatabaseDriverFactory(androidContext()) }
     single<IngredientListRecognizer> { MlKitIngredientListRecognizer(get()) }
+    single<NetworkMonitor> { AndroidNetworkMonitor() }
+    single<ConsentClient> { AndroidConsentClient() }
+    single<AdsInitializer> { AndroidAdsInitializer() }
 }

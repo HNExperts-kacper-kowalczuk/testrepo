@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.failure
 
+import com.hnexperts.cosmetics.catalog.domain.CorruptCatalogException
 import com.hnexperts.cosmetics.logging.AppLog
 import kotlinx.coroutines.CancellationException
 
@@ -9,7 +10,13 @@ object FailureCatcher {
     }
 
     suspend fun <T> catalog(operation: String, block: suspend () -> T): Outcome<T> {
-        return wrap(operation, { error -> AppFailure.CatalogLoad(operation, error.toVerboseString()) }, block)
+        return wrap(operation, { error ->
+            if (error is CorruptCatalogException) {
+                AppFailure.CorruptCatalog(operation, error.toVerboseString())
+            } else {
+                AppFailure.CatalogLoad(operation, error.toVerboseString())
+            }
+        }, block)
     }
 
     suspend fun <T> evaluation(operation: String, block: suspend () -> T): Outcome<T> {

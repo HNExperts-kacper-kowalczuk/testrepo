@@ -53,6 +53,23 @@
     <string name="prefs_language_en">English</string>
     <string name="prefs_language_pl">Polish</string>
     <string name="prefs_avoid_title">Avoid specific ingredients</string>
+    <string name="prefs_catalog_title">Offline catalog</string>
+    <string name="prefs_catalog_stamp">Version %1$s · built %2$s · %3$s</string>
+    <string name="prefs_catalog_unknown">Catalog version is not available yet.</string>
+    <string name="prefs_catalog_uptodate">This device already has the published catalog.</string>
+    <string name="prefs_catalog_update">A newer catalog (%1$s) is published. It will apply when a delta is bundled.</string>
+    <string name="prefs_catalog_offline">Offline — showing the bundled catalog. Updates wait until you have a network connection.</string>
+    <string name="prefs_catalog_check_action">Check for catalog updates</string>
+    <string name="prefs_privacy">Ad privacy options</string>
+    <string name="prefs_clear_history">Clear scan history</string>
+    <string name="prefs_cleared_history">Scan history was deleted on this device.</string>
+
+    <string name="disclaimer_title">Before you scan</string>
+    <string name="disclaimer_body">This app is an informational consumer tool. It is not a medical device and it is not a substitute for the printed ingredient list, a dermatologist, or official EU annexes. Ratings can lag regulatory updates. Unknown names are shown, never treated as safe. Ads never appear on the camera or ingredient review screens.</string>
+    <string name="disclaimer_accept">I understand</string>
+
+    <string name="result_rating_a11y">Overall rating: %1$s</string>
+    <string name="finding_rating_a11y">Ingredient rating: %1$s</string>
 
     <string name="ad_placeholder">Advertisement</string>
     <string name="common_retry">Retry</string>

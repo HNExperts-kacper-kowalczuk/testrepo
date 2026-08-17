@@ -18,6 +18,8 @@ sqlDelight = "2.3.2"
 camerax = "1.4.2"
 mlkit-barcode = "17.3.0"
 mlkit-text = "16.0.1"
+play-ads = "24.5.0"
+ump = "3.2.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
@@ -52,6 +54,8 @@ androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "
 androidx-camera-mlkit = { module = "androidx.camera:camera-mlkit-vision", version.ref = "camerax" }
 mlkit-barcode = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode" }
 mlkit-text = { module = "com.google.mlkit:text-recognition", version.ref = "mlkit-text" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "play-ads" }
+user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

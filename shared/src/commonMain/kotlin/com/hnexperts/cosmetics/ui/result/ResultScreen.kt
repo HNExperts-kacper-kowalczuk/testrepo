@@ -24,17 +24,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.hnexperts.cosmetics.ads.AdPolicy
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
+import com.hnexperts.cosmetics.resources.finding_rating_a11y
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.result_disclaimer
 import com.hnexperts.cosmetics.resources.result_missing
 import com.hnexperts.cosmetics.resources.result_not_suitable
+import com.hnexperts.cosmetics.resources.result_rating_a11y
 import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
@@ -65,13 +69,7 @@ fun ResultScreen(
             )
         },
         bottomBar = {
-            BannerAdSlot(
-                visible = AdPolicy().shouldShowBanner(
-                    screen = AppScreen.RESULT,
-                    consentGranted = true,
-                    networkAvailable = false
-                )
-            )
+            BannerAdSlot(screen = AppScreen.RESULT, placement = AdPlacement.RESULT)
         }
     ) { padding ->
         if (assessment == null) {
@@ -127,14 +125,17 @@ private fun ResultHeader(assessment: ProductAssessment) {
             Text(text = brand, style = MaterialTheme.typography.titleMedium)
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            val overallLabel: String = dangerLevelText(assessment.overall)
+            val overallDescription: String = stringResource(Res.string.result_rating_a11y, overallLabel)
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .size(18.dp)
                     .clip(CircleShape)
                     .background(RatingColors.of(assessment.overall))
+                    .semantics { contentDescription = overallDescription }
             )
             Text(
-                text = dangerLevelText(assessment.overall),
+                text = overallLabel,
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -156,13 +157,16 @@ private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
     ) {
         Text(text = finding.ingredient.displayName, style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            val levelLabel: String = dangerLevelText(finding.level)
+            val levelDescription: String = stringResource(Res.string.finding_rating_a11y, levelLabel)
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .size(10.dp)
                     .clip(CircleShape)
                     .background(RatingColors.of(finding.level))
+                    .semantics { contentDescription = levelDescription }
             )
-            Text(text = dangerLevelText(finding.level), style = MaterialTheme.typography.bodyMedium)
+            Text(text = levelLabel, style = MaterialTheme.typography.bodyMedium)
         }
         val comment = viewModel.commentFor(finding.comments)
         if (comment != null) {

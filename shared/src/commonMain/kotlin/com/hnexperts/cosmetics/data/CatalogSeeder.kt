@@ -3,6 +3,7 @@ package com.hnexperts.cosmetics.data
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
 import com.hnexperts.cosmetics.catalog.fixture.FixtureIngredient
 import com.hnexperts.cosmetics.catalog.fixture.FixtureProduct
+import com.hnexperts.cosmetics.catalog.domain.CatalogIntegrity
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import com.hnexperts.cosmetics.ingredients.domain.InciNormalizer
 
@@ -11,24 +12,30 @@ class CatalogSeeder(
 ) {
     fun seedIfEmpty() {
         val existing = database.catalogDatabaseQueries.selectMeta().executeAsOneOrNull()
-        if (existing != null) {
+        if (existing == null) {
+            database.transaction {
+                FixtureCatalog.ingredients.forEach(::insertIngredient)
+                FixtureCatalog.products.forEach(::insertProduct)
+                insertMeta()
+            }
             return
         }
-        database.transaction {
+        if (existing.checksum != CatalogIntegrity.fixtureChecksum() &&
+            existing.catalog_version == FixtureCatalog.CATALOG_VERSION
+        ) {
             insertMeta()
-            FixtureCatalog.ingredients.forEach(::insertIngredient)
-            FixtureCatalog.products.forEach(::insertProduct)
         }
     }
 
     private fun insertMeta() {
+        val meta = CatalogIntegrity.fixtureMeta()
         database.catalogDatabaseQueries.upsertMeta(
-            catalog_version = FixtureCatalog.CATALOG_VERSION,
-            ruleset_version = FixtureCatalog.RULESET_VERSION,
-            built_at = "2026-08-17T00:00:00Z",
-            region = "EU",
-            checksum = "fixture",
-            supported_comment_locales = "en,pl"
+            catalog_version = meta.catalogVersion,
+            ruleset_version = meta.rulesetVersion,
+            built_at = meta.builtAt,
+            region = meta.region,
+            checksum = meta.checksum,
+            supported_comment_locales = meta.supportedCommentLocales.joinToString(",")
         )
     }
 

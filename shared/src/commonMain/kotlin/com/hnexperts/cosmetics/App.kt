@@ -1,6 +1,9 @@
 package com.hnexperts.cosmetics
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -12,7 +15,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -22,6 +30,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.hnexperts.cosmetics.failure.Outcome
+import com.hnexperts.cosmetics.legal.domain.LegalState
+import com.hnexperts.cosmetics.legal.domain.LegalStore
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.tab_history
 import com.hnexperts.cosmetics.resources.tab_more
@@ -34,6 +45,8 @@ import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsScreen
 import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
 import com.hnexperts.cosmetics.ui.history.HistoryScreen
 import com.hnexperts.cosmetics.ui.history.HistoryViewModel
+import com.hnexperts.cosmetics.ui.legal.DisclaimerScreen
+import com.hnexperts.cosmetics.ui.legal.DisclaimerViewModel
 import com.hnexperts.cosmetics.ui.preferences.PreferencesScreen
 import com.hnexperts.cosmetics.ui.preferences.PreferencesViewModel
 import com.hnexperts.cosmetics.ui.result.ResultScreen
@@ -45,6 +58,7 @@ import com.hnexperts.cosmetics.ui.search.SearchViewModel
 import com.hnexperts.cosmetics.ui.theme.CosmeticsTheme
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -72,7 +86,32 @@ object ConfirmIngredientsDestination
 @Composable
 fun App() {
     CosmeticsTheme {
-        val navController: NavHostController = rememberNavController()
+        val legal: LegalStore = koinInject()
+        var accepted: Boolean? by remember { mutableStateOf(null) }
+        LaunchedEffect(Unit) {
+            accepted = when (val loaded: Outcome<LegalState> = legal.load()) {
+                is Outcome.Ok -> loaded.value.disclaimerAccepted
+                is Outcome.Err -> false
+            }
+        }
+        when (accepted) {
+            null -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            false -> {
+                val viewModel: DisclaimerViewModel = koinViewModel()
+                DisclaimerScreen(viewModel = viewModel, onAccepted = { accepted = true })
+            }
+            true -> AppNavigation()
+        }
+    }
+}
+
+@Composable
+private fun AppNavigation() {
+    val navController: NavHostController = rememberNavController()
         val backStack by navController.currentBackStackEntryAsState()
         val route: String = backStack?.destination?.route.orEmpty()
         val showBottomBar: Boolean = !hidesBottomBar(route)
@@ -142,7 +181,6 @@ fun App() {
                 }
             }
         }
-    }
 }
 
 private fun hidesBottomBar(route: String): Boolean {

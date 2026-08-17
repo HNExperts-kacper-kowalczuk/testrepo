@@ -8,9 +8,9 @@ import org.koin.android.ext.koin.androidContext
 class CosmeticsApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        AndroidAppContext.install(this)
         initKoin {
             androidContext(this@CosmeticsApp)
         }
-        AndroidAppContext.install(this)
     }
 }

@@ -13,6 +13,7 @@ class AdPolicyTest {
         assertFalse(policy.shouldShowBanner(AppScreen.CAMERA, consentGranted = true, networkAvailable = true))
         assertFalse(policy.shouldShowBanner(AppScreen.OCR_REVIEW, consentGranted = true, networkAvailable = true))
         assertFalse(policy.shouldShowBanner(AppScreen.PREFERENCES, consentGranted = true, networkAvailable = true))
+        assertFalse(policy.shouldShowBanner(AppScreen.CONSENT, consentGranted = true, networkAvailable = true))
     }
 
     @Test
