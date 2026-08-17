@@ -16,6 +16,7 @@ Working now:
 - Compose Multiplatform UI: Scan, Search, History, Preferences, Result
 - EN/PL string resources and localized ingredient comments
 - Reserved ad banner slot (hidden until network + consent; never on Scan)
+- Background work: catalog bootstrap, matching, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
 Not in this slice yet (see `docs/plan.md` and `docs/further-additions.md`):
 

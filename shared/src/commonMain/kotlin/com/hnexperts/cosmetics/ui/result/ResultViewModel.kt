@@ -10,6 +10,8 @@ import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.i18n.systemAppLocale
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,15 +32,19 @@ class ResultViewModel(
 
     init {
         viewModelScope.launch {
-            val stored = preferences.load()
-            val locale: AppLocale = when (stored.localePreference) {
-                LocalePreference.PINNED -> stored.pinnedLocale ?: AppLocale.ENGLISH
-                LocalePreference.FOLLOW_SYSTEM -> systemAppLocale()
+            coroutineScope {
+                val storedDeferred = async { preferences.load() }
+                val assessmentDeferred = async { session.currentAssessment() }
+                val stored = storedDeferred.await()
+                val locale: AppLocale = when (stored.localePreference) {
+                    LocalePreference.PINNED -> stored.pinnedLocale ?: AppLocale.ENGLISH
+                    LocalePreference.FOLLOW_SYSTEM -> systemAppLocale()
+                }
+                state.value = ResultUiState(
+                    assessment = assessmentDeferred.await(),
+                    commentLocale = locale
+                )
             }
-            state.value = ResultUiState(
-                assessment = session.currentAssessment(),
-                commentLocale = locale
-            )
         }
     }
 

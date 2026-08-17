@@ -20,7 +20,7 @@ class SqlHistoryRepository(
     private val dispatchers: AppDispatchers
 ) {
     suspend fun record(assessment: ProductAssessment, source: String) {
-        withContext(dispatchers.database) {
+        withContext(dispatchers.userDatabase) {
             database.userDatabaseQueries.insertHistory(
                 scanned_at = kotlin.time.Clock.System.now().toString(),
                 gtin = assessment.gtin,
@@ -33,7 +33,7 @@ class SqlHistoryRepository(
     }
 
     suspend fun recent(): List<HistoryEntry> {
-        return withContext(dispatchers.database) {
+        return withContext(dispatchers.userDatabase) {
             database.userDatabaseQueries.selectHistory().executeAsList().map { row ->
                 HistoryEntry(
                     id = row.id,

@@ -16,7 +16,7 @@ class SqlProductRepository(
         if (gtin.isEmpty()) {
             return null
         }
-        return withContext(dispatchers.database) {
+        return withContext(dispatchers.catalogDatabase) {
             val row = database.catalogDatabaseQueries.selectProductByGtin(gtin).executeAsOneOrNull()
             row?.let(::toProduct)
         }
@@ -24,7 +24,7 @@ class SqlProductRepository(
 
     suspend fun search(query: String): List<Product> {
         val trimmed: String = query.trim()
-        return withContext(dispatchers.database) {
+        return withContext(dispatchers.catalogDatabase) {
             val rows = if (trimmed.isEmpty()) {
                 database.catalogDatabaseQueries.selectAllProducts().executeAsList()
             } else {

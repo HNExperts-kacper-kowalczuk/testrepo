@@ -168,7 +168,7 @@ flowchart LR
 - **Platform adapters** (`BarcodeScanner`, `TextRecognizer`, `BannerAd`, `FileOpener`) are `expect`/`actual` or injected interfaces.
 - ViewModels map domain results to UI state. They do not parse INCI strings or compute hazard scores.
 - ViewModels emit `UiText` (resource / plural / catalog string), never hardcoded sentences. Domain errors are enums.
-- **Threading:** SQLite runs on a single-thread dispatcher. Matching and scoring run on `Dispatchers.Default`. Long INCI lists match tokens concurrently. Catalog seed/index load starts at process start, off the main thread. ViewModels expose `StateFlow` and never block composition with database or evaluation work. Search queries are debounced and cancelled (`mapLatest`) when the user types again.
+- **Threading:** Catalog SQLite and user SQLite each run on their own single-thread dispatcher so history/preferences never stall barcode lookup. Matching, fuzzy OCR, and catalog index assembly run on `Dispatchers.Default`. Long INCI lists match tokens in worker chunks; large catalogs parallelize Levenshtein for short lists. Catalog seed starts at process start on a supervised app scope: DB read, then CPU assemble. Evaluation loads the index and user profile in parallel, then publishes the session and writes history concurrently. ViewModels expose `StateFlow` and never block composition with database or evaluation work. Search queries are debounced and cancelled (`mapLatest`) when the user types again. Preference toggles are serialized with a mutex so rapid taps cannot drop a flag.
 
 ### 5.2 Bounded contexts
 

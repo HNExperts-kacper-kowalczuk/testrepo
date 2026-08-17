@@ -18,7 +18,7 @@ class SqlPreferencesRepository(
     private val dispatchers: AppDispatchers
 ) {
     suspend fun load(): StoredPreferences {
-        return withContext(dispatchers.database) {
+        return withContext(dispatchers.userDatabase) {
             ensureProfile()
             val row = database.userDatabaseQueries.selectProfile().executeAsOne()
             val avoidIds: Set<String> = database.userDatabaseQueries.selectAvoidIds().executeAsList().toSet()
@@ -38,7 +38,7 @@ class SqlPreferencesRepository(
     }
 
     suspend fun save(preferences: StoredPreferences) {
-        withContext(dispatchers.database) {
+        withContext(dispatchers.userDatabase) {
             database.transaction {
                 database.userDatabaseQueries.upsertProfile(
                     pregnancy_caution = if (preferences.profile.pregnancyCaution) 1 else 0,

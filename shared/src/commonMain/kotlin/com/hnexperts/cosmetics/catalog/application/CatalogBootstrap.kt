@@ -1,24 +1,30 @@
 package com.hnexperts.cosmetics.catalog.application
 
 import com.hnexperts.cosmetics.concurrency.AppDispatchers
+import com.hnexperts.cosmetics.concurrency.ApplicationScope
 import com.hnexperts.cosmetics.data.CatalogSeeder
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CatalogBootstrap(
     catalogDatabase: CatalogDatabase,
-    dispatchers: AppDispatchers
+    dispatchers: AppDispatchers,
+    applicationScope: ApplicationScope
 ) {
     private val ready: CompletableDeferred<CatalogIndex> = CompletableDeferred()
 
     init {
-        CoroutineScope(SupervisorJob() + dispatchers.database).launch {
+        applicationScope.coroutineScope.launch {
             try {
-                CatalogSeeder(catalogDatabase).seedIfEmpty()
-                ready.complete(CatalogIndex.load(catalogDatabase))
+                val snapshot: CatalogSnapshot = withContext(dispatchers.catalogDatabase) {
+                    CatalogSeeder(catalogDatabase).seedIfEmpty()
+                    CatalogIndex.read(catalogDatabase)
+                }
+                ready.complete(withContext(dispatchers.computation) {
+                    CatalogIndex.assemble(snapshot)
+                })
             } catch (error: Throwable) {
                 ready.completeExceptionally(error)
             }

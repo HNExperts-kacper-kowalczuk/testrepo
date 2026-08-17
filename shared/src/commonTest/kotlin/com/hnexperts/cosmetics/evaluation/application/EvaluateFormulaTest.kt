@@ -76,6 +76,19 @@ class EvaluateFormulaTest {
     }
 
     @Test
+    fun asyncEvaluationMatchesSynchronousPath() {
+        val productInci: String = FixtureCatalog.products
+            .joinToString(", ") { item -> item.product.inciRaw }
+        val sequential: ProductAssessment = evaluateFormula.evaluate(productInci, UserAvoidanceProfile.EMPTY)
+        val concurrent: ProductAssessment = kotlinx.coroutines.runBlocking {
+            evaluateFormula.evaluateAsync(productInci, UserAvoidanceProfile.EMPTY)
+        }
+        assertEquals(sequential.overall, concurrent.overall)
+        assertEquals(sequential.findings.map { finding -> finding.ingredient.id }, concurrent.findings.map { finding -> finding.ingredient.id })
+        assertEquals(sequential.unknownCount, concurrent.unknownCount)
+    }
+
+    @Test
     fun explicitAvoidListOverridesOtherwiseSafeFormula() {
         val assessment: ProductAssessment = evaluateFormula.evaluate(
             inciRaw = "Aqua, Glycerin",

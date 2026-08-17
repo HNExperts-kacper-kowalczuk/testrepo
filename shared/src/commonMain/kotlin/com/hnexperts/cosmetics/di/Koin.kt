@@ -3,6 +3,7 @@ package com.hnexperts.cosmetics.di
 import com.hnexperts.cosmetics.catalog.application.CatalogBootstrap
 import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
 import com.hnexperts.cosmetics.concurrency.AppDispatchers
+import com.hnexperts.cosmetics.concurrency.ApplicationScope
 import com.hnexperts.cosmetics.data.DatabaseDriverFactory
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import com.hnexperts.cosmetics.data.userdb.UserDatabase
@@ -23,9 +24,10 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { AppDispatchers() }
+    single { ApplicationScope(get()) }
     single { CatalogDatabase(get<DatabaseDriverFactory>().createCatalogDriver()) }
     single { UserDatabase(get<DatabaseDriverFactory>().createUserDriver()) }
-    single { CatalogBootstrap(get(), get()) }
+    single { CatalogBootstrap(get(), get(), get()) }
     single { SqlProductRepository(get(), get()) }
     single { SqlPreferencesRepository(get(), get()) }
     single { SqlHistoryRepository(get(), get()) }

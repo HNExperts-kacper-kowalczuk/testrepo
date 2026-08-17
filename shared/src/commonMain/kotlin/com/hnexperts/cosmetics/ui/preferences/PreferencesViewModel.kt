@@ -9,10 +9,14 @@ import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.data.StoredPreferences
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class PreferencesViewModel(
     private val repository: SqlPreferencesRepository,
@@ -28,12 +32,16 @@ class PreferencesViewModel(
     val preferences: StateFlow<StoredPreferences> = state.asStateFlow()
     private val ingredientState: MutableStateFlow<List<Ingredient>> = MutableStateFlow(emptyList())
     val ingredients: StateFlow<List<Ingredient>> = ingredientState.asStateFlow()
+    private val persistMutex: Mutex = Mutex()
 
     init {
         viewModelScope.launch {
-            state.value = repository.load()
-            val index = catalog.awaitIndex()
-            ingredientState.value = index.ingredientsById.values.sortedBy { ingredient -> ingredient.inciName }
+            coroutineScope {
+                val storedDeferred = async { repository.load() }
+                val indexDeferred = async { catalog.awaitIndex() }
+                state.value = storedDeferred.await()
+                ingredientState.value = indexDeferred.await().ingredientsSorted
+            }
         }
     }
 
@@ -66,9 +74,11 @@ class PreferencesViewModel(
 
     private fun update(transform: (StoredPreferences) -> StoredPreferences) {
         viewModelScope.launch {
-            val next: StoredPreferences = transform(state.value)
-            repository.save(next)
-            state.value = next
+            persistMutex.withLock {
+                val next: StoredPreferences = transform(state.value)
+                repository.save(next)
+                state.value = next
+            }
         }
     }
 }

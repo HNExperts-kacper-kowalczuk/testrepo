@@ -1,8 +1,6 @@
 package com.hnexperts.cosmetics.ingredients.domain
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import com.hnexperts.cosmetics.concurrency.ParallelMapper
 
 class IngredientMatcher(
     ingredients: Collection<Ingredient>,
@@ -18,120 +16,113 @@ class IngredientMatcher(
         val ingredient: Ingredient = byId[ingredientId] ?: return@mapNotNull null
         InciNormalizer.normalize(alias) to ingredient
     }.toMap()
+    private val fuzzyIndex: FuzzyIngredientIndex = FuzzyIngredientIndex(ingredients, aliasToIngredient)
 
     fun matchList(inciRaw: String): List<IngredientRef> {
         return tokenizer.tokenize(inciRaw).map { token -> matchToken(token) }
     }
 
+    suspend fun matchListConcurrently(inciRaw: String): List<IngredientRef> {
+        val tokens: List<String> = tokenizer.tokenize(inciRaw)
+        if (tokens.size >= ParallelMapper.DEFAULT_THRESHOLD) {
+            return ParallelMapper.map(tokens) { token -> matchToken(token) }
+        }
+        if (fuzzyIndex.size >= FUZZY_PARALLEL_THRESHOLD) {
+            return matchShortListWithParallelFuzzy(tokens)
+        }
+        return tokens.map { token -> matchToken(token) }
+    }
+
     fun matchToken(rawToken: String): IngredientRef {
+        val early: IngredientRef? = matchWithoutFuzzy(rawToken)
+        if (early != null) {
+            return early
+        }
+        return finishMatch(rawToken, fuzzyIndex.find(InciNormalizer.normalize(rawToken)))
+    }
+
+    private suspend fun matchShortListWithParallelFuzzy(tokens: List<String>): List<IngredientRef> {
+        return tokens.map { token -> matchTokenWithParallelFuzzy(token) }
+    }
+
+    private suspend fun matchTokenWithParallelFuzzy(token: String): IngredientRef {
+        val early: IngredientRef? = matchWithoutFuzzy(token)
+        if (early != null) {
+            return early
+        }
+        val fuzzy: Ingredient? = fuzzyIndex.findParallel(InciNormalizer.normalize(token))
+        return finishMatch(token, fuzzy)
+    }
+
+    private fun matchWithoutFuzzy(rawToken: String): IngredientRef? {
         val normalized: String = InciNormalizer.normalize(rawToken)
         if (normalized.isEmpty()) {
-            return IngredientRef(id = null, displayName = rawToken.trim(), matchedBy = MatchMethod.UNMATCHED)
+            return unmatched(rawToken)
         }
-        val exact: Ingredient? = lookupExact(normalized)
-        if (exact != null) {
-            return IngredientRef(id = exact.id, displayName = exact.inciName, matchedBy = MatchMethod.EXACT)
-        }
-        val alias: Ingredient? = aliasToIngredient[normalized]
-        if (alias != null) {
-            return IngredientRef(id = alias.id, displayName = alias.inciName, matchedBy = MatchMethod.ALIAS)
-        }
-        val parenthetical: Pair<String, String?> = InciNormalizer.stripParenthetical(normalized)
-        val outerMatch: Ingredient? = lookupExact(parenthetical.first) ?: aliasToIngredient[parenthetical.first]
-        if (outerMatch != null) {
-            return IngredientRef(id = outerMatch.id, displayName = outerMatch.inciName, matchedBy = MatchMethod.ALIAS)
-        }
-        val inner: String? = parenthetical.second
-        if (inner != null) {
-            val innerMatch: Ingredient? = lookupExact(inner) ?: aliasToIngredient[inner]
-            if (innerMatch != null) {
-                return IngredientRef(id = innerMatch.id, displayName = innerMatch.inciName, matchedBy = MatchMethod.ALIAS)
-            }
-        }
-        val slashParts: List<String> = normalized.split('/').map { part -> part.trim() }.filter { part -> part.isNotEmpty() }
-        if (slashParts.size > 1) {
-            for (part in slashParts) {
-                val slashMatch: Ingredient? = lookupExact(part) ?: aliasToIngredient[part]
-                if (slashMatch != null) {
-                    return IngredientRef(id = slashMatch.id, displayName = slashMatch.inciName, matchedBy = MatchMethod.ALIAS)
-                }
-            }
-        }
-        val fuzzy: Ingredient? = lookupFuzzy(normalized)
+        exactMatch(normalized)?.let { return it }
+        aliasMatch(normalized)?.let { return it }
+        parentheticalMatch(normalized)?.let { return it }
+        slashMatch(normalized)?.let { return it }
+        return null
+    }
+
+    private fun finishMatch(rawToken: String, fuzzy: Ingredient?): IngredientRef {
         if (fuzzy != null) {
             return IngredientRef(id = fuzzy.id, displayName = fuzzy.inciName, matchedBy = MatchMethod.FUZZY)
         }
+        return unmatched(rawToken)
+    }
+
+    private fun exactMatch(normalized: String): IngredientRef? {
+        val ingredient: Ingredient = byNormalizedName[normalized] ?: return null
+        return IngredientRef(id = ingredient.id, displayName = ingredient.inciName, matchedBy = MatchMethod.EXACT)
+    }
+
+    private fun aliasMatch(normalized: String): IngredientRef? {
+        val ingredient: Ingredient = aliasToIngredient[normalized] ?: return null
+        return IngredientRef(id = ingredient.id, displayName = ingredient.inciName, matchedBy = MatchMethod.ALIAS)
+    }
+
+    private fun parentheticalMatch(normalized: String): IngredientRef? {
+        val parts: Pair<String, String?> = InciNormalizer.stripParenthetical(normalized)
+        val outer: Ingredient? = lookupExactOrAlias(parts.first)
+        if (outer != null) {
+            return aliased(outer)
+        }
+        val inner: String = parts.second ?: return null
+        val innerMatch: Ingredient? = lookupExactOrAlias(inner)
+        return innerMatch?.let(::aliased)
+    }
+
+    private fun slashMatch(normalized: String): IngredientRef? {
+        val slashParts: List<String> = normalized.split('/')
+            .map { part -> part.trim() }
+            .filter { part -> part.isNotEmpty() }
+        if (slashParts.size <= 1) {
+            return null
+        }
+        for (part in slashParts) {
+            val match: Ingredient? = lookupExactOrAlias(part)
+            if (match != null) {
+                return aliased(match)
+            }
+        }
+        return null
+    }
+
+    private fun lookupExactOrAlias(normalized: String): Ingredient? {
+        return byNormalizedName[normalized] ?: aliasToIngredient[normalized]
+    }
+
+    private fun aliased(ingredient: Ingredient): IngredientRef {
+        return IngredientRef(id = ingredient.id, displayName = ingredient.inciName, matchedBy = MatchMethod.ALIAS)
+    }
+
+    private fun unmatched(rawToken: String): IngredientRef {
         return IngredientRef(id = null, displayName = rawToken.trim(), matchedBy = MatchMethod.UNMATCHED)
     }
 
-    suspend fun matchListConcurrently(inciRaw: String): List<IngredientRef> {
-        val tokens: List<String> = tokenizer.tokenize(inciRaw)
-        if (tokens.size < PARALLEL_TOKEN_THRESHOLD) {
-            return tokens.map { token -> matchToken(token) }
-        }
-        return coroutineScope {
-            tokens.map { token ->
-                async { matchToken(token) }
-            }.awaitAll()
-        }
-    }
-
-    private fun lookupExact(normalized: String): Ingredient? {
-        return byNormalizedName[normalized]
-    }
-
-    private fun lookupFuzzy(normalized: String): Ingredient? {
-        if (normalized.length < MIN_FUZZY_LENGTH) {
-            return null
-        }
-        val maxDistance: Int = if (normalized.length < 8) 1 else 2
-        var best: Ingredient? = null
-        var bestDistance: Int = maxDistance + 1
-        val candidates: Sequence<Ingredient> = (byNormalizedName.values.asSequence() + aliasToIngredient.values.asSequence()).distinct()
-        for (ingredient in candidates) {
-            val nameDistance: Int = levenshtein(normalized, InciNormalizer.normalize(ingredient.inciName))
-            if (nameDistance < bestDistance && nameDistance <= maxDistance) {
-                best = ingredient
-                bestDistance = nameDistance
-            }
-        }
-        for (alias in aliasToIngredient.keys) {
-            val aliasDistance: Int = levenshtein(normalized, alias)
-            if (aliasDistance < bestDistance && aliasDistance <= maxDistance) {
-                best = aliasToIngredient.getValue(alias)
-                bestDistance = aliasDistance
-            }
-        }
-        return best
-    }
-
-    private fun levenshtein(left: String, right: String): Int {
-        if (left == right) {
-            return 0
-        }
-        if (left.isEmpty()) {
-            return right.length
-        }
-        if (right.isEmpty()) {
-            return left.length
-        }
-        val previous: IntArray = IntArray(right.length + 1) { index -> index }
-        val current: IntArray = IntArray(right.length + 1)
-        for (i in left.indices) {
-            current[0] = i + 1
-            for (j in right.indices) {
-                val cost: Int = if (left[i] == right[j]) 0 else 1
-                current[j + 1] = minOf(current[j] + 1, previous[j + 1] + 1, previous[j] + cost)
-            }
-            for (j in previous.indices) {
-                previous[j] = current[j]
-            }
-        }
-        return previous[right.length]
-    }
-
     private companion object {
-        const val MIN_FUZZY_LENGTH: Int = 5
-        const val PARALLEL_TOKEN_THRESHOLD: Int = 8
+        const val FUZZY_PARALLEL_THRESHOLD: Int = 256
     }
 }
