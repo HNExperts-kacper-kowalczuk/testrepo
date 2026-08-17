@@ -9,4 +9,4 @@ This repository currently contains the product and technical plan, not the appli
 - **[Product and architecture plan](docs/plan.md)** — goals, user flows, domain model, offline database, scanning, evaluation, ads, i18n, and implementation phases
 - **[Internationalization](docs/i18n.md)** — UI resources, catalog comments, locale switching, translator workflow
 - **[Module layout](docs/module-layout.md)** — proposed Gradle / source-set structure
-- **[Data model](docs/data-model.md)** — entities, matching rules, and the bundled SQLite schema
+- **[Further additions](docs/further-additions.md)** — recommended P1–P3 features after v1 (usage type, verify label, compare, accessibility)

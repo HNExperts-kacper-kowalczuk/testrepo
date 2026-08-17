@@ -35,6 +35,8 @@ CREATE TABLE product (
     brand TEXT,
     category TEXT,
     inci_raw TEXT NOT NULL,
+    inci_hash TEXT,                -- for later “formula changed” / verify-label
+    usage TEXT,                    -- RINSE_OFF | LEAVE_ON | LIP | EYE | SPRAY | UNKNOWN
     source TEXT NOT NULL,          -- 'obf' | 'curated'
     verified INTEGER NOT NULL DEFAULT 0
 );

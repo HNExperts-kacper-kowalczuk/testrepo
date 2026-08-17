@@ -569,3 +569,11 @@ Each phase should leave the app **installable**. Camera and ads are add-ons on t
 5. Banner ads never appear on camera or OCR-review screens and never cover the evaluate / ingredient-row actions.
 6. Android and iOS ship from one Kotlin evaluation engine.
 7. Switching the in-app language to Polish (offline) updates chrome, plurals, and ingredient comments without a restart of evaluation logic; missing comment locales fall back to English.
+
+---
+
+## 19. Further additions (not v1 scope)
+
+Recommended next capabilities — usage type (leave-on vs rinse-off), verify pack vs catalog, structured allergen/children profiles, colour-safe ratings, shelf/compare, encyclopedia — are listed with priority in **[further-additions.md](further-additions.md)**.
+
+Reserve in the v1 schema even if the UI waits: `product.usage`, `product.inci_hash`, user shelf, local report queue.
