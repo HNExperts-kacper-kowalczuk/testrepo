@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +35,7 @@ import com.hnexperts.cosmetics.resources.scan_invalid_barcode
 import com.hnexperts.cosmetics.resources.scan_not_found_body
 import com.hnexperts.cosmetics.resources.scan_not_found_title
 import com.hnexperts.cosmetics.resources.scan_title
+import com.hnexperts.cosmetics.resources.scan_working
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -41,8 +45,14 @@ fun ScanScreen(
 ) {
     var barcode: String by remember { mutableStateOf("") }
     var inci: String by remember { mutableStateOf("") }
-    var error: String? by remember { mutableStateOf(null) }
-    var notFound: String? by remember { mutableStateOf(null) }
+    val uiState: ScanUiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.navigateToResult) {
+        if (uiState.navigateToResult) {
+            onResult()
+            viewModel.consumeNavigation()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -57,39 +67,25 @@ fun ScanScreen(
             value = barcode,
             onValueChange = { value -> barcode = value },
             modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.busy,
             label = { Text(stringResource(Res.string.scan_barcode_label)) },
             placeholder = { Text(stringResource(Res.string.scan_hint_gtin)) },
             singleLine = true
         )
         Button(
-            onClick = {
-                when (val lookup = viewModel.lookupBarcode(barcode)) {
-                    is BarcodeLookup.Found -> {
-                        error = null
-                        notFound = null
-                        onResult()
-                    }
-                    is BarcodeLookup.NotFound -> {
-                        error = null
-                        notFound = lookup.gtin
-                    }
-                    is BarcodeLookup.Invalid -> {
-                        notFound = null
-                        error = "invalid"
-                    }
-                }
-            },
+            onClick = { viewModel.lookupBarcode(barcode) },
+            enabled = !uiState.busy,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(Res.string.scan_barcode_action))
         }
-        if (error == "invalid") {
+        if (uiState.invalidBarcode) {
             Text(
                 text = stringResource(Res.string.scan_invalid_barcode),
                 color = MaterialTheme.colorScheme.error
             )
         }
-        if (notFound != null) {
+        if (uiState.notFoundGtin != null) {
             Text(text = stringResource(Res.string.scan_not_found_title), style = MaterialTheme.typography.titleMedium)
             Text(text = stringResource(Res.string.scan_not_found_body))
         }
@@ -97,28 +93,26 @@ fun ScanScreen(
         OutlinedTextField(
             value = inci,
             onValueChange = { value -> inci = value },
+            enabled = !uiState.busy,
             modifier = Modifier.fillMaxWidth().height(160.dp),
             label = { Text(stringResource(Res.string.scan_inci_label)) }
         )
         Button(
-            onClick = {
-                if (inci.isBlank()) {
-                    error = "empty-inci"
-                } else {
-                    error = null
-                    viewModel.evaluateTypedList(inci)
-                    onResult()
-                }
-            },
+            onClick = { viewModel.evaluateTypedList(inci) },
+            enabled = !uiState.busy,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(Res.string.scan_inci_action))
         }
-        if (error == "empty-inci") {
+        if (uiState.emptyInci) {
             Text(
                 text = stringResource(Res.string.scan_empty_inci),
                 color = MaterialTheme.colorScheme.error
             )
+        }
+        if (uiState.busy) {
+            CircularProgressIndicator()
+            Text(text = stringResource(Res.string.scan_working))
         }
     }
 }

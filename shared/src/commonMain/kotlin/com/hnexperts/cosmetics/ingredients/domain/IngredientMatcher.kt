@@ -1,5 +1,9 @@
 package com.hnexperts.cosmetics.ingredients.domain
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
 class IngredientMatcher(
     ingredients: Collection<Ingredient>,
     aliases: Map<String, String>,
@@ -60,6 +64,18 @@ class IngredientMatcher(
         return IngredientRef(id = null, displayName = rawToken.trim(), matchedBy = MatchMethod.UNMATCHED)
     }
 
+    suspend fun matchListConcurrently(inciRaw: String): List<IngredientRef> {
+        val tokens: List<String> = tokenizer.tokenize(inciRaw)
+        if (tokens.size < PARALLEL_TOKEN_THRESHOLD) {
+            return tokens.map { token -> matchToken(token) }
+        }
+        return coroutineScope {
+            tokens.map { token ->
+                async { matchToken(token) }
+            }.awaitAll()
+        }
+    }
+
     private fun lookupExact(normalized: String): Ingredient? {
         return byNormalizedName[normalized]
     }
@@ -116,5 +132,6 @@ class IngredientMatcher(
 
     private companion object {
         const val MIN_FUZZY_LENGTH: Int = 5
+        const val PARALLEL_TOKEN_THRESHOLD: Int = 8
     }
 }

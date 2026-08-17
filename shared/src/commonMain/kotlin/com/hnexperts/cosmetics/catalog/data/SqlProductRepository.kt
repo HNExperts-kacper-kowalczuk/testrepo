@@ -2,71 +2,48 @@ package com.hnexperts.cosmetics.catalog.data
 
 import com.hnexperts.cosmetics.catalog.domain.GtinNormalizer
 import com.hnexperts.cosmetics.catalog.domain.Product
+import com.hnexperts.cosmetics.concurrency.AppDispatchers
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
+import com.hnexperts.cosmetics.data.catalogdb.Product as ProductRow
+import kotlinx.coroutines.withContext
 
 class SqlProductRepository(
-    private val database: CatalogDatabase
+    private val database: CatalogDatabase,
+    private val dispatchers: AppDispatchers
 ) {
-    fun findByGtin(rawGtin: String): Product? {
+    suspend fun findByGtin(rawGtin: String): Product? {
         val gtin: String = GtinNormalizer.normalize(rawGtin)
         if (gtin.isEmpty()) {
             return null
         }
-        val row = database.catalogDatabaseQueries.selectProductByGtin(gtin).executeAsOneOrNull()
-            ?: return null
-        return Product(
-            id = row.id,
-            name = row.name,
-            brand = row.brand,
-            category = row.category,
-            inciRaw = row.inci_raw,
-            usage = row.usage,
-            source = row.source,
-            verified = row.verified != 0L
-        )
+        return withContext(dispatchers.database) {
+            val row = database.catalogDatabaseQueries.selectProductByGtin(gtin).executeAsOneOrNull()
+            row?.let(::toProduct)
+        }
     }
 
-    fun findById(id: String): Product? {
-        val row = database.catalogDatabaseQueries.selectProductById(id).executeAsOneOrNull() ?: return null
-        return Product(
-            id = row.id,
-            name = row.name,
-            brand = row.brand,
-            category = row.category,
-            inciRaw = row.inci_raw,
-            usage = row.usage,
-            source = row.source,
-            verified = row.verified != 0L
-        )
-    }
-
-    fun search(query: String): List<Product> {
+    suspend fun search(query: String): List<Product> {
         val trimmed: String = query.trim()
-        if (trimmed.isEmpty()) {
-            return database.catalogDatabaseQueries.selectAllProducts().executeAsList().map { row ->
-                Product(
-                    id = row.id,
-                    name = row.name,
-                    brand = row.brand,
-                    category = row.category,
-                    inciRaw = row.inci_raw,
-                    usage = row.usage,
-                    source = row.source,
-                    verified = row.verified != 0L
-                )
+        return withContext(dispatchers.database) {
+            val rows = if (trimmed.isEmpty()) {
+                database.catalogDatabaseQueries.selectAllProducts().executeAsList()
+            } else {
+                database.catalogDatabaseQueries.searchProducts(trimmed, trimmed).executeAsList()
             }
+            rows.map(::toProduct)
         }
-        return database.catalogDatabaseQueries.searchProducts(trimmed, trimmed).executeAsList().map { row ->
-            Product(
-                id = row.id,
-                name = row.name,
-                brand = row.brand,
-                category = row.category,
-                inciRaw = row.inci_raw,
-                usage = row.usage,
-                source = row.source,
-                verified = row.verified != 0L
-            )
-        }
+    }
+
+    private fun toProduct(row: ProductRow): Product {
+        return Product(
+            id = row.id,
+            name = row.name,
+            brand = row.brand,
+            category = row.category,
+            inciRaw = row.inci_raw,
+            usage = row.usage,
+            source = row.source,
+            verified = row.verified != 0L
+        )
     }
 }

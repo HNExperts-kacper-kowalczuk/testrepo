@@ -1,75 +1,95 @@
 package com.hnexperts.cosmetics.ui.scan
 
 import androidx.lifecycle.ViewModel
-import com.hnexperts.cosmetics.catalog.application.CatalogIndex
+import androidx.lifecycle.viewModelScope
 import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
 import com.hnexperts.cosmetics.catalog.domain.GtinNormalizer
 import com.hnexperts.cosmetics.catalog.domain.Product
-import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
-import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
-import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
-import com.hnexperts.cosmetics.scanning.data.SqlHistoryRepository
+import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-sealed class BarcodeLookup {
-    data class Found(val assessment: ProductAssessment) : BarcodeLookup()
-    data class NotFound(val gtin: String) : BarcodeLookup()
-    data class Invalid(val reason: String) : BarcodeLookup()
-}
+data class ScanUiState(
+    val busy: Boolean = false,
+    val invalidBarcode: Boolean = false,
+    val emptyInci: Boolean = false,
+    val notFoundGtin: String? = null,
+    val navigateToResult: Boolean = false
+)
 
 class ScanViewModel(
     private val products: SqlProductRepository,
-    private val index: CatalogIndex,
-    private val session: EvaluationSession,
-    private val preferences: SqlPreferencesRepository,
-    private val history: SqlHistoryRepository
+    private val evaluateProduct: EvaluateProduct
 ) : ViewModel() {
-    fun lookupBarcode(raw: String): BarcodeLookup {
+    private val state: MutableStateFlow<ScanUiState> = MutableStateFlow(ScanUiState())
+    val uiState: StateFlow<ScanUiState> = state.asStateFlow()
+    private var runningJob: Job? = null
+
+    fun lookupBarcode(raw: String) {
         val gtin: String = GtinNormalizer.normalize(raw)
         if (gtin.length < 8) {
-            return BarcodeLookup.Invalid("short")
+            state.update { current ->
+                current.copy(invalidBarcode = true, emptyInci = false, notFoundGtin = null)
+            }
+            return
         }
-        val product: Product? = products.findByGtin(gtin)
-        if (product == null) {
-            return BarcodeLookup.NotFound(gtin)
+        startWork {
+            val product: Product? = products.findByGtin(gtin)
+            if (product == null) {
+                state.update { current ->
+                    current.copy(invalidBarcode = false, notFoundGtin = gtin)
+                }
+                return@startWork
+            }
+            evaluateProduct.invoke(
+                inciRaw = product.inciRaw,
+                source = "barcode",
+                productName = product.name,
+                brand = product.brand,
+                gtin = gtin
+            )
+            state.update { current ->
+                current.copy(
+                    invalidBarcode = false,
+                    notFoundGtin = null,
+                    navigateToResult = true
+                )
+            }
         }
-        val assessment: ProductAssessment = evaluateAndStore(
-            inciRaw = product.inciRaw,
-            source = "barcode",
-            productName = product.name,
-            brand = product.brand,
-            gtin = gtin
-        )
-        return BarcodeLookup.Found(assessment)
     }
 
-    fun evaluateTypedList(inciRaw: String): ProductAssessment {
-        return evaluateAndStore(
-            inciRaw = inciRaw,
-            source = "manual",
-            productName = null,
-            brand = null,
-            gtin = null
-        )
+    fun evaluateTypedList(inciRaw: String) {
+        if (inciRaw.isBlank()) {
+            state.update { current -> current.copy(emptyInci = true, invalidBarcode = false) }
+            return
+        }
+        startWork {
+            evaluateProduct.invoke(inciRaw = inciRaw, source = "manual")
+            state.update { current ->
+                current.copy(emptyInci = false, navigateToResult = true)
+            }
+        }
     }
 
-    private fun evaluateAndStore(
-        inciRaw: String,
-        source: String,
-        productName: String?,
-        brand: String?,
-        gtin: String?
-    ): ProductAssessment {
-        val profile = preferences.load().profile
-        val assessment: ProductAssessment = index.evaluateFormula.evaluate(
-            inciRaw = inciRaw,
-            profile = profile,
-            productName = productName,
-            brand = brand,
-            gtin = gtin
-        )
-        session.lastAssessment = assessment
-        session.lastSource = source
-        history.record(assessment, source)
-        return assessment
+    fun consumeNavigation() {
+        state.update { current -> current.copy(navigateToResult = false) }
+    }
+
+    private fun startWork(block: suspend () -> Unit) {
+        runningJob?.cancel()
+        runningJob = viewModelScope.launch {
+            state.update { current ->
+                current.copy(busy = true, invalidBarcode = false, emptyInci = false)
+            }
+            try {
+                block()
+            } finally {
+                state.update { current -> current.copy(busy = false) }
+            }
+        }
     }
 }

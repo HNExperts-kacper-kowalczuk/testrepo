@@ -17,6 +17,7 @@
     <string name="scan_not_found_title">Brak produktu w katalogu offline</string>
     <string name="scan_not_found_body">Możesz mimo to ocenić produkt, wpisując lub wklejając skład z opakowania.</string>
     <string name="scan_empty_inci">Wklej lub wpisz przynajmniej jedną nazwę składnika.</string>
+    <string name="scan_working">Ocenianie…</string>
 
     <string name="search_title">Katalog</string>
     <string name="search_placeholder">Szukaj po nazwie lub marce</string>

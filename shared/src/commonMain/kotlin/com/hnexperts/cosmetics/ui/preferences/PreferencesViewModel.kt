@@ -1,49 +1,56 @@
 package com.hnexperts.cosmetics.ui.preferences
 
 import androidx.lifecycle.ViewModel
-import com.hnexperts.cosmetics.catalog.application.CatalogIndex
+import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.catalog.application.CatalogBootstrap
 import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.data.StoredPreferences
+import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class PreferencesViewModel(
     private val repository: SqlPreferencesRepository,
-    private val catalogIndex: CatalogIndex
+    private val catalog: CatalogBootstrap
 ) : ViewModel() {
-    private val state: MutableStateFlow<StoredPreferences> = MutableStateFlow(repository.load())
+    private val state: MutableStateFlow<StoredPreferences> = MutableStateFlow(
+        StoredPreferences(
+            profile = UserAvoidanceProfile.EMPTY,
+            localePreference = LocalePreference.FOLLOW_SYSTEM,
+            pinnedLocale = null
+        )
+    )
     val preferences: StateFlow<StoredPreferences> = state.asStateFlow()
+    private val ingredientState: MutableStateFlow<List<Ingredient>> = MutableStateFlow(emptyList())
+    val ingredients: StateFlow<List<Ingredient>> = ingredientState.asStateFlow()
 
-    fun ingredients(): List<Ingredient> {
-        return catalogIndex.ingredientsById.values.sortedBy { ingredient -> ingredient.inciName }
+    init {
+        viewModelScope.launch {
+            state.value = repository.load()
+            val index = catalog.awaitIndex()
+            ingredientState.value = index.ingredientsById.values.sortedBy { ingredient -> ingredient.inciName }
+        }
     }
 
     fun setPregnancyCaution(enabled: Boolean) {
-        update { current ->
-            current.copy(profile = current.profile.copy(pregnancyCaution = enabled))
-        }
+        update { current -> current.copy(profile = current.profile.copy(pregnancyCaution = enabled)) }
     }
 
     fun setFragranceFree(enabled: Boolean) {
-        update { current ->
-            current.copy(profile = current.profile.copy(fragranceFree = enabled))
-        }
+        update { current -> current.copy(profile = current.profile.copy(fragranceFree = enabled)) }
     }
 
     fun setFollowSystemLocale() {
-        update { current ->
-            current.copy(localePreference = LocalePreference.FOLLOW_SYSTEM, pinnedLocale = null)
-        }
+        update { current -> current.copy(localePreference = LocalePreference.FOLLOW_SYSTEM, pinnedLocale = null) }
     }
 
     fun pinLocale(locale: AppLocale) {
-        update { current ->
-            current.copy(localePreference = LocalePreference.PINNED, pinnedLocale = locale)
-        }
+        update { current -> current.copy(localePreference = LocalePreference.PINNED, pinnedLocale = locale) }
     }
 
     fun toggleAvoid(ingredientId: String) {
@@ -58,8 +65,10 @@ class PreferencesViewModel(
     }
 
     private fun update(transform: (StoredPreferences) -> StoredPreferences) {
-        val next: StoredPreferences = transform(state.value)
-        repository.save(next)
-        state.value = next
+        viewModelScope.launch {
+            val next: StoredPreferences = transform(state.value)
+            repository.save(next)
+            state.value = next
+        }
     }
 }

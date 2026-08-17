@@ -12,6 +12,8 @@ import com.hnexperts.cosmetics.ingredients.domain.IngredientMatcher
 import com.hnexperts.cosmetics.ingredients.domain.IngredientRef
 import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
+import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.coroutineContext
 
 class EvaluateFormula(
     private val matcher: IngredientMatcher,
@@ -28,7 +30,42 @@ class EvaluateFormula(
         brand: String? = null,
         gtin: String? = null
     ): ProductAssessment {
-        val references: List<IngredientRef> = matcher.matchList(inciRaw)
+        return toAssessment(
+            references = matcher.matchList(inciRaw),
+            inciRaw = inciRaw,
+            profile = profile,
+            productName = productName,
+            brand = brand,
+            gtin = gtin
+        )
+    }
+
+    suspend fun evaluateAsync(
+        inciRaw: String,
+        profile: UserAvoidanceProfile,
+        productName: String? = null,
+        brand: String? = null,
+        gtin: String? = null
+    ): ProductAssessment {
+        coroutineContext.ensureActive()
+        return toAssessment(
+            references = matcher.matchListConcurrently(inciRaw),
+            inciRaw = inciRaw,
+            profile = profile,
+            productName = productName,
+            brand = brand,
+            gtin = gtin
+        )
+    }
+
+    private fun toAssessment(
+        references: List<IngredientRef>,
+        inciRaw: String,
+        profile: UserAvoidanceProfile,
+        productName: String?,
+        brand: String?,
+        gtin: String?
+    ): ProductAssessment {
         val findings: List<Finding> = references.map { reference ->
             val ingredient: Ingredient? = reference.id?.let { id -> ingredientsById[id] }
             val hazard: IngredientHazard? = reference.id?.let { id -> hazardsById[id] }

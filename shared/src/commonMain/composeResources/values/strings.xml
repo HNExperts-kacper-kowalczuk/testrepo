@@ -17,6 +17,7 @@
     <string name="scan_not_found_title">Product not in the offline catalog</string>
     <string name="scan_not_found_body">You can still evaluate this product by typing or pasting the ingredient list printed on the pack.</string>
     <string name="scan_empty_inci">Paste or type at least one ingredient name.</string>
+    <string name="scan_working">Evaluating…</string>
 
     <string name="search_title">Catalog</string>
     <string name="search_placeholder">Search by name or brand</string>

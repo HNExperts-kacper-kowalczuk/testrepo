@@ -35,6 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun PreferencesScreen(viewModel: PreferencesViewModel) {
     val stored: StoredPreferences by viewModel.preferences.collectAsState()
+    val ingredients by viewModel.ingredients.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +73,7 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             )
         }
         Text(text = stringResource(Res.string.prefs_avoid_title), style = MaterialTheme.typography.titleMedium)
-        viewModel.ingredients().forEach { ingredient ->
+        ingredients.forEach { ingredient ->
             PreferenceSwitch(
                 label = ingredient.inciName,
                 checked = stored.profile.avoidedIngredientIds.contains(ingredient.id),

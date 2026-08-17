@@ -1,11 +1,12 @@
 package com.hnexperts.cosmetics.di
 
-import com.hnexperts.cosmetics.catalog.application.CatalogIndex
+import com.hnexperts.cosmetics.catalog.application.CatalogBootstrap
 import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
-import com.hnexperts.cosmetics.data.CatalogSeeder
+import com.hnexperts.cosmetics.concurrency.AppDispatchers
 import com.hnexperts.cosmetics.data.DatabaseDriverFactory
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import com.hnexperts.cosmetics.data.userdb.UserDatabase
+import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
 import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
@@ -21,18 +22,16 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
 val appModule = module {
-    single {
-        val database: CatalogDatabase = CatalogDatabase(get<DatabaseDriverFactory>().createCatalogDriver())
-        CatalogSeeder(database).seedIfEmpty()
-        database
-    }
+    single { AppDispatchers() }
+    single { CatalogDatabase(get<DatabaseDriverFactory>().createCatalogDriver()) }
     single { UserDatabase(get<DatabaseDriverFactory>().createUserDriver()) }
-    single { SqlProductRepository(get()) }
-    single { SqlPreferencesRepository(get()) }
-    single { SqlHistoryRepository(get()) }
-    single { CatalogIndex.load(get()) }
+    single { CatalogBootstrap(get(), get()) }
+    single { SqlProductRepository(get(), get()) }
+    single { SqlPreferencesRepository(get(), get()) }
+    single { SqlHistoryRepository(get(), get()) }
     single { EvaluationSession() }
     single { CommentLocalizer() }
+    single { EvaluateProduct(get(), get(), get(), get(), get()) }
 
     viewModelOf(::ScanViewModel)
     viewModelOf(::ResultViewModel)

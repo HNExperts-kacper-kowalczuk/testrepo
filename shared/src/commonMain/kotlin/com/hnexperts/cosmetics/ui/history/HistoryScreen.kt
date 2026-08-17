@@ -9,7 +9,9 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPolicy
@@ -26,7 +28,17 @@ fun HistoryScreen(
     viewModel: HistoryViewModel,
     onOpenResult: () -> Unit
 ) {
-    val entries: List<HistoryEntry> = remember { viewModel.entries() }
+    val uiState: HistoryUiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
+    LaunchedEffect(uiState.navigateToResult) {
+        if (uiState.navigateToResult) {
+            onOpenResult()
+            viewModel.consumeNavigation()
+        }
+    }
+    val entries: List<HistoryEntry> = uiState.entries
     Scaffold(
         bottomBar = {
             BannerAdSlot(
@@ -58,9 +70,8 @@ fun HistoryScreen(
                     headlineContent = { Text(entry.rating) },
                     supportingContent = { Text(entry.scannedAt) },
                     overlineContent = { Text(entry.source) },
-                    modifier = Modifier.clickable {
+                    modifier = Modifier.clickable(enabled = !uiState.busy) {
                         viewModel.reopen(entry)
-                        onOpenResult()
                     }
                 )
             }

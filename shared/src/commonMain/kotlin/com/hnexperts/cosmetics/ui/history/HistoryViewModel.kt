@@ -1,31 +1,56 @@
 package com.hnexperts.cosmetics.ui.history
 
 import androidx.lifecycle.ViewModel
-import com.hnexperts.cosmetics.catalog.application.CatalogIndex
-import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
-import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
+import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.scanning.data.HistoryEntry
 import com.hnexperts.cosmetics.scanning.data.SqlHistoryRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class HistoryUiState(
+    val entries: List<HistoryEntry> = emptyList(),
+    val busy: Boolean = false,
+    val navigateToResult: Boolean = false
+)
 
 class HistoryViewModel(
     private val history: SqlHistoryRepository,
-    private val index: CatalogIndex,
-    private val session: EvaluationSession,
-    private val preferences: SqlPreferencesRepository
+    private val evaluateProduct: EvaluateProduct
 ) : ViewModel() {
-    fun entries(): List<HistoryEntry> {
-        return history.recent()
+    private val state: MutableStateFlow<HistoryUiState> = MutableStateFlow(HistoryUiState())
+    val uiState: StateFlow<HistoryUiState> = state.asStateFlow()
+    private var openJob: Job? = null
+
+    fun refresh() {
+        viewModelScope.launch {
+            val entries: List<HistoryEntry> = history.recent()
+            state.update { current -> current.copy(entries = entries) }
+        }
     }
 
     fun reopen(entry: HistoryEntry) {
-        val assessment = index.evaluateFormula.evaluate(
-            inciRaw = entry.inciRaw,
-            profile = preferences.load().profile,
-            productName = null,
-            brand = null,
-            gtin = entry.gtin
-        )
-        session.lastAssessment = assessment
-        session.lastSource = entry.source
+        openJob?.cancel()
+        openJob = viewModelScope.launch {
+            state.update { current -> current.copy(busy = true) }
+            try {
+                evaluateProduct.invoke(
+                    inciRaw = entry.inciRaw,
+                    source = entry.source,
+                    gtin = entry.gtin
+                )
+                state.update { current -> current.copy(navigateToResult = true) }
+            } finally {
+                state.update { current -> current.copy(busy = false) }
+            }
+        }
+    }
+
+    fun consumeNavigation() {
+        state.update { current -> current.copy(navigateToResult = false) }
     }
 }
