@@ -11,6 +11,7 @@ The app must:
 3. Work **without an internet connection** for lookup, evaluation, and browsing.
 4. Fall back to **scanning the printed ingredient list** (INCI composition / skład) when the barcode is unknown.
 5. Show **ad banners** that never block scanning, results, or other primary interactions.
+6. Be **easy to translate**: UI copy and editorial comments are externalized, with a locale fallback chain and an in-app language setting.
 
 This is an **informational consumer tool**, not a medical or regulatory authority. Every result screen must carry a short, persistent disclaimer.
 
@@ -26,6 +27,7 @@ This is an **informational consumer tool**, not a medical or regulatory authorit
 | Human-readable | Hazard levels come with short comments in the user’s language, not only codes or annex numbers. |
 | Non-blocking ads | Ads occupy reserved space. They never overlay the camera, cover buttons, or interrupt the scan-to-result path. |
 | Honest limits | OCR and catalog coverage will miss items. The UI always offers edit, retry, and “evaluate this list anyway”. |
+| Translatable | No user-facing literals in Kotlin. UI XML + localized catalog comments; adding a language does not touch the evaluation engine. |
 
 ---
 
@@ -103,6 +105,7 @@ A product that is “generally moderate” can become **Not suitable** for that 
 | Networking (optional) | Ktor Client | Catalog **delta updates only**. Never on the evaluation path. |
 | Ads | Google AdMob via `expect`/`actual` banner composable | Adaptive banners; UMP consent on Android, ATT + UMP on iOS. |
 | Images | Coil3 (CMP) | Product photos when present in the bundled catalog; placeholders offline. |
+| i18n | Compose Multiplatform `composeResources` (`stringResource` / `pluralStringResource`) + SQLite comments by locale | Shared Android/iOS translations; Polish plurals; in-app language override. See [i18n.md](i18n.md). |
 
 **Not in v1:** interstitial ads, rewarded ads, app-open ads, cloud OCR, account login. Those either block UX or break the offline guarantee.
 
@@ -164,6 +167,7 @@ flowchart LR
 - **Repositories** are interfaces in the domain; SQLDelight implementations live in `:core:database`.
 - **Platform adapters** (`BarcodeScanner`, `TextRecognizer`, `BannerAd`, `FileOpener`) are `expect`/`actual` or injected interfaces.
 - ViewModels map domain results to UI state. They do not parse INCI strings or compute hazard scores.
+- ViewModels emit `UiText` (resource / plural / catalog string), never hardcoded sentences. Domain errors are enums.
 
 ### 5.2 Bounded contexts
 
@@ -177,6 +181,7 @@ flowchart LR
 | **Preferences** | Local user avoid-list and caution flags. |
 | **Ads** | Consent, banner placement, “ads enabled” flag. No domain knowledge. |
 | **Sync** | Optional background pull of catalog/ruleset deltas when online. |
+| **i18n** | `AppLocale`, in-app vs system language, `UiText`, comment fallback (`pl` → `en`). |
 
 Each context is a Gradle module (see [module-layout.md](module-layout.md)) so catalogs and ads cannot leak into the evaluation engine.
 
@@ -207,7 +212,7 @@ Each ingredient row stores:
 - `comment_detail` (optional longer explanation)
 - `ruleset_version`
 
-**Comments are first-class data**, not hardcoded strings. They ship in the offline database so a toxicologist/editor can update copy without an app release (via catalog sync) and so the app still shows them offline.
+**Comments are first-class data**, not hardcoded strings. They ship in the offline database, **one row per locale**, so a toxicologist/editor can update copy without an app release (via catalog sync) and so the app still shows them offline. UI chrome (buttons, errors, rating labels) lives in XML, not in this table. See [i18n.md](i18n.md).
 
 ### 6.2 Product score
 
@@ -364,7 +369,7 @@ This is the difference between a demo and a trustworthy scanner.
 | Ingredient detail | Optional small banner at the very bottom, above system nav | Comments are the content |
 | Search / catalog | Same reserved bottom slot as Home | |
 | History | Same | |
-| Preferences | **None** | Settings and health-related choices |
+| Preferences | **None** | Avoid-list, **language**, pregnancy / fragrance flags |
 | Consent / ATT | **None** | |
 
 Navigation: bottom bar with Scan, Search, History, More. Scan is the default tab.
@@ -436,8 +441,14 @@ enum class AdPlacement { HOME, RESULT, SEARCH, HISTORY }
 
 ## 12. Localization and markets
 
-- v1 UI: **Polish and English** (INCI names stay in INCI; comments are translated).
-- Hazard comments table keyed by `locale`.
+Full design: **[i18n.md](i18n.md)**.
+
+- v1 languages: **English (default, complete)** and **Polish**. Further locales are extra `values-xx/` XML + comment rows, not a code fork.
+- **Two stores:** Compose Multiplatform `composeResources` for UI; SQLite `ingredient_comment.locale` for editorial text. INCI names are never translated.
+- **No literals in Kotlin.** ViewModels expose `UiText`; screens call `stringResource` / `pluralStringResource`. Plurals use XML quantities (`one`/`few`/`many`/`other` for Polish), never `if (count == 1)`.
+- **Locale:** follow the OS by default; Preferences can pin a language. Android per-app locales and iOS preferred-language override stay in sync. Comment lookup: exact tag → language → `en`.
+- Layout uses `start`/`end` (RTL-ready). INCI tokens stay LTR.
+- CI: key-parity between `en` and shipped locales; Detekt/lint rejects raw `Text("…")` in UI; screenshot tests in `pl` and a pseudo-locale.
 - Barcode catalog biased to products sold in the EU; INCI evaluation still works worldwide because it does not need a GTIN.
 
 ---
@@ -476,6 +487,7 @@ Phases are technical slices, not calendar estimates.
 
 - KMP + Compose Multiplatform project (Android + iOS).
 - Navigation graph, Koin, empty screens, design tokens.
+- **i18n baseline:** `composeResources` (`values` + `values-pl`), `UiText`, `LocaleController`, language row in Preferences, lint against raw UI strings.
 - SQLDelight with schema v1 and a tiny fixture catalog (10 products, ~50 ingredients).
 
 ### Phase 1 — Evaluation engine (no camera)
@@ -512,9 +524,9 @@ Phases are technical slices, not calendar estimates.
 - Manifest + delta apply when online.
 - In-app “last updated” stamp.
 
-### Phase 7 — Polish
+### Phase 7 — Release polish
 
-- PL/EN copy, accessibility (TalkBack/VoiceOver on ratings), large-font result cards, Play/App Store listings, privacy labels.
+- Translator pass on PL/EN XML and comments, pseudo-locale screenshot QA, accessibility (TalkBack/VoiceOver on ratings), large-font result cards, Play/App Store listings per locale, privacy labels.
 
 Each phase should leave the app **installable**. Camera and ads are add-ons on top of a working offline evaluator.
 
@@ -532,6 +544,8 @@ Each phase should leave the app **installable**. Camera and ads are add-ons on t
 | Regulatory data goes stale | `ruleset_version`, optional sync, disclaimer |
 | Treating CosIng as law | Store annex references; wording stays informational |
 | KMP camera interop cost | Thin `expect`/`actual`; keep Compose screens shared |
+| Hardcoded UI strings block later languages | `UiText` + XML from Phase 0; CI key-parity |
+| Polish plurals / long copy break layout | XML plurals; screenshot + pseudo-locale tests |
 
 ---
 
@@ -554,3 +568,4 @@ Each phase should leave the app **installable**. Camera and ads are add-ons on t
 4. Personal avoid-list can turn a “caution” product into “not suitable”.
 5. Banner ads never appear on camera or OCR-review screens and never cover the evaluate / ingredient-row actions.
 6. Android and iOS ship from one Kotlin evaluation engine.
+7. Switching the in-app language to Polish (offline) updates chrome, plurals, and ingredient comments without a restart of evaluation logic; missing comment locales fall back to English.

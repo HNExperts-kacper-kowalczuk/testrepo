@@ -25,7 +25,8 @@ CREATE TABLE catalog_meta (
     ruleset_version TEXT NOT NULL,
     built_at TEXT NOT NULL,
     region TEXT NOT NULL,
-    checksum TEXT NOT NULL
+    checksum TEXT NOT NULL,
+    supported_comment_locales TEXT NOT NULL  -- BCP-47 list, e.g. 'en,pl'
 );
 
 CREATE TABLE product (
@@ -70,7 +71,7 @@ CREATE TABLE ingredient_hazard (
 
 CREATE TABLE ingredient_comment (
     ingredient_id TEXT NOT NULL REFERENCES ingredient(id),
-    locale TEXT NOT NULL,
+    locale TEXT NOT NULL,          -- BCP-47, e.g. 'en', 'pl'
     summary TEXT NOT NULL,
     detail TEXT,
     PRIMARY KEY (ingredient_id, locale)
@@ -79,7 +80,9 @@ CREATE TABLE ingredient_comment (
 CREATE TABLE user_profile (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     pregnancy_caution INTEGER NOT NULL DEFAULT 0,
-    fragrance_free INTEGER NOT NULL DEFAULT 0
+    fragrance_free INTEGER NOT NULL DEFAULT 0,
+    locale_preference TEXT NOT NULL DEFAULT 'system',  -- 'system' | 'pinned'
+    pinned_locale TEXT                                 -- BCP-47 when pinned
 );
 
 CREATE TABLE user_avoid_ingredient (
@@ -126,8 +129,14 @@ data class Finding(
     val ingredient: IngredientRef,
     val level: DangerLevel,
     val regulatoryTags: List<String>,
-    val comment: String?,
+    val comments: List<LocalizedText>,
     val personalAvoid: Boolean
+)
+
+data class LocalizedText(
+    val locale: String,
+    val summary: String,
+    val detail: String?
 )
 
 data class ProductAssessment(
@@ -140,7 +149,7 @@ data class ProductAssessment(
 )
 ```
 
-`EvaluateFormula` returns `ProductAssessment`. History stores `rating` + `inci_raw` so a later ruleset can re-evaluate without keeping a frozen copy of every comment.
+`EvaluateFormula` returns `ProductAssessment` with **all** comment locales for each finding (or the repository loads them). The UI picks the row via `CommentLocalizer` for the current `AppLocale`. History stores `rating` + `inci_raw` so a later ruleset can re-evaluate without keeping a frozen copy of every comment. Ratings are enum codes, so a language switch relabels history without a migration.
 
 ## 4. Catalog file packaging
 
@@ -161,4 +170,6 @@ data class ProductAssessment(
 - One sentence in `summary` (what the shopper needs at the shelf).
 - Optional `detail` for the ingredient screen (restriction, typical function, why the level was chosen).
 - No medical claims. Prefer “listed as a common fragrance allergen in the EU” over “causes allergy”.
-- Every `HIGH` / `PROHIBITED` row must have a comment in PL and EN before it ships in the bundled DB.
+- Every `HIGH` / `PROHIBITED` row must have a comment in **every shipped comment locale** (`en`, `pl` in v1) before it ships in the bundled DB. CI fails otherwise.
+- Lookup: exact BCP-47 → language → `en` → last-resort any row (UI may show a fallback hint). See [i18n.md](i18n.md).
+- UI chrome (buttons, plurals, rating labels) is **not** stored here; it lives in `composeResources`.
