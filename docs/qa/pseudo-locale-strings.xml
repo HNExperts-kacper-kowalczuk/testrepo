@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="app_name">[!!INCI Scan!!]</string>
+    <string name="tab_scan">[!!Scan!!]</string>
+    <string name="tab_search">[!!Search!!]</string>
+    <string name="tab_history">[!!History!!]</string>
+    <string name="tab_more">[!!More!!]</string>
+
+    <string name="scan_title">[!!Scan a cosmetic!!]</string>
+    <string name="scan_barcode_label">[!!Barcode (EAN / UPC)!!]</string>
+    <string name="scan_barcode_action">[!!Look up barcode!!]</string>
+    <string name="scan_inci_label">[!!Ingredient list (INCI)!!]</string>
+    <string name="scan_inci_action">[!!Evaluate list!!]</string>
+    <string name="scan_camera_note">[!!Scan a barcode or the printed INCI list with the camera. You can still type a GTIN or paste the list if the camera cannot read it.!!]</string>
+    <string name="scan_open_barcode">[!!Scan barcode!!]</string>
+    <string name="scan_open_inci">[!!Scan ingredient list!!]</string>
+    <string name="scan_hint_gtin">[!!Try 5901234123457!!]</string>
+    <string name="scan_invalid_barcode">[!!That does not look like a valid barcode.!!]</string>
+    <string name="scan_not_found_title">[!!Product not in the offline catalog!!]</string>
+    <string name="scan_not_found_body">[!!This barcode is not in the offline catalog. Scan the printed ingredient list, or type or paste it from the pack.!!]</string>
+    <string name="scan_empty_inci">[!!Paste or type at least one ingredient name.!!]</string>
+    <string name="scan_working">[!!Evaluating…!!]</string>
+
+    <string name="search_title">[!!Catalog!!]</string>
+    <string name="search_placeholder">[!!Search by name or brand!!]</string>
+    <string name="search_empty">[!!No products match that query.!!]</string>
+
+    <string name="history_title">[!!Recent scans!!]</string>
+    <string name="history_empty">[!!You have not evaluated a product yet.!!]</string>
+
+    <string name="result_title">[!!Result!!]</string>
+    <string name="result_missing">[!!No evaluation to show. Scan a product first.!!]</string>
+    <string name="result_not_suitable">[!!Not suitable for your current filters.!!]</string>
+    <string name="result_suitable">[!!No personal avoid-list hits.!!]</string>
+    <string name="result_disclaimer">[!!Informational only. This is not a medical device or a substitute for the ingredient list, a dermatologist, or official EU annexes. Data can lag regulatory updates.!!]</string>
+    <string name="result_unverified">[!!Catalog formula is unverified community data.!!]</string>
+    <string name="level_safe">[!!Generally acceptable!!]</string>
+    <string name="level_low">[!!Low concern!!]</string>
+    <string name="level_moderate">[!!Moderate concern!!]</string>
+    <string name="level_restricted">[!!Restricted use!!]</string>
+    <string name="level_high">[!!High concern!!]</string>
+    <string name="level_prohibited">[!!Prohibited!!]</string>
+    <string name="level_unknown">[!!Unknown!!]</string>
+    <string name="finding_personal_avoid">[!!On your avoid list!!]</string>
+    <string name="finding_unmatched">[!!Not in the knowledge base!!]</string>
+    <string name="back">[!!Back!!]</string>
+
+    <string name="prefs_title">[!!Preferences!!]</string>
+    <string name="prefs_pregnancy">[!!Pregnancy / breastfeeding caution!!]</string>
+    <string name="prefs_fragrance_free">[!!Prefer fragrance-free!!]</string>
+    <string name="prefs_language">[!!Language for comments!!]</string>
+    <string name="prefs_language_system">[!!Follow system!!]</string>
+    <string name="prefs_language_en">[!!English!!]</string>
+    <string name="prefs_language_pl">[!!Polish!!]</string>
+    <string name="prefs_avoid_title">[!!Avoid specific ingredients!!]</string>
+    <string name="prefs_catalog_title">[!!Offline catalog!!]</string>
+    <string name="prefs_catalog_stamp">[!!Version %1$s · built %2$s · %3$s!!]</string>
+    <string name="prefs_catalog_unknown">[!!Catalog version is not available yet.!!]</string>
+    <string name="prefs_catalog_uptodate">[!!This device already has the published catalog.!!]</string>
+    <string name="prefs_catalog_update">[!!A newer catalog (%1$s) is published. Apply it if a delta is bundled on this device.!!]</string>
+    <string name="prefs_catalog_apply">[!!Apply catalog update!!]</string>
+    <string name="prefs_catalog_applied">[!!The bundled catalog update was applied.!!]</string>
+    <string name="prefs_catalog_offline">[!!Offline — showing the bundled catalog. Updates wait until you have a network connection.!!]</string>
+    <string name="prefs_catalog_check_action">[!!Check for catalog updates!!]</string>
+    <string name="prefs_privacy">[!!Ad privacy options!!]</string>
+    <string name="prefs_clear_history">[!!Clear scan history!!]</string>
+    <string name="prefs_cleared_history">[!!Scan history was deleted on this device.!!]</string>
+
+    <string name="disclaimer_title">[!!Before you scan!!]</string>
+    <string name="disclaimer_body">[!!This app is an informational consumer tool. It is not a medical device and it is not a substitute for the printed ingredient list, a dermatologist, or official EU annexes. Ratings can lag regulatory updates. Unknown names are shown, never treated as safe. Ads never appear on the camera or ingredient review screens.!!]</string>
+    <string name="disclaimer_accept">[!!I understand!!]</string>
+    <string name="onboarding_next">[!!Next!!]</string>
+    <string name="onboarding_scan_title">[!!What a scan does!!]</string>
+    <string name="onboarding_scan_body">[!!Point the camera at a barcode or the printed INCI list (skład). Lookup and scoring stay on this device. You can also type a GTIN or paste the list if the camera cannot read the pack.!!]</string>
+    <string name="onboarding_unknown_title">[!!Unknown is not safe!!]</string>
+    <string name="onboarding_unknown_body">[!!If a name is not in the knowledge base, it is listed as Unknown. Results can be incomplete. Edit OCR mistakes before you evaluate. Community catalog formulas are marked unverified.!!]</string>
+
+    <string name="usage_prompt">[!!How is this product used?!!]</string>
+    <string name="usage_leave_on">[!!Leave-on!!]</string>
+    <string name="usage_rinse_off">[!!Rinse-off!!]</string>
+    <string name="usage_spray">[!!Spray!!]</string>
+    <string name="usage_lip">[!!Lips!!]</string>
+    <string name="usage_eye">[!!Eye area!!]</string>
+    <string name="result_usage">[!!Scored as %1$s.!!]</string>
+    <string name="result_usage_assumed">[!!Usage was not given, so the stricter leave-on reading was used.!!]</string>
+    <string name="finding_usage_adjusted">[!!Level adjusted for this product type.!!]</string>
+
+    <string name="result_rating_a11y">[!!Overall rating: %1$s!!]</string>
+    <string name="finding_rating_a11y">[!!Ingredient rating: %1$s!!]</string>
+
+    <string name="ad_placeholder">[!!Advertisement!!]</string>
+    <string name="common_retry">[!!Retry!!]</string>
+    <string name="common_continue">[!!Continue!!]</string>
+    <string name="error_catalog">[!!Could not load the offline catalog.!!]</string>
+    <string name="error_corrupt_catalog">[!!The offline catalog looks damaged.!!]</string>
+    <string name="error_database">[!!A local database operation failed.!!]</string>
+    <string name="error_evaluation">[!!Ingredient evaluation failed.!!]</string>
+    <string name="error_camera">[!!The camera could not complete this scan.!!]</string>
+    <string name="error_ocr">[!!Could not read the ingredient list from the photo.!!]</string>
+    <string name="error_unexpected">[!!Something went wrong.!!]</string>
+
+    <string name="camera_title_barcode">[!!Scan barcode!!]</string>
+    <string name="camera_title_inci">[!!Scan ingredient list!!]</string>
+    <string name="camera_hint_barcode">[!!Point at an EAN or UPC barcode. Detection is on-device and ads stay off this screen.!!]</string>
+    <string name="camera_hint_inci">[!!Flatten the label, then capture a still of the INCI / skład block.!!]</string>
+    <string name="camera_capture">[!!Capture list!!]</string>
+    <string name="camera_torch_on">[!!Torch on!!]</string>
+    <string name="camera_torch_off">[!!Torch off!!]</string>
+    <string name="camera_unavailable">[!!Camera scanning is not available on this device. Type the barcode or paste the ingredient list instead.!!]</string>
+    <string name="camera_permission_title">[!!Camera access needed!!]</string>
+    <string name="camera_permission_body">[!!The camera is used only to read product barcodes and printed ingredient lists. Nothing is uploaded.!!]</string>
+    <string name="camera_permission_request">[!!Allow camera access when the system asks, or go back and type the list instead.!!]</string>
+    <string name="camera_permission_settings">[!!Open settings!!]</string>
+
+    <string name="confirm_title">[!!Confirm ingredients!!]</string>
+    <string name="confirm_empty">[!!No captured list to review. Go back and scan the label again.!!]</string>
+    <string name="confirm_raw_label">[!!Ingredient name!!]</string>
+    <string name="confirm_unknown">[!!Not in the knowledge base — edit if OCR misread it.!!]</string>
+    <string name="confirm_fuzzy_prompt">[!!Did you mean %2$s instead of “%1$s”?!!]</string>
+    <string name="confirm_fuzzy_accept">[!!Use suggestion!!]</string>
+    <string name="confirm_fuzzy_reject">[!!Keep original!!]</string>
+    <string name="confirm_pending_fuzzy">[!!Accept or reject each suggested match before evaluating.!!]</string>
+    <string name="confirm_add">[!!Add ingredient!!]</string>
+    <string name="confirm_remove">[!!Remove!!]</string>
+    <string name="confirm_evaluate">[!!Evaluate list!!]</string>
+
+    <plurals name="result_unknown_count">
+        <item quantity="one">[!!We could not identify %1$d name — results may be incomplete.!!]</item>
+        <item quantity="other">[!!We could not identify %1$d names — results may be incomplete.!!]</item>
+    </plurals>
+</resources>

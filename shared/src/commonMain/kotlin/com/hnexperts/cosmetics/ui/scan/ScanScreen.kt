@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.scan_barcode_action
 import com.hnexperts.cosmetics.resources.scan_barcode_label
@@ -34,18 +35,24 @@ import com.hnexperts.cosmetics.resources.scan_inci_label
 import com.hnexperts.cosmetics.resources.scan_invalid_barcode
 import com.hnexperts.cosmetics.resources.scan_not_found_body
 import com.hnexperts.cosmetics.resources.scan_not_found_title
+import com.hnexperts.cosmetics.resources.scan_open_barcode
+import com.hnexperts.cosmetics.resources.scan_open_inci
 import com.hnexperts.cosmetics.resources.scan_title
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.ui.common.FailureBanner
+import com.hnexperts.cosmetics.ui.common.UsagePicker
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ScanScreen(
     viewModel: ScanViewModel,
-    onResult: () -> Unit
+    onResult: () -> Unit,
+    onOpenBarcodeCamera: () -> Unit,
+    onOpenInciCamera: () -> Unit
 ) {
     var barcode: String by remember { mutableStateOf("") }
     var inci: String by remember { mutableStateOf("") }
+    var usage: ProductUsage by remember { mutableStateOf(ProductUsage.LEAVE_ON) }
     val uiState: ScanUiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState.navigateToResult) {
@@ -53,6 +60,10 @@ fun ScanScreen(
             onResult()
             viewModel.consumeNavigation()
         }
+    }
+    LaunchedEffect(uiState.notFoundGtin) {
+        val gtin: String = uiState.notFoundGtin ?: return@LaunchedEffect
+        barcode = gtin
     }
 
     Column(
@@ -64,6 +75,20 @@ fun ScanScreen(
     ) {
         Text(text = stringResource(Res.string.scan_title), style = MaterialTheme.typography.headlineSmall)
         FailureBanner(failure = uiState.failure)
+        Button(
+            onClick = onOpenBarcodeCamera,
+            enabled = !uiState.busy,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(Res.string.scan_open_barcode))
+        }
+        Button(
+            onClick = onOpenInciCamera,
+            enabled = !uiState.busy,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(Res.string.scan_open_inci))
+        }
         Text(text = stringResource(Res.string.scan_camera_note), style = MaterialTheme.typography.bodyMedium)
         OutlinedTextField(
             value = barcode,
@@ -90,6 +115,13 @@ fun ScanScreen(
         if (uiState.notFoundGtin != null) {
             Text(text = stringResource(Res.string.scan_not_found_title), style = MaterialTheme.typography.titleMedium)
             Text(text = stringResource(Res.string.scan_not_found_body))
+            Button(
+                onClick = onOpenInciCamera,
+                enabled = !uiState.busy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(Res.string.scan_open_inci))
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -99,8 +131,9 @@ fun ScanScreen(
             modifier = Modifier.fillMaxWidth().height(160.dp),
             label = { Text(stringResource(Res.string.scan_inci_label)) }
         )
+        UsagePicker(selected = usage, onSelect = { next -> usage = next })
         Button(
-            onClick = { viewModel.evaluateTypedList(inci) },
+            onClick = { viewModel.evaluateTypedList(inci, usage) },
             enabled = !uiState.busy,
             modifier = Modifier.fillMaxWidth()
         ) {

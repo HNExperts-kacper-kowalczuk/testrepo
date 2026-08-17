@@ -9,6 +9,7 @@ enum class AdPlacement {
 
 enum class AppScreen {
     SCAN,
+    CAMERA,
     OCR_REVIEW,
     RESULT,
     SEARCH,
@@ -24,7 +25,7 @@ class AdPolicy {
             return false
         }
         return when (screen) {
-            AppScreen.SCAN, AppScreen.OCR_REVIEW, AppScreen.PREFERENCES, AppScreen.CONSENT -> false
+            AppScreen.SCAN, AppScreen.CAMERA, AppScreen.OCR_REVIEW, AppScreen.PREFERENCES, AppScreen.CONSENT -> false
             AppScreen.RESULT, AppScreen.SEARCH, AppScreen.HISTORY, AppScreen.INGREDIENT_DETAIL -> true
         }
     }

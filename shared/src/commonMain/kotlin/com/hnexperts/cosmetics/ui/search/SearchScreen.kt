@@ -18,7 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hnexperts.cosmetics.ads.AdPolicy
+import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.resources.Res
@@ -45,13 +45,7 @@ fun SearchScreen(
     }
     Scaffold(
         bottomBar = {
-            BannerAdSlot(
-                visible = AdPolicy().shouldShowBanner(
-                    AppScreen.SEARCH,
-                    consentGranted = true,
-                    networkAvailable = false
-                )
-            )
+            BannerAdSlot(screen = AppScreen.SEARCH, placement = AdPlacement.SEARCH)
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {

@@ -45,4 +45,12 @@ class SqlHistoryRepository(
             }
         }
     }
+
+    override suspend fun clear(): Outcome<Unit> {
+        return FailureCatcher.database("history.clear") {
+            withContext(dispatchers.userDatabase) {
+                database.userDatabaseQueries.clearHistory()
+            }
+        }
+    }
 }

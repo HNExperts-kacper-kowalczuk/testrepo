@@ -11,11 +11,13 @@
     <string name="scan_barcode_action">Szukaj kodu</string>
     <string name="scan_inci_label">Skład INCI</string>
     <string name="scan_inci_action">Oceń skład</string>
-    <string name="scan_camera_note">Skanowanie aparatem (kod i skład) pojawi się w kolejnej wersji. Na razie wpisz kod kreskowy albo wklej skład z opakowania.</string>
+    <string name="scan_camera_note">Zeskanuj kod kreskowy albo skład INCI aparatem. Jeśli aparat nie odczyta etykiety, możesz wpisać kod albo wkleić skład.</string>
+    <string name="scan_open_barcode">Skanuj kod kreskowy</string>
+    <string name="scan_open_inci">Skanuj skład</string>
     <string name="scan_hint_gtin">Spróbuj 5901234123457</string>
     <string name="scan_invalid_barcode">To nie wygląda na poprawny kod kreskowy.</string>
     <string name="scan_not_found_title">Brak produktu w katalogu offline</string>
-    <string name="scan_not_found_body">Możesz mimo to ocenić produkt, wpisując lub wklejając skład z opakowania.</string>
+    <string name="scan_not_found_body">Tego kodu nie ma w katalogu offline. Zeskanuj skład z etykiety albo wpisz lub wklej go z opakowania.</string>
     <string name="scan_empty_inci">Wklej lub wpisz przynajmniej jedną nazwę składnika.</string>
     <string name="scan_working">Ocenianie…</string>
 
@@ -51,6 +53,40 @@
     <string name="prefs_language_en">Angielski</string>
     <string name="prefs_language_pl">Polski</string>
     <string name="prefs_avoid_title">Unikaj wybranych składników</string>
+    <string name="prefs_catalog_title">Katalog offline</string>
+    <string name="prefs_catalog_stamp">Wersja %1$s · zbudowano %2$s · %3$s</string>
+    <string name="prefs_catalog_unknown">Wersja katalogu nie jest jeszcze dostępna.</string>
+    <string name="prefs_catalog_uptodate">To urządzenie ma już opublikowany katalog.</string>
+    <string name="prefs_catalog_update">Jest nowszy katalog (%1$s). Wczytaj go, jeśli na urządzeniu jest paczka różnic.</string>
+    <string name="prefs_catalog_apply">Wczytaj aktualizację katalogu</string>
+    <string name="prefs_catalog_applied">Zbundlowana aktualizacja katalogu została wczytana.</string>
+    <string name="prefs_catalog_offline">Offline — pokazujemy katalog z aplikacji. Aktualizacje poczekają na sieć.</string>
+    <string name="prefs_catalog_check_action">Sprawdź aktualizacje katalogu</string>
+    <string name="prefs_privacy">Opcje prywatności reklam</string>
+    <string name="prefs_clear_history">Wyczyść historię skanów</string>
+    <string name="prefs_cleared_history">Historia skanów została usunięta z tego urządzenia.</string>
+
+    <string name="disclaimer_title">Zanim zeskanujesz</string>
+    <string name="disclaimer_body">To narzędzie informacyjne dla konsumenta. Nie jest wyrobem medycznym i nie zastępuje składu z etykiety, dermatologa ani oficjalnych załączników UE. Oceny mogą się opóźniać względem przepisów. Nierozpoznane nazwy są pokazywane, nigdy traktowane jako bezpieczne. Reklamy nie pojawiają się na ekranie aparatu ani przy potwierdzaniu składu.</string>
+    <string name="disclaimer_accept">Rozumiem</string>
+    <string name="onboarding_next">Dalej</string>
+    <string name="onboarding_scan_title">Co robi skan</string>
+    <string name="onboarding_scan_body">Skieruj aparat na kod kreskowy albo skład INCI (skład). Wyszukiwanie i ocena zostają na tym urządzeniu. Możesz też wpisać GTIN albo wkleić skład, jeśli aparat nie odczyta opakowania.</string>
+    <string name="onboarding_unknown_title">Nieznany to nie bezpieczny</string>
+    <string name="onboarding_unknown_body">Jeśli nazwy nie ma w bazie wiedzy, jest oznaczona jako nieznana. Wynik może być niepełny. Popraw błędy OCR przed oceną. Składy z katalogu społecznościowego są oznaczone jako niezweryfikowane.</string>
+
+    <string name="usage_prompt">Jak używasz tego produktu?</string>
+    <string name="usage_leave_on">Leave-on</string>
+    <string name="usage_rinse_off">Spłukiwany</string>
+    <string name="usage_spray">Spray</string>
+    <string name="usage_lip">Usta</string>
+    <string name="usage_eye">Okolicę oczu</string>
+    <string name="result_usage">Oceniono jako %1$s.</string>
+    <string name="result_usage_assumed">Nie podano sposobu użycia, więc zastosowano ostrzejszą interpretację leave-on.</string>
+    <string name="finding_usage_adjusted">Poziom dostosowany do typu produktu.</string>
+
+    <string name="result_rating_a11y">Ocena ogólna: %1$s</string>
+    <string name="finding_rating_a11y">Ocena składnika: %1$s</string>
 
     <string name="ad_placeholder">Reklama</string>
     <string name="common_retry">Ponów</string>
@@ -59,7 +95,34 @@
     <string name="error_corrupt_catalog">Katalog offline wygląda na uszkodzony.</string>
     <string name="error_database">Operacja na lokalnej bazie nie powiodła się.</string>
     <string name="error_evaluation">Ocena składu nie powiodła się.</string>
+    <string name="error_camera">Aparat nie dokończył skanowania.</string>
+    <string name="error_ocr">Nie udało się odczytać składu ze zdjęcia.</string>
     <string name="error_unexpected">Coś poszło nie tak.</string>
+
+    <string name="camera_title_barcode">Skanuj kod kreskowy</string>
+    <string name="camera_title_inci">Skanuj skład</string>
+    <string name="camera_hint_barcode">Skieruj aparat na kod EAN lub UPC. Rozpoznawanie działa offline, a reklamy nie pojawiają się na tym ekranie.</string>
+    <string name="camera_hint_inci">Wypłaszcz etykietę, a potem zrób zdjęcie bloku INCI / składu.</string>
+    <string name="camera_capture">Zrób zdjęcie składu</string>
+    <string name="camera_torch_on">Latarka włączona</string>
+    <string name="camera_torch_off">Latarka wyłączona</string>
+    <string name="camera_unavailable">Skanowanie aparatem nie jest dostępne na tym urządzeniu. Wpisz kod albo wklej skład.</string>
+    <string name="camera_permission_title">Potrzebny dostęp do aparatu</string>
+    <string name="camera_permission_body">Aparat służy tylko do odczytu kodów kreskowych i składu z etykiety. Nic nie jest wysyłane.</string>
+    <string name="camera_permission_request">Zezwól na aparat, gdy system o to poprosi, albo wróć i wpisz skład ręcznie.</string>
+    <string name="camera_permission_settings">Otwórz ustawienia</string>
+
+    <string name="confirm_title">Potwierdź składniki</string>
+    <string name="confirm_empty">Brak listy do sprawdzenia. Wróć i zeskanuj etykietę ponownie.</string>
+    <string name="confirm_raw_label">Nazwa składnika</string>
+    <string name="confirm_unknown">Brak w bazie wiedzy — popraw, jeśli OCR źle odczytał nazwę.</string>
+    <string name="confirm_fuzzy_prompt">Czy chodziło o %2$s zamiast „%1$s”?</string>
+    <string name="confirm_fuzzy_accept">Użyj podpowiedzi</string>
+    <string name="confirm_fuzzy_reject">Zostaw oryginał</string>
+    <string name="confirm_pending_fuzzy">Zaakceptuj lub odrzuć każdą podpowiedź przed oceną.</string>
+    <string name="confirm_add">Dodaj składnik</string>
+    <string name="confirm_remove">Usuń</string>
+    <string name="confirm_evaluate">Oceń skład</string>
 
     <plurals name="result_unknown_count">
         <item quantity="one">Nie rozpoznano %1$d nazwy — wynik może być niepełny.</item>

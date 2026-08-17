@@ -2,6 +2,7 @@ package com.hnexperts.cosmetics.evaluation.application
 
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.catalog.application.CatalogIndex
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.concurrency.AppDispatchers
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.failure.FailureCatcher
@@ -27,7 +28,8 @@ class EvaluateProduct(
         source: String,
         productName: String? = null,
         brand: String? = null,
-        gtin: String? = null
+        gtin: String? = null,
+        usage: ProductUsage = ProductUsage.UNKNOWN
     ): Outcome<ProductAssessment> {
         val inputs: EvaluationInputs = when (val loaded: Outcome<EvaluationInputs> = loadInputs()) {
             is Outcome.Err -> return loaded
@@ -39,7 +41,8 @@ class EvaluateProduct(
             inciRaw = inciRaw,
             productName = productName,
             brand = brand,
-            gtin = gtin
+            gtin = gtin,
+            usage = usage
         )
         val assessment: ProductAssessment = when (scored) {
             is Outcome.Err -> return scored
@@ -73,7 +76,8 @@ class EvaluateProduct(
         inciRaw: String,
         productName: String?,
         brand: String?,
-        gtin: String?
+        gtin: String?,
+        usage: ProductUsage
     ): Outcome<ProductAssessment> {
         return FailureCatcher.evaluation("evaluation.score") {
             withContext(dispatchers.computation) {
@@ -82,7 +86,8 @@ class EvaluateProduct(
                     profile = profile,
                     productName = productName,
                     brand = brand,
-                    gtin = gtin
+                    gtin = gtin,
+                    usage = usage
                 )
             }
         }

@@ -18,12 +18,16 @@ class IngredientMatcher(
     }.toMap()
     private val fuzzyIndex: FuzzyIngredientIndex = FuzzyIngredientIndex(ingredients, aliasToIngredient)
 
+    fun tokenize(inciRaw: String): List<String> {
+        return tokenizer.tokenize(inciRaw)
+    }
+
     fun matchList(inciRaw: String): List<IngredientRef> {
-        return tokenizer.tokenize(inciRaw).map { token -> matchToken(token) }
+        return tokenize(inciRaw).map { token -> matchToken(token) }
     }
 
     suspend fun matchListConcurrently(inciRaw: String): List<IngredientRef> {
-        val tokens: List<String> = tokenizer.tokenize(inciRaw)
+        val tokens: List<String> = tokenize(inciRaw)
         if (tokens.size >= ParallelMapper.DEFAULT_THRESHOLD) {
             return ParallelMapper.map(tokens) { token -> matchToken(token) }
         }

@@ -137,3 +137,27 @@ FROM ingredient_hazard;
 selectAllComments:
 SELECT *
 FROM ingredient_comment;
+
+deleteComments:
+DELETE FROM ingredient_comment;
+
+deleteHazards:
+DELETE FROM ingredient_hazard;
+
+deleteCommaExceptions:
+DELETE FROM inci_comma_exception;
+
+deleteAliases:
+DELETE FROM ingredient_alias;
+
+deleteBarcodes:
+DELETE FROM product_barcode;
+
+deleteProducts:
+DELETE FROM product;
+
+deleteIngredients:
+DELETE FROM ingredient;
+
+deleteMeta:
+DELETE FROM catalog_meta;

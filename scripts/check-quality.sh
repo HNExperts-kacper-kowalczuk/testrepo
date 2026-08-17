@@ -53,6 +53,20 @@ else
   echo "OK: no catch (Throwable)"
 fi
 
+extract_keys() {
+  grep -oE 'name="[^"]+"' "$1" | sed 's/name="//;s/"$//' | sort
+}
+
+EN_STRINGS="$(extract_keys shared/src/commonMain/composeResources/values/strings.xml)"
+PL_STRINGS="$(extract_keys shared/src/commonMain/composeResources/values-pl/strings.xml)"
+if [ "$EN_STRINGS" != "$PL_STRINGS" ]; then
+  echo "FAIL: EN/PL string key mismatch"
+  diff <(printf '%s\n' "$EN_STRINGS") <(printf '%s\n' "$PL_STRINGS") || true
+  FAILED=1
+else
+  echo "OK: EN/PL string keys match"
+fi
+
 echo
 if [ "$FAILED" -ne 0 ]; then
   echo "Quality check FAILED. Fix the issues and re-read docs/quality-checklist.md before committing."
