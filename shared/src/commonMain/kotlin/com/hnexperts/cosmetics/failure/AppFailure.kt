@@ -32,6 +32,16 @@ sealed class AppFailure {
         override val detail: String
     ) : AppFailure()
 
+    data class Camera(
+        override val operation: String,
+        override val detail: String
+    ) : AppFailure()
+
+    data class Ocr(
+        override val operation: String,
+        override val detail: String
+    ) : AppFailure()
+
     data class Unexpected(
         override val operation: String,
         override val detail: String

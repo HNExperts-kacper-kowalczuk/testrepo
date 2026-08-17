@@ -2,11 +2,11 @@ package com.hnexperts.cosmetics.ui.scan
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hnexperts.cosmetics.catalog.domain.GtinNormalizer
-import com.hnexperts.cosmetics.catalog.domain.Product
-import com.hnexperts.cosmetics.catalog.domain.ProductRepository
+import com.hnexperts.cosmetics.catalog.application.BarcodeLookup
+import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
+import com.hnexperts.cosmetics.scanning.application.ScanBridge
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,38 +25,44 @@ data class ScanUiState(
 )
 
 class ScanViewModel(
-    private val products: ProductRepository,
-    private val evaluateProduct: EvaluateProduct
+    private val resolveBarcode: ResolveBarcode,
+    private val evaluateProduct: EvaluateProduct,
+    private val scanBridge: ScanBridge
 ) : ViewModel() {
     private val state: MutableStateFlow<ScanUiState> = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = state.asStateFlow()
     private var runningJob: Job? = null
 
-    fun lookupBarcode(raw: String) {
-        val gtin: String = GtinNormalizer.normalize(raw)
-        if (gtin.length < 8) {
-            state.update { current ->
-                current.copy(invalidBarcode = true, emptyInci = false, notFoundGtin = null, failure = null)
-            }
-            return
-        }
-        startWork {
-            val product: Product? = runUiAction(onFailure = ::showFailure) {
-                products.findByGtin(gtin)
-            } ?: return@startWork
-            if (product == null) {
-                state.update { current ->
-                    current.copy(invalidBarcode = false, notFoundGtin = gtin, failure = null)
+    init {
+        viewModelScope.launch {
+            scanBridge.notFoundGtin.collect { gtin ->
+                if (gtin != null) {
+                    state.update { current ->
+                        current.copy(notFoundGtin = gtin, invalidBarcode = false, failure = null)
+                    }
+                    scanBridge.consumeNotFound()
                 }
-                return@startWork
             }
-            evaluateAndOpen(
-                inciRaw = product.inciRaw,
-                source = "barcode",
-                productName = product.name,
-                brand = product.brand,
-                gtin = gtin
-            )
+        }
+    }
+
+    fun lookupBarcode(raw: String) {
+        startWork {
+            when (val lookup: BarcodeLookup = runUiAction(::showFailure) { resolveBarcode.invoke(raw) } ?: return@startWork) {
+                is BarcodeLookup.Invalid -> state.update { current ->
+                    current.copy(invalidBarcode = true, emptyInci = false, notFoundGtin = null)
+                }
+                is BarcodeLookup.NotFound -> state.update { current ->
+                    current.copy(invalidBarcode = false, notFoundGtin = lookup.gtin)
+                }
+                is BarcodeLookup.Found -> evaluateAndOpen(
+                    inciRaw = lookup.product.inciRaw,
+                    source = "barcode",
+                    productName = lookup.product.name,
+                    brand = lookup.product.brand,
+                    gtin = lookup.gtin
+                )
+            }
         }
     }
 

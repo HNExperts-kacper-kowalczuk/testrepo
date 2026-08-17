@@ -2,6 +2,7 @@ package com.hnexperts.cosmetics.di
 
 import com.hnexperts.cosmetics.catalog.application.CatalogBootstrap
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
 import com.hnexperts.cosmetics.catalog.data.CatalogSnapshotReader
 import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
@@ -16,14 +17,21 @@ import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
 import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
+import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
+import com.hnexperts.cosmetics.scanning.application.PrepareIngredientReview
+import com.hnexperts.cosmetics.scanning.application.ScanBridge
 import com.hnexperts.cosmetics.scanning.data.SqlHistoryRepository
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
+import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
+import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
 import com.hnexperts.cosmetics.ui.history.HistoryViewModel
 import com.hnexperts.cosmetics.ui.preferences.PreferencesViewModel
 import com.hnexperts.cosmetics.ui.result.ResultViewModel
 import com.hnexperts.cosmetics.ui.scan.ScanViewModel
 import com.hnexperts.cosmetics.ui.search.SearchViewModel
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -42,8 +50,24 @@ val appModule = module {
     single { EvaluationSession() }
     single { CommentLocalizer() }
     single { EvaluateProduct(get(), get(), get(), get(), get()) }
+    single { ResolveBarcode(get()) }
+    single { PrepareIngredientReview(get()) }
+    single { IngredientReviewSession() }
+    single { ScanBridge() }
 
     viewModelOf(::ScanViewModel)
+    viewModel { parameters ->
+        CameraScanViewModel(
+            resolveBarcode = get(),
+            evaluateProduct = get(),
+            recognizer = get(),
+            prepareReview = get(),
+            reviewSession = get(),
+            scanBridge = get(),
+            initialMode = parameters.getOrNull<ScannerMode>() ?: ScannerMode.BARCODE
+        )
+    }
+    viewModelOf(::ConfirmIngredientsViewModel)
     viewModelOf(::ResultViewModel)
     viewModelOf(::SearchViewModel)
     viewModelOf(::HistoryViewModel)

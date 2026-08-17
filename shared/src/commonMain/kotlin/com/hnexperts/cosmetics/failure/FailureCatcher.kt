@@ -16,6 +16,14 @@ object FailureCatcher {
         return wrap(operation, { error -> AppFailure.Evaluation(operation, error.toVerboseString()) }, block)
     }
 
+    suspend fun <T> camera(operation: String, block: suspend () -> T): Outcome<T> {
+        return wrap(operation, { error -> AppFailure.Camera(operation, error.toVerboseString()) }, block)
+    }
+
+    suspend fun <T> ocr(operation: String, block: suspend () -> T): Outcome<T> {
+        return wrap(operation, { error -> AppFailure.Ocr(operation, error.toVerboseString()) }, block)
+    }
+
     suspend fun <T> unexpected(operation: String, block: suspend () -> T): Outcome<T> {
         return wrap(operation, { error -> AppFailure.Unexpected(operation, error.toVerboseString()) }, block)
     }

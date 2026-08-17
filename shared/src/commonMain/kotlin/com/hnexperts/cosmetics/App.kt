@@ -21,11 +21,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.tab_history
 import com.hnexperts.cosmetics.resources.tab_more
 import com.hnexperts.cosmetics.resources.tab_scan
 import com.hnexperts.cosmetics.resources.tab_search
+import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.ui.camera.CameraScanScreen
+import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
+import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsScreen
+import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
 import com.hnexperts.cosmetics.ui.history.HistoryScreen
 import com.hnexperts.cosmetics.ui.history.HistoryViewModel
 import com.hnexperts.cosmetics.ui.preferences.PreferencesScreen
@@ -40,6 +46,7 @@ import com.hnexperts.cosmetics.ui.theme.CosmeticsTheme
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Serializable
 object ScanDestination
@@ -56,12 +63,19 @@ object MoreDestination
 @Serializable
 object ResultDestination
 
+@Serializable
+data class CameraDestination(val barcode: Boolean)
+
+@Serializable
+object ConfirmIngredientsDestination
+
 @Composable
 fun App() {
     CosmeticsTheme {
         val navController: NavHostController = rememberNavController()
         val backStack by navController.currentBackStackEntryAsState()
-        val showBottomBar: Boolean = backStack?.destination?.route?.contains("Result") != true
+        val route: String = backStack?.destination?.route.orEmpty()
+        val showBottomBar: Boolean = !hidesBottomBar(route)
         Scaffold(
             bottomBar = {
                 if (showBottomBar) {
@@ -76,9 +90,12 @@ fun App() {
             ) {
                 composable<ScanDestination> {
                     val viewModel: ScanViewModel = koinViewModel()
-                    ScanScreen(viewModel = viewModel, onResult = {
-                        navController.navigate(ResultDestination)
-                    })
+                    ScanScreen(
+                        viewModel = viewModel,
+                        onResult = { navController.navigate(ResultDestination) },
+                        onOpenBarcodeCamera = { navController.navigate(CameraDestination(barcode = true)) },
+                        onOpenInciCamera = { navController.navigate(CameraDestination(barcode = false)) }
+                    )
                 }
                 composable<SearchDestination> {
                     val viewModel: SearchViewModel = koinViewModel()
@@ -96,12 +113,57 @@ fun App() {
                     val viewModel: PreferencesViewModel = koinViewModel()
                     PreferencesScreen(viewModel)
                 }
+                composable<CameraDestination> { entry ->
+                    val destination: CameraDestination = entry.toRoute()
+                    val mode: ScannerMode = if (destination.barcode) {
+                        ScannerMode.BARCODE
+                    } else {
+                        ScannerMode.INGREDIENT_LIST
+                    }
+                    val viewModel: CameraScanViewModel = koinViewModel(parameters = { parametersOf(mode) })
+                    CameraScanScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
+                        onResult = { navController.navigateToResultFromCamera() },
+                        onConfirm = { navController.navigateToConfirmFromCamera() }
+                    )
+                }
+                composable<ConfirmIngredientsDestination> {
+                    val viewModel: ConfirmIngredientsViewModel = koinViewModel()
+                    ConfirmIngredientsScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
+                        onResult = { navController.navigateToResultFromConfirm() }
+                    )
+                }
                 composable<ResultDestination> {
                     val viewModel: ResultViewModel = koinViewModel()
                     ResultScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
                 }
             }
         }
+    }
+}
+
+private fun hidesBottomBar(route: String): Boolean {
+    return route.contains("Result") || route.contains("Camera") || route.contains("Confirm")
+}
+
+private fun NavHostController.navigateToResultFromCamera() {
+    navigate(ResultDestination) {
+        popUpTo<CameraDestination> { inclusive = true }
+    }
+}
+
+private fun NavHostController.navigateToConfirmFromCamera() {
+    navigate(ConfirmIngredientsDestination) {
+        popUpTo<CameraDestination> { inclusive = true }
+    }
+}
+
+private fun NavHostController.navigateToResultFromConfirm() {
+    navigate(ResultDestination) {
+        popUpTo<ConfirmIngredientsDestination> { inclusive = true }
     }
 }
 

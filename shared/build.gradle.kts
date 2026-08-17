@@ -47,6 +47,13 @@ kotlin {
             implementation(libs.androidx.appcompat)
             implementation(libs.koin.android)
             implementation(libs.sqldelight.android.driver)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
+            implementation(libs.androidx.camera.mlkit)
+            implementation(libs.mlkit.barcode)
+            implementation(libs.mlkit.text)
+            implementation(libs.kotlinx.coroutines.play.services)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)

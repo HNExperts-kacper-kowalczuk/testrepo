@@ -34,6 +34,8 @@ import com.hnexperts.cosmetics.resources.scan_inci_label
 import com.hnexperts.cosmetics.resources.scan_invalid_barcode
 import com.hnexperts.cosmetics.resources.scan_not_found_body
 import com.hnexperts.cosmetics.resources.scan_not_found_title
+import com.hnexperts.cosmetics.resources.scan_open_barcode
+import com.hnexperts.cosmetics.resources.scan_open_inci
 import com.hnexperts.cosmetics.resources.scan_title
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.ui.common.FailureBanner
@@ -42,7 +44,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ScanScreen(
     viewModel: ScanViewModel,
-    onResult: () -> Unit
+    onResult: () -> Unit,
+    onOpenBarcodeCamera: () -> Unit,
+    onOpenInciCamera: () -> Unit
 ) {
     var barcode: String by remember { mutableStateOf("") }
     var inci: String by remember { mutableStateOf("") }
@@ -54,6 +58,10 @@ fun ScanScreen(
             viewModel.consumeNavigation()
         }
     }
+    LaunchedEffect(uiState.notFoundGtin) {
+        val gtin: String = uiState.notFoundGtin ?: return@LaunchedEffect
+        barcode = gtin
+    }
 
     Column(
         modifier = Modifier
@@ -64,6 +72,20 @@ fun ScanScreen(
     ) {
         Text(text = stringResource(Res.string.scan_title), style = MaterialTheme.typography.headlineSmall)
         FailureBanner(failure = uiState.failure)
+        Button(
+            onClick = onOpenBarcodeCamera,
+            enabled = !uiState.busy,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(Res.string.scan_open_barcode))
+        }
+        Button(
+            onClick = onOpenInciCamera,
+            enabled = !uiState.busy,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(Res.string.scan_open_inci))
+        }
         Text(text = stringResource(Res.string.scan_camera_note), style = MaterialTheme.typography.bodyMedium)
         OutlinedTextField(
             value = barcode,
@@ -90,6 +112,13 @@ fun ScanScreen(
         if (uiState.notFoundGtin != null) {
             Text(text = stringResource(Res.string.scan_not_found_title), style = MaterialTheme.typography.titleMedium)
             Text(text = stringResource(Res.string.scan_not_found_body))
+            Button(
+                onClick = onOpenInciCamera,
+                enabled = !uiState.busy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(Res.string.scan_open_inci))
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(

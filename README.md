@@ -2,7 +2,7 @@
 
 Kotlin Multiplatform (Android + iOS) app that lets people look up a cosmetic product and see whether its ingredients are potentially harmful, restricted, or otherwise worth avoiding.
 
-The evaluator, catalog, and comments work **offline**. v1 ships a fixture catalog (8 products, ~35 ingredients). Type a barcode or paste an INCI list; on-device camera scanning is next.
+The evaluator, catalog, and comments work **offline**. v1 ships a fixture catalog (8 products, ~35 ingredients). Scan a barcode or the printed INCI list on device, or type/paste if the camera cannot read the pack.
 
 UI copy and comments are structured for **easy translation** (English and Polish).
 
@@ -10,17 +10,18 @@ UI copy and comments are structured for **easy translation** (English and Polish
 
 Working now:
 
+- Live camera barcode scan (CameraX + ML Kit on Android, AVFoundation on iOS) with 800 ms debounce
+- Still-image INCI OCR and a confirm-ingredients screen (edit / add / remove; fuzzy matches must be accepted or rejected)
 - INCI matching (aliases, `1,2-Hexanediol`, fuzzy OCR typos)
 - Hazard scoring + personal avoid-list (fragrance-free, pregnancy caution)
 - SQLDelight catalog + user preferences/history
-- Compose Multiplatform UI: Scan, Search, History, Preferences, Result
+- Compose Multiplatform UI: Scan, Camera, Confirm, Search, History, Preferences, Result
 - EN/PL string resources and localized ingredient comments
-- Reserved ad banner slot (hidden until network + consent; never on Scan)
-- Background work: catalog bootstrap, matching, and SQLite stay off the UI thread; catalog and user databases can run in parallel
+- Reserved ad banner slot (hidden until network + consent; never on Scan, camera, or OCR review)
+- Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
 Not in this slice yet (see `docs/plan.md` and `docs/further-additions.md`):
 
-- Live camera barcode / INCI OCR
 - Real AdMob SDK
 - Full regional product dump
 
@@ -49,7 +50,7 @@ iOS: open `iosApp/iosApp.xcodeproj` on macOS after a Gradle sync.
 | `5901234123518` | Niacinamide Serum 10% | Low |
 | `5901234123525` | Plain Petrolatum Balm | Safe |
 
-Unknown barcodes fall through to the INCI paste field.
+Unknown barcodes open a fallback to scan or paste the INCI list.
 
 ## Docs
 
