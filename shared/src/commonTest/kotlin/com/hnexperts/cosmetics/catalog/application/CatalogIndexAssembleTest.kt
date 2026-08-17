@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.catalog.application
 
+import com.hnexperts.cosmetics.catalog.domain.CatalogIntegrity
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import kotlin.test.Test
@@ -10,7 +11,7 @@ class CatalogIndexAssembleTest {
     @Test
     fun assembleSortsIngredientsAndWiresMatcher() {
         val snapshot: CatalogSnapshot = CatalogSnapshot(
-            rulesetVersion = FixtureCatalog.RULESET_VERSION,
+            meta = CatalogIntegrity.fixtureMeta(),
             ingredients = FixtureCatalog.ingredients.map { item -> item.ingredient },
             aliases = FixtureCatalog.aliasMap(),
             commaExceptions = FixtureCatalog.commaExceptions(),

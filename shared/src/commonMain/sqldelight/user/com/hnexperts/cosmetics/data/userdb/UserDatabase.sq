@@ -36,6 +36,12 @@ CREATE TABLE report_queue (
     flushed INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE user_legal (
+    id INTEGER NOT NULL PRIMARY KEY,
+    disclaimer_accepted INTEGER NOT NULL DEFAULT 0,
+    accepted_at TEXT
+);
+
 selectProfile:
 SELECT *
 FROM user_profile
@@ -64,8 +70,20 @@ insertHistory:
 INSERT INTO scan_history(scanned_at, gtin, product_id, inci_raw, rating, source)
 VALUES (?, ?, ?, ?, ?, ?);
 
+clearHistory:
+DELETE FROM scan_history;
+
 selectHistory:
 SELECT *
 FROM scan_history
 ORDER BY scanned_at DESC
 LIMIT 100;
+
+selectLegal:
+SELECT *
+FROM user_legal
+WHERE id = 1;
+
+upsertLegal:
+INSERT OR REPLACE INTO user_legal(id, disclaimer_accepted, accepted_at)
+VALUES (1, ?, ?);

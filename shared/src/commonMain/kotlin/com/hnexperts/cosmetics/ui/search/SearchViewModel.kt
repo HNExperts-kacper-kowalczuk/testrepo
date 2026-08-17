@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
@@ -59,7 +60,8 @@ class SearchViewModel(
                         inciRaw = product.inciRaw,
                         source = "search",
                         productName = product.name,
-                        brand = product.brand
+                        brand = product.brand,
+                        usage = ProductUsage.parse(product.usage)
                     )
                 }
                 if (assessment != null) {

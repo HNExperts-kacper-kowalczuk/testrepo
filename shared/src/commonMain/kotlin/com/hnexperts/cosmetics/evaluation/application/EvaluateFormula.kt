@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.evaluation.application
 
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
@@ -28,7 +29,8 @@ class EvaluateFormula(
         profile: UserAvoidanceProfile,
         productName: String? = null,
         brand: String? = null,
-        gtin: String? = null
+        gtin: String? = null,
+        usage: ProductUsage = ProductUsage.UNKNOWN
     ): ProductAssessment {
         return toAssessment(
             references = matcher.matchList(inciRaw),
@@ -36,7 +38,8 @@ class EvaluateFormula(
             profile = profile,
             productName = productName,
             brand = brand,
-            gtin = gtin
+            gtin = gtin,
+            usage = usage
         )
     }
 
@@ -45,7 +48,8 @@ class EvaluateFormula(
         profile: UserAvoidanceProfile,
         productName: String? = null,
         brand: String? = null,
-        gtin: String? = null
+        gtin: String? = null,
+        usage: ProductUsage = ProductUsage.UNKNOWN
     ): ProductAssessment {
         coroutineContext.ensureActive()
         return toAssessment(
@@ -54,7 +58,8 @@ class EvaluateFormula(
             profile = profile,
             productName = productName,
             brand = brand,
-            gtin = gtin
+            gtin = gtin,
+            usage = usage
         )
     }
 
@@ -64,13 +69,14 @@ class EvaluateFormula(
         profile: UserAvoidanceProfile,
         productName: String?,
         brand: String?,
-        gtin: String?
+        gtin: String?,
+        usage: ProductUsage
     ): ProductAssessment {
         val findings: List<Finding> = references.map { reference ->
             val ingredient: Ingredient? = reference.id?.let { id -> ingredientsById[id] }
             val hazard: IngredientHazard? = reference.id?.let { id -> hazardsById[id] }
             val comments: List<LocalizedText> = reference.id?.let { id -> commentsById[id] }.orEmpty()
-            policy.assess(reference, ingredient, hazard, comments, profile)
+            policy.assess(reference, ingredient, hazard, comments, profile, usage)
         }
         val unknownCount: Int = findings.count { finding ->
             finding.ingredient.matchedBy == MatchMethod.UNMATCHED || finding.level == DangerLevel.UNKNOWN
@@ -86,7 +92,9 @@ class EvaluateFormula(
             suitableForUser = suitableForUser,
             findings = findings,
             unknownCount = unknownCount,
-            rulesetVersion = rulesetVersion
+            rulesetVersion = rulesetVersion,
+            usage = usage.scoringUsage(),
+            usageAssumed = usage == ProductUsage.UNKNOWN
         )
     }
 }

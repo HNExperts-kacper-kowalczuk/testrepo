@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.evaluation.application
 
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.catalog.fixture.EvaluationFactory
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
@@ -23,10 +24,25 @@ class EvaluateFormulaTest {
     }
 
     @Test
-    fun shampooWithMitIsHigh() {
-        val productInci: String = FixtureCatalog.products.first { item -> item.product.id == "strong-shampoo" }.product.inciRaw
-        val assessment: ProductAssessment = evaluateFormula.evaluate(productInci, UserAvoidanceProfile.EMPTY)
+    fun shampooWithMitIsHighWhenRinseOff() {
+        val product = FixtureCatalog.products.first { item -> item.product.id == "strong-shampoo" }.product
+        val assessment: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = product.inciRaw,
+            profile = UserAvoidanceProfile.EMPTY,
+            usage = ProductUsage.parse(product.usage)
+        )
         assertEquals(DangerLevel.HIGH, assessment.overall)
+    }
+
+    @Test
+    fun mitInLeaveOnIsProhibited() {
+        val assessment: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = "Aqua, Methylisothiazolinone, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY,
+            usage = ProductUsage.LEAVE_ON
+        )
+        assertEquals(DangerLevel.PROHIBITED, assessment.overall)
+        assertTrue(assessment.findings.first { finding -> finding.ingredient.id == "methylisothiazolinone" }.usageAdjusted)
     }
 
     @Test

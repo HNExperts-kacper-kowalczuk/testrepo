@@ -16,4 +16,5 @@ data class HistoryEntry(
 interface ScanHistoryRepository {
     suspend fun record(assessment: ProductAssessment, source: String): Outcome<Unit>
     suspend fun recent(): Outcome<List<HistoryEntry>>
+    suspend fun clear(): Outcome<Unit>
 }

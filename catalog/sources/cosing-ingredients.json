@@ -1,0 +1,969 @@
+{
+    "source": "cosing-derived",
+    "region": "EU",
+    "catalogVersion": "2026.08-fixture",
+    "rulesetVersion": "2026.08-fixture",
+    "builtAt": "2026-08-17T00:00:00Z",
+    "ingredients": [
+        {
+            "id": "aqua",
+            "inciName": "Aqua",
+            "casNumbers": null,
+            "aliases": [
+                "Water",
+                "Eau"
+            ],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "SOLVENT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Water. No relevant restriction in this ruleset.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Woda. Brak istotnych ograniczeń w tym zestawie reguł.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "glycerin",
+            "inciName": "Glycerin",
+            "casNumbers": null,
+            "aliases": [
+                "Glycerol"
+            ],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "HUMECTANT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Common humectant, generally accepted in cosmetics.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Popularny humektant, zwykle akceptowany w kosmetykach.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "niacinamide",
+            "inciName": "Niacinamide",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "SKIN_CONDITIONING"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Vitamin B3 derivative used for skin conditioning.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Pochodna witaminy B3 stosowana do kondycjonowania skóry.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "tocopherol",
+            "inciName": "Tocopherol",
+            "casNumbers": null,
+            "aliases": [
+                "Vitamin E"
+            ],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "ANTIOXIDANT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Vitamin E antioxidant. Generally accepted at typical use.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Przeciwutleniacz — witamina E. Zwykle akceptowany.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "zinc-oxide",
+            "inciName": "Zinc Oxide",
+            "casNumbers": null,
+            "aliases": [
+                "CI 77947"
+            ],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "UV_FILTER"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Mineral UV filter authorised in the EU with concentration limits.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Mineralny filtr UV dopuszczony w UE z limitami stężenia.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "dimethicone",
+            "inciName": "Dimethicone",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "EMOLLIENT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Silicone emollient. No relevant restriction in this ruleset.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Emolient silikonowy. Brak istotnych ograniczeń w tym zestawie reguł.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "petrolatum",
+            "inciName": "Petrolatum",
+            "casNumbers": null,
+            "aliases": [
+                "Vaseline",
+                "Petroleum Jelly"
+            ],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "EMOLLIENT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Occlusive emollient. Cosmetic grades are highly refined.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Emolient okluzyjny. Gatunki kosmetyczne są wysoko oczyszczone.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "cetyl-alcohol",
+            "inciName": "Cetyl Alcohol",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "EMOLLIENT",
+                "EMULSIFIER"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Fatty alcohol used as an emollient and thickener.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Alkohol tłuszczowy stosowany jako emolient i zagęstnik.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "cocamidopropyl-betaine",
+            "inciName": "Cocamidopropyl Betaine",
+            "casNumbers": null,
+            "aliases": [
+                "CAPB"
+            ],
+            "commaException": false,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [],
+            "functionTags": [
+                "SURFACTANT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Mild surfactant. Can occasionally sensitise, especially if impure.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Łagodny środek powierzchniowo czynny. Czasem może uczulać.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "phenoxyethanol",
+            "inciName": "Phenoxyethanol",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [
+                "ANNEX_V"
+            ],
+            "functionTags": [
+                "PRESERVATIVE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "EU-authorised preservative with a maximum concentration.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Konserwant dopuszczony w UE z maksymalnym stężeniem.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "sodium-benzoate",
+            "inciName": "Sodium Benzoate",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [
+                "ANNEX_V"
+            ],
+            "functionTags": [
+                "PRESERVATIVE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Authorised preservative; more common in rinse-off products.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Dopuszczony konserwant; częstszy w produktach spłukiwanych.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "alcohol-denat",
+            "inciName": "Alcohol Denat.",
+            "casNumbers": null,
+            "aliases": [
+                "Alcohol Denatured",
+                "Ethanol"
+            ],
+            "commaException": false,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [],
+            "functionTags": [
+                "SOLVENT"
+            ],
+            "restriction": {
+                "leaveOn": "MODERATE",
+                "rinseOff": "LOW",
+                "lip": null,
+                "eye": null,
+                "spray": null
+            },
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Denatured alcohol. Can dry or irritate in leave-on products.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Denaturowany alkohol. W produktach leave-on może wysuszać lub podrażniać.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "hexanediol",
+            "inciName": "1,2-Hexanediol",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": true,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [],
+            "functionTags": [
+                "HUMECTANT",
+                "PRESERVATIVE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Humectant and mild preservative booster. Name contains a comma.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Humektant i wspomaganie konserwacji. Nazwa zawiera przecinek.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "titanium-dioxide",
+            "inciName": "Titanium Dioxide",
+            "casNumbers": null,
+            "aliases": [
+                "CI 77891",
+                "CI77891"
+            ],
+            "commaException": false,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [
+                "ANNEX_VI"
+            ],
+            "functionTags": [
+                "UV_FILTER",
+                "COLORANT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Mineral pigment and UV filter. Nano forms must be labelled.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Mineralny pigment i filtr UV. Formy nano muszą być oznaczone.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "ci-19140",
+            "inciName": "CI 19140",
+            "casNumbers": null,
+            "aliases": [
+                "Yellow 5",
+                "Tartrazine"
+            ],
+            "commaException": false,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [
+                "ANNEX_IV"
+            ],
+            "functionTags": [
+                "COLORANT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Yellow colourant authorised in cosmetics under Annex IV.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Żółty barwnik dopuszczony w kosmetykach (załącznik IV).",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "sodium-lauryl-sulfate",
+            "inciName": "Sodium Lauryl Sulfate",
+            "casNumbers": null,
+            "aliases": [
+                "SLS",
+                "Sodium Lauryl Sulphate"
+            ],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "SURFACTANT"
+            ],
+            "restriction": {
+                "leaveOn": "HIGH",
+                "rinseOff": "MODERATE",
+                "lip": null,
+                "eye": null,
+                "spray": null
+            },
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Strong surfactant. Can irritate skin and eyes, especially in leave-on use.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Silny środek powierzchniowo czynny. Może podrażniać skórę i oczy.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "sodium-laureth-sulfate",
+            "inciName": "Sodium Laureth Sulfate",
+            "casNumbers": null,
+            "aliases": [
+                "SLES",
+                "Sodium Laureth Sulphate"
+            ],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "SURFACTANT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Common cleanser. Milder than SLS but still a frequent irritant.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Popularny środek myjący. Łagodniejszy niż SLS, ale nadal bywa drażniący.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "parfum",
+            "inciName": "Parfum",
+            "casNumbers": null,
+            "aliases": [
+                "Fragrance",
+                "Aroma"
+            ],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "FRAGRANCE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Undisclosed fragrance mix. May include EU-labelled allergens.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Niejawna mieszanina zapachowa. Może zawierać alergeny oznaczane w UE.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "limonene",
+            "inciName": "Limonene",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [
+                "ALLERGEN_26"
+            ],
+            "functionTags": [
+                "FRAGRANCE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Common fragrance allergen that must be labelled above a threshold.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Częsty alergen zapachowy, który powyżej progu musi być wymieniony.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "linalool",
+            "inciName": "Linalool",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [
+                "ALLERGEN_26"
+            ],
+            "functionTags": [
+                "FRAGRANCE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Common fragrance allergen that must be labelled above a threshold.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Częsty alergen zapachowy, który powyżej progu musi być wymieniony.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "citral",
+            "inciName": "Citral",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [
+                "ALLERGEN_26"
+            ],
+            "functionTags": [
+                "FRAGRANCE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Fragrance allergen listed in the EU allergen annex.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Alergen zapachowy wymieniony w unijnym wykazie alergenów.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "hydroxycitronellal",
+            "inciName": "Hydroxycitronellal",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [
+                "ALLERGEN_26"
+            ],
+            "functionTags": [
+                "FRAGRANCE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Fragrance allergen listed in the EU allergen annex.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Alergen zapachowy wymieniony w unijnym wykazie alergenów.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "homosalate",
+            "inciName": "Homosalate",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [
+                "ANNEX_VI"
+            ],
+            "functionTags": [
+                "UV_FILTER"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Chemical UV filter with concentration limits and ongoing scrutiny.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Chemiczny filtr UV z limitami stężenia i trwającą oceną bezpieczeństwa.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "propylparaben",
+            "inciName": "Propylparaben",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "MODERATE",
+            "regulatoryTags": [
+                "ANNEX_V"
+            ],
+            "functionTags": [
+                "PRESERVATIVE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Paraben preservative allowed only under concentration limits.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Paraben dopuszczony wyłącznie w określonych stężeniach.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "triclosan",
+            "inciName": "Triclosan",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "RESTRICTED",
+            "regulatoryTags": [
+                "ANNEX_V"
+            ],
+            "functionTags": [
+                "PRESERVATIVE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Restricted preservative. Allowed only in specific product types and concentrations.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Ograniczony konserwant. Dopuszczony tylko w określonych produktach i stężeniach.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "benzophenone-3",
+            "inciName": "Benzophenone-3",
+            "casNumbers": null,
+            "aliases": [
+                "Oxybenzone"
+            ],
+            "commaException": false,
+            "dangerLevel": "RESTRICTED",
+            "regulatoryTags": [
+                "ANNEX_VI"
+            ],
+            "functionTags": [
+                "UV_FILTER"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "UV filter restricted in the EU; concentration and labelling conditions apply.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Filtr UV ograniczony w UE; obowiązują limity i oznakowanie.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "salicylic-acid",
+            "inciName": "Salicylic Acid",
+            "casNumbers": null,
+            "aliases": [
+                "BHA Acid"
+            ],
+            "commaException": false,
+            "dangerLevel": "RESTRICTED",
+            "regulatoryTags": [
+                "ANNEX_III",
+                "PREGNANCY_CAUTION"
+            ],
+            "functionTags": [
+                "KERATOLYTIC"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Restricted keratolytic. Not for children under three; caution in pregnancy.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Ograniczony keratolotyk. Nie dla dzieci poniżej 3 lat; ostrożnie w ciąży.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "retinol",
+            "inciName": "Retinol",
+            "casNumbers": null,
+            "aliases": [
+                "Vitamin A"
+            ],
+            "commaException": false,
+            "dangerLevel": "RESTRICTED",
+            "regulatoryTags": [
+                "ANNEX_III",
+                "PREGNANCY_CAUTION"
+            ],
+            "functionTags": [],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Vitamin A. Concentration-capped in the EU; often avoided in pregnancy.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Witamina A. W UE z limitem stężenia; często unikana w ciąży.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "methylisothiazolinone",
+            "inciName": "Methylisothiazolinone",
+            "casNumbers": null,
+            "aliases": [
+                "MIT"
+            ],
+            "commaException": false,
+            "dangerLevel": "HIGH",
+            "regulatoryTags": [
+                "ANNEX_V"
+            ],
+            "functionTags": [
+                "PRESERVATIVE"
+            ],
+            "restriction": {
+                "leaveOn": "PROHIBITED",
+                "rinseOff": "HIGH",
+                "lip": null,
+                "eye": null,
+                "spray": null
+            },
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Strong sensitiser. Banned in leave-on cosmetics in the EU.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Silny alergen. W UE zakazany w kosmetykach leave-on.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "methylchloroisothiazolinone",
+            "inciName": "Methylchloroisothiazolinone",
+            "casNumbers": null,
+            "aliases": [
+                "MCI"
+            ],
+            "commaException": false,
+            "dangerLevel": "HIGH",
+            "regulatoryTags": [
+                "ANNEX_V"
+            ],
+            "functionTags": [
+                "PRESERVATIVE"
+            ],
+            "restriction": {
+                "leaveOn": "PROHIBITED",
+                "rinseOff": "HIGH",
+                "lip": null,
+                "eye": null,
+                "spray": null
+            },
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Used with MIT in a restricted rinse-off mix. High allergy concern.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Stosowany z MIT w ograniczonej mieszaninie do spłukiwania. Wysokie ryzyko alergii.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "butylparaben",
+            "inciName": "Butylparaben",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "HIGH",
+            "regulatoryTags": [
+                "ANNEX_V"
+            ],
+            "functionTags": [
+                "PRESERVATIVE"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Paraben with tighter restrictions than some other parabens.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Paraben z ostrzejszymi ograniczeniami niż niektóre inne parabeny.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "bha",
+            "inciName": "BHA",
+            "casNumbers": null,
+            "aliases": [
+                "Butylated Hydroxyanisole"
+            ],
+            "commaException": false,
+            "dangerLevel": "HIGH",
+            "regulatoryTags": [],
+            "functionTags": [
+                "ANTIOXIDANT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Antioxidant with significant safety concern in leave-on cosmetics.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Przeciwutleniacz budzący istotne zastrzeżenia w kosmetykach leave-on.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "cyclotetrasiloxane",
+            "inciName": "Cyclotetrasiloxane",
+            "casNumbers": null,
+            "aliases": [
+                "D4"
+            ],
+            "commaException": false,
+            "dangerLevel": "HIGH",
+            "regulatoryTags": [],
+            "functionTags": [
+                "EMOLLIENT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Cyclic silicone (D4) with serious environmental and health restrictions.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Cykliczny silikon (D4) z poważnymi ograniczeniami zdrowotnymi i środowiskowymi.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "formaldehyde",
+            "inciName": "Formaldehyde",
+            "casNumbers": null,
+            "aliases": [
+                "Methanal"
+            ],
+            "commaException": false,
+            "dangerLevel": "PROHIBITED",
+            "regulatoryTags": [
+                "ANNEX_II",
+                "CMR"
+            ],
+            "functionTags": [],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Listed as prohibited in EU cosmetics (Annex II).",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Wykazany jako substancja zakazana w kosmetykach UE (załącznik II).",
+                    "detail": null
+                }
+            ]
+        }
+    ]
+}

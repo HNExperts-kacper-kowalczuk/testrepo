@@ -1,6 +1,9 @@
 package com.hnexperts.cosmetics
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -12,7 +15,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -21,13 +29,24 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.hnexperts.cosmetics.failure.Outcome
+import com.hnexperts.cosmetics.legal.domain.LegalState
+import com.hnexperts.cosmetics.legal.domain.LegalStore
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.tab_history
 import com.hnexperts.cosmetics.resources.tab_more
 import com.hnexperts.cosmetics.resources.tab_scan
 import com.hnexperts.cosmetics.resources.tab_search
+import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.ui.camera.CameraScanScreen
+import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
+import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsScreen
+import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
 import com.hnexperts.cosmetics.ui.history.HistoryScreen
 import com.hnexperts.cosmetics.ui.history.HistoryViewModel
+import com.hnexperts.cosmetics.ui.legal.DisclaimerScreen
+import com.hnexperts.cosmetics.ui.legal.DisclaimerViewModel
 import com.hnexperts.cosmetics.ui.preferences.PreferencesScreen
 import com.hnexperts.cosmetics.ui.preferences.PreferencesViewModel
 import com.hnexperts.cosmetics.ui.result.ResultScreen
@@ -39,7 +58,9 @@ import com.hnexperts.cosmetics.ui.search.SearchViewModel
 import com.hnexperts.cosmetics.ui.theme.CosmeticsTheme
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Serializable
 object ScanDestination
@@ -56,12 +77,44 @@ object MoreDestination
 @Serializable
 object ResultDestination
 
+@Serializable
+data class CameraDestination(val barcode: Boolean)
+
+@Serializable
+object ConfirmIngredientsDestination
+
 @Composable
 fun App() {
     CosmeticsTheme {
-        val navController: NavHostController = rememberNavController()
+        val legal: LegalStore = koinInject()
+        var accepted: Boolean? by remember { mutableStateOf(null) }
+        LaunchedEffect(Unit) {
+            accepted = when (val loaded: Outcome<LegalState> = legal.load()) {
+                is Outcome.Ok -> loaded.value.disclaimerAccepted
+                is Outcome.Err -> false
+            }
+        }
+        when (accepted) {
+            null -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            false -> {
+                val viewModel: DisclaimerViewModel = koinViewModel()
+                DisclaimerScreen(viewModel = viewModel, onAccepted = { accepted = true })
+            }
+            true -> AppNavigation()
+        }
+    }
+}
+
+@Composable
+private fun AppNavigation() {
+    val navController: NavHostController = rememberNavController()
         val backStack by navController.currentBackStackEntryAsState()
-        val showBottomBar: Boolean = backStack?.destination?.route?.contains("Result") != true
+        val route: String = backStack?.destination?.route.orEmpty()
+        val showBottomBar: Boolean = !hidesBottomBar(route)
         Scaffold(
             bottomBar = {
                 if (showBottomBar) {
@@ -76,9 +129,12 @@ fun App() {
             ) {
                 composable<ScanDestination> {
                     val viewModel: ScanViewModel = koinViewModel()
-                    ScanScreen(viewModel = viewModel, onResult = {
-                        navController.navigate(ResultDestination)
-                    })
+                    ScanScreen(
+                        viewModel = viewModel,
+                        onResult = { navController.navigate(ResultDestination) },
+                        onOpenBarcodeCamera = { navController.navigate(CameraDestination(barcode = true)) },
+                        onOpenInciCamera = { navController.navigate(CameraDestination(barcode = false)) }
+                    )
                 }
                 composable<SearchDestination> {
                     val viewModel: SearchViewModel = koinViewModel()
@@ -96,12 +152,56 @@ fun App() {
                     val viewModel: PreferencesViewModel = koinViewModel()
                     PreferencesScreen(viewModel)
                 }
+                composable<CameraDestination> { entry ->
+                    val destination: CameraDestination = entry.toRoute()
+                    val mode: ScannerMode = if (destination.barcode) {
+                        ScannerMode.BARCODE
+                    } else {
+                        ScannerMode.INGREDIENT_LIST
+                    }
+                    val viewModel: CameraScanViewModel = koinViewModel(parameters = { parametersOf(mode) })
+                    CameraScanScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
+                        onResult = { navController.navigateToResultFromCamera() },
+                        onConfirm = { navController.navigateToConfirmFromCamera() }
+                    )
+                }
+                composable<ConfirmIngredientsDestination> {
+                    val viewModel: ConfirmIngredientsViewModel = koinViewModel()
+                    ConfirmIngredientsScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
+                        onResult = { navController.navigateToResultFromConfirm() }
+                    )
+                }
                 composable<ResultDestination> {
                     val viewModel: ResultViewModel = koinViewModel()
                     ResultScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
                 }
             }
         }
+}
+
+private fun hidesBottomBar(route: String): Boolean {
+    return route.contains("Result") || route.contains("Camera") || route.contains("Confirm")
+}
+
+private fun NavHostController.navigateToResultFromCamera() {
+    navigate(ResultDestination) {
+        popUpTo<CameraDestination> { inclusive = true }
+    }
+}
+
+private fun NavHostController.navigateToConfirmFromCamera() {
+    navigate(ConfirmIngredientsDestination) {
+        popUpTo<CameraDestination> { inclusive = true }
+    }
+}
+
+private fun NavHostController.navigateToResultFromConfirm() {
+    navigate(ResultDestination) {
+        popUpTo<ConfirmIngredientsDestination> { inclusive = true }
     }
 }
 

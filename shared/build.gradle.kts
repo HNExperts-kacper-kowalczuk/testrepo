@@ -47,6 +47,15 @@ kotlin {
             implementation(libs.androidx.appcompat)
             implementation(libs.koin.android)
             implementation(libs.sqldelight.android.driver)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
+            implementation(libs.androidx.camera.mlkit)
+            implementation(libs.mlkit.barcode)
+            implementation(libs.mlkit.text)
+            implementation(libs.kotlinx.coroutines.play.services)
+            implementation(libs.play.services.ads)
+            implementation(libs.user.messaging.platform)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)
@@ -75,7 +84,7 @@ kotlin {
             implementation(libs.sqldelight.coroutines)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.coroutines.core)
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
+            implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -103,4 +112,16 @@ sqldelight {
 compose.resources {
     publicResClass = true
     packageOfResClass = "com.hnexperts.cosmetics.resources"
+}
+
+afterEvaluate {
+    val jvmMain = kotlin.targets.getByName("jvm").compilations.getByName("main")
+    tasks.register<JavaExec>("exportCatalogSources") {
+        group = "catalog"
+        description = "Write CosIng/OBF source JSON, manifest, and catalog.sqlite.gz"
+        dependsOn(jvmMain.compileTaskProvider)
+        classpath = files(jvmMain.output.allOutputs, jvmMain.runtimeDependencyFiles)
+        mainClass.set("com.hnexperts.cosmetics.catalog.pipeline.ExportCatalogSourcesKt")
+        args(rootProject.projectDir.absolutePath)
+    }
 }

@@ -16,7 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hnexperts.cosmetics.ads.AdPolicy
+import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.history_empty
@@ -44,13 +44,7 @@ fun HistoryScreen(
     val entries: List<HistoryEntry> = uiState.entries
     Scaffold(
         bottomBar = {
-            BannerAdSlot(
-                visible = AdPolicy().shouldShowBanner(
-                    AppScreen.HISTORY,
-                    consentGranted = true,
-                    networkAvailable = false
-                )
-            )
+            BannerAdSlot(screen = AppScreen.HISTORY, placement = AdPlacement.HISTORY)
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {

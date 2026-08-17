@@ -1,6 +1,9 @@
 package com.hnexperts.cosmetics.catalog.data
 
 import com.hnexperts.cosmetics.catalog.application.CatalogSnapshot
+import com.hnexperts.cosmetics.catalog.domain.CatalogIntegrity
+import com.hnexperts.cosmetics.catalog.domain.CatalogMeta
+import com.hnexperts.cosmetics.catalog.domain.CorruptCatalogException
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import com.hnexperts.cosmetics.hazards.domain.DangerLevelParser
 import com.hnexperts.cosmetics.hazards.domain.IngredientHazard
@@ -12,11 +15,36 @@ class CatalogSnapshotReader(
     private val database: CatalogDatabase
 ) {
     fun read(): CatalogSnapshot {
-        val meta = database.catalogDatabaseQueries.selectMeta().executeAsOneOrNull()
+        val row = database.catalogDatabaseQueries.selectMeta().executeAsOneOrNull()
             ?: throw IllegalStateException("catalog_meta is missing after seed")
+        val ingredients: List<Ingredient> = readIngredients()
+        val products = database.catalogDatabaseQueries.selectAllProducts().executeAsList()
+        val computed: String = CatalogIntegrity.fingerprint(
+            catalogVersion = row.catalog_version,
+            rulesetVersion = row.ruleset_version,
+            builtAt = row.built_at,
+            region = row.region,
+            ingredientIds = ingredients.map { ingredient -> ingredient.id },
+            productIds = products.map { product -> product.id }
+        )
+        if (computed != row.checksum) {
+            throw CorruptCatalogException(
+                "catalog checksum mismatch: stored=${row.checksum} computed=$computed"
+            )
+        }
+        val meta = CatalogMeta(
+            catalogVersion = row.catalog_version,
+            rulesetVersion = row.ruleset_version,
+            builtAt = row.built_at,
+            region = row.region,
+            checksum = row.checksum,
+            supportedCommentLocales = row.supported_comment_locales.split(',')
+                .map { tag -> tag.trim() }
+                .filter { tag -> tag.isNotEmpty() }
+        )
         return CatalogSnapshot(
-            rulesetVersion = meta.ruleset_version,
-            ingredients = readIngredients(),
+            meta = meta,
+            ingredients = ingredients,
             aliases = readAliases(),
             commaExceptions = readCommaExceptions(),
             hazards = readHazards(),

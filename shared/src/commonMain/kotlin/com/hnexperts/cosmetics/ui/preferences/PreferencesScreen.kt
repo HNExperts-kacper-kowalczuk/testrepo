@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -18,17 +19,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.hnexperts.cosmetics.catalog.application.CatalogFreshness
 import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.prefs_avoid_title
+import com.hnexperts.cosmetics.resources.prefs_catalog_apply
+import com.hnexperts.cosmetics.resources.prefs_catalog_applied
+import com.hnexperts.cosmetics.resources.prefs_catalog_check_action
+import com.hnexperts.cosmetics.resources.prefs_catalog_offline
+import com.hnexperts.cosmetics.resources.prefs_catalog_stamp
+import com.hnexperts.cosmetics.resources.prefs_catalog_title
+import com.hnexperts.cosmetics.resources.prefs_catalog_unknown
+import com.hnexperts.cosmetics.resources.prefs_catalog_update
+import com.hnexperts.cosmetics.resources.prefs_catalog_uptodate
+import com.hnexperts.cosmetics.resources.prefs_clear_history
+import com.hnexperts.cosmetics.resources.prefs_cleared_history
 import com.hnexperts.cosmetics.resources.prefs_fragrance_free
 import com.hnexperts.cosmetics.resources.prefs_language
 import com.hnexperts.cosmetics.resources.prefs_language_en
 import com.hnexperts.cosmetics.resources.prefs_language_pl
 import com.hnexperts.cosmetics.resources.prefs_language_system
 import com.hnexperts.cosmetics.resources.prefs_pregnancy
+import com.hnexperts.cosmetics.resources.prefs_privacy
 import com.hnexperts.cosmetics.resources.prefs_title
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import org.jetbrains.compose.resources.stringResource
@@ -82,6 +96,54 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
                 onCheckedChange = { viewModel.toggleAvoid(ingredient.id) }
             )
         }
+        CatalogSection(
+            uiState = uiState,
+            onCheck = viewModel::reload,
+            onApply = viewModel::applyCatalogUpdate
+        )
+        if (uiState.ads.privacyOptionsRequired) {
+            Button(onClick = viewModel::openPrivacyOptions, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.prefs_privacy))
+            }
+        }
+        Button(onClick = viewModel::clearHistory, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(Res.string.prefs_clear_history))
+        }
+        if (uiState.historyCleared) {
+            Text(text = stringResource(Res.string.prefs_cleared_history))
+        }
+    }
+}
+
+@Composable
+private fun CatalogSection(
+    uiState: PreferencesUiState,
+    onCheck: () -> Unit,
+    onApply: () -> Unit
+) {
+    Text(text = stringResource(Res.string.prefs_catalog_title), style = MaterialTheme.typography.titleMedium)
+    val meta = uiState.catalogMeta
+    if (meta == null) {
+        Text(text = stringResource(Res.string.prefs_catalog_unknown))
+    } else {
+        Text(text = stringResource(Res.string.prefs_catalog_stamp, meta.catalogVersion, meta.builtAt, meta.region))
+    }
+    when (val freshness: CatalogFreshness? = uiState.freshness) {
+        is CatalogFreshness.UpToDate -> Text(text = stringResource(Res.string.prefs_catalog_uptodate))
+        is CatalogFreshness.UpdateAvailable -> {
+            Text(text = stringResource(Res.string.prefs_catalog_update, freshness.published.catalogVersion))
+            Button(onClick = onApply, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.prefs_catalog_apply))
+            }
+        }
+        CatalogFreshness.Offline -> Text(text = stringResource(Res.string.prefs_catalog_offline))
+        null -> Unit
+    }
+    if (uiState.catalogApplied) {
+        Text(text = stringResource(Res.string.prefs_catalog_applied))
+    }
+    Button(onClick = onCheck, modifier = Modifier.fillMaxWidth()) {
+        Text(stringResource(Res.string.prefs_catalog_check_action))
     }
 }
 
