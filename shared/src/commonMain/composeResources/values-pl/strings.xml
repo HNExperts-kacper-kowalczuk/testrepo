@@ -55,6 +55,11 @@
     <string name="ad_placeholder">Reklama</string>
     <string name="common_retry">Ponów</string>
     <string name="common_continue">Dalej</string>
+    <string name="error_catalog">Nie udało się wczytać katalogu offline.</string>
+    <string name="error_corrupt_catalog">Katalog offline wygląda na uszkodzony.</string>
+    <string name="error_database">Operacja na lokalnej bazie nie powiodła się.</string>
+    <string name="error_evaluation">Ocena składu nie powiodła się.</string>
+    <string name="error_unexpected">Coś poszło nie tak.</string>
 
     <plurals name="result_unknown_count">
         <item quantity="one">Nie rozpoznano %1$d nazwy — wynik może być niepełny.</item>

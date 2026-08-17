@@ -55,6 +55,11 @@
     <string name="ad_placeholder">Advertisement</string>
     <string name="common_retry">Retry</string>
     <string name="common_continue">Continue</string>
+    <string name="error_catalog">Could not load the offline catalog.</string>
+    <string name="error_corrupt_catalog">The offline catalog looks damaged.</string>
+    <string name="error_database">A local database operation failed.</string>
+    <string name="error_evaluation">Ingredient evaluation failed.</string>
+    <string name="error_unexpected">Something went wrong.</string>
 
     <plurals name="result_unknown_count">
         <item quantity="one">We could not identify %1$d name — results may be incomplete.</item>

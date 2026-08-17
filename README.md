@@ -57,4 +57,4 @@ Unknown barcodes fall through to the INCI paste field.
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**
-- **[Data model](docs/data-model.md)**
+- **[Quality checklist](docs/quality-checklist.md)** — 11 points; run `./scripts/check-quality.sh` before every commit

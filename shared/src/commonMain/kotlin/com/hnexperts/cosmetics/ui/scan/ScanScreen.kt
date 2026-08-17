@@ -36,6 +36,7 @@ import com.hnexperts.cosmetics.resources.scan_not_found_body
 import com.hnexperts.cosmetics.resources.scan_not_found_title
 import com.hnexperts.cosmetics.resources.scan_title
 import com.hnexperts.cosmetics.resources.scan_working
+import com.hnexperts.cosmetics.ui.common.FailureBanner
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -62,6 +63,7 @@ fun ScanScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(text = stringResource(Res.string.scan_title), style = MaterialTheme.typography.headlineSmall)
+        FailureBanner(failure = uiState.failure)
         Text(text = stringResource(Res.string.scan_camera_note), style = MaterialTheme.typography.bodyMedium)
         OutlinedTextField(
             value = barcode,

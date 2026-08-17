@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
-import com.hnexperts.cosmetics.preferences.data.StoredPreferences
+import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.prefs_avoid_title
 import com.hnexperts.cosmetics.resources.prefs_fragrance_free
@@ -30,12 +30,13 @@ import com.hnexperts.cosmetics.resources.prefs_language_pl
 import com.hnexperts.cosmetics.resources.prefs_language_system
 import com.hnexperts.cosmetics.resources.prefs_pregnancy
 import com.hnexperts.cosmetics.resources.prefs_title
+import com.hnexperts.cosmetics.ui.common.FailureBanner
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PreferencesScreen(viewModel: PreferencesViewModel) {
-    val stored: StoredPreferences by viewModel.preferences.collectAsState()
-    val ingredients by viewModel.ingredients.collectAsState()
+    val uiState: PreferencesUiState by viewModel.uiState.collectAsState()
+    val stored: StoredPreferences = uiState.stored
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,6 +45,7 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(text = stringResource(Res.string.prefs_title), style = MaterialTheme.typography.headlineSmall)
+        FailureBanner(failure = uiState.failure, onRetry = viewModel::reload)
         PreferenceSwitch(
             label = stringResource(Res.string.prefs_pregnancy),
             checked = stored.profile.pregnancyCaution,
@@ -73,7 +75,7 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             )
         }
         Text(text = stringResource(Res.string.prefs_avoid_title), style = MaterialTheme.typography.titleMedium)
-        ingredients.forEach { ingredient ->
+        uiState.ingredients.forEach { ingredient ->
             PreferenceSwitch(
                 label = ingredient.inciName,
                 checked = stored.profile.avoidedIngredientIds.contains(ingredient.id),

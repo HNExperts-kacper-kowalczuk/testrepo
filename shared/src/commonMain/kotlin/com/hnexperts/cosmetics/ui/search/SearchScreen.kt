@@ -27,6 +27,7 @@ import com.hnexperts.cosmetics.resources.search_empty
 import com.hnexperts.cosmetics.resources.search_placeholder
 import com.hnexperts.cosmetics.resources.search_title
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
+import com.hnexperts.cosmetics.ui.common.FailureBanner
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -55,6 +56,7 @@ fun SearchScreen(
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
             Text(text = stringResource(Res.string.search_title), style = androidx.compose.material3.MaterialTheme.typography.headlineSmall)
+            FailureBanner(failure = uiState.failure)
             OutlinedTextField(
                 value = uiState.query,
                 onValueChange = viewModel::onQueryChange,

@@ -10,6 +10,7 @@ class CatalogIndexAssembleTest {
     @Test
     fun assembleSortsIngredientsAndWiresMatcher() {
         val snapshot: CatalogSnapshot = CatalogSnapshot(
+            rulesetVersion = FixtureCatalog.RULESET_VERSION,
             ingredients = FixtureCatalog.ingredients.map { item -> item.ingredient },
             aliases = FixtureCatalog.aliasMap(),
             commaExceptions = FixtureCatalog.commaExceptions(),

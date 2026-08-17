@@ -39,6 +39,7 @@ import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
+import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
 import com.hnexperts.cosmetics.ui.theme.RatingColors
 import org.jetbrains.compose.resources.pluralStringResource
@@ -74,10 +75,10 @@ fun ResultScreen(
         }
     ) { padding ->
         if (assessment == null) {
-            Text(
-                text = stringResource(Res.string.result_missing),
-                modifier = Modifier.padding(padding).padding(16.dp)
-            )
+            Column(modifier = Modifier.padding(padding).padding(16.dp)) {
+                FailureBanner(failure = uiState.failure)
+                Text(text = stringResource(Res.string.result_missing))
+            }
             return@Scaffold
         }
         LazyColumn(
@@ -87,6 +88,9 @@ fun ResultScreen(
         ) {
             item {
                 ResultHeader(assessment)
+            }
+            item {
+                FailureBanner(failure = uiState.failure)
             }
             if (assessment.unknownCount > 0) {
                 item {

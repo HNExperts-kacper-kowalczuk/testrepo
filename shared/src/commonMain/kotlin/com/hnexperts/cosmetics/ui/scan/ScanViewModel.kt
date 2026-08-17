@@ -2,10 +2,12 @@ package com.hnexperts.cosmetics.ui.scan
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
 import com.hnexperts.cosmetics.catalog.domain.GtinNormalizer
 import com.hnexperts.cosmetics.catalog.domain.Product
+import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
+import com.hnexperts.cosmetics.failure.AppFailure
+import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,11 +20,12 @@ data class ScanUiState(
     val invalidBarcode: Boolean = false,
     val emptyInci: Boolean = false,
     val notFoundGtin: String? = null,
+    val failure: AppFailure? = null,
     val navigateToResult: Boolean = false
 )
 
 class ScanViewModel(
-    private val products: SqlProductRepository,
+    private val products: ProductRepository,
     private val evaluateProduct: EvaluateProduct
 ) : ViewModel() {
     private val state: MutableStateFlow<ScanUiState> = MutableStateFlow(ScanUiState())
@@ -33,45 +36,37 @@ class ScanViewModel(
         val gtin: String = GtinNormalizer.normalize(raw)
         if (gtin.length < 8) {
             state.update { current ->
-                current.copy(invalidBarcode = true, emptyInci = false, notFoundGtin = null)
+                current.copy(invalidBarcode = true, emptyInci = false, notFoundGtin = null, failure = null)
             }
             return
         }
         startWork {
-            val product: Product? = products.findByGtin(gtin)
+            val product: Product? = runUiAction(onFailure = ::showFailure) {
+                products.findByGtin(gtin)
+            } ?: return@startWork
             if (product == null) {
                 state.update { current ->
-                    current.copy(invalidBarcode = false, notFoundGtin = gtin)
+                    current.copy(invalidBarcode = false, notFoundGtin = gtin, failure = null)
                 }
                 return@startWork
             }
-            evaluateProduct.invoke(
+            evaluateAndOpen(
                 inciRaw = product.inciRaw,
                 source = "barcode",
                 productName = product.name,
                 brand = product.brand,
                 gtin = gtin
             )
-            state.update { current ->
-                current.copy(
-                    invalidBarcode = false,
-                    notFoundGtin = null,
-                    navigateToResult = true
-                )
-            }
         }
     }
 
     fun evaluateTypedList(inciRaw: String) {
         if (inciRaw.isBlank()) {
-            state.update { current -> current.copy(emptyInci = true, invalidBarcode = false) }
+            state.update { current -> current.copy(emptyInci = true, invalidBarcode = false, failure = null) }
             return
         }
         startWork {
-            evaluateProduct.invoke(inciRaw = inciRaw, source = "manual")
-            state.update { current ->
-                current.copy(emptyInci = false, navigateToResult = true)
-            }
+            evaluateAndOpen(inciRaw = inciRaw, source = "manual")
         }
     }
 
@@ -79,11 +74,42 @@ class ScanViewModel(
         state.update { current -> current.copy(navigateToResult = false) }
     }
 
+    private suspend fun evaluateAndOpen(
+        inciRaw: String,
+        source: String,
+        productName: String? = null,
+        brand: String? = null,
+        gtin: String? = null
+    ) {
+        runUiAction(onFailure = ::showFailure) {
+            evaluateProduct.invoke(
+                inciRaw = inciRaw,
+                source = source,
+                productName = productName,
+                brand = brand,
+                gtin = gtin
+            )
+        } ?: return
+        state.update { current ->
+            current.copy(
+                invalidBarcode = false,
+                notFoundGtin = null,
+                emptyInci = false,
+                failure = null,
+                navigateToResult = true
+            )
+        }
+    }
+
+    private fun showFailure(failure: AppFailure) {
+        state.update { current -> current.copy(failure = failure, navigateToResult = false) }
+    }
+
     private fun startWork(block: suspend () -> Unit) {
         runningJob?.cancel()
         runningJob = viewModelScope.launch {
             state.update { current ->
-                current.copy(busy = true, invalidBarcode = false, emptyInci = false)
+                current.copy(busy = true, invalidBarcode = false, emptyInci = false, failure = null)
             }
             try {
                 block()

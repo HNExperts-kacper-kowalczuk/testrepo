@@ -1,37 +1,43 @@
 package com.hnexperts.cosmetics.catalog.application
 
+import com.hnexperts.cosmetics.catalog.data.CatalogSnapshotReader
 import com.hnexperts.cosmetics.concurrency.AppDispatchers
 import com.hnexperts.cosmetics.concurrency.ApplicationScope
 import com.hnexperts.cosmetics.data.CatalogSeeder
-import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
+import com.hnexperts.cosmetics.failure.FailureCatcher
+import com.hnexperts.cosmetics.failure.Outcome
+import com.hnexperts.cosmetics.logging.AppLog
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CatalogBootstrap(
-    catalogDatabase: CatalogDatabase,
-    dispatchers: AppDispatchers,
+    private val seeder: CatalogSeeder,
+    private val snapshotReader: CatalogSnapshotReader,
+    private val dispatchers: AppDispatchers,
     applicationScope: ApplicationScope
-) {
-    private val ready: CompletableDeferred<CatalogIndex> = CompletableDeferred()
+) : CatalogGateway {
+    private val ready: CompletableDeferred<Outcome<CatalogIndex>> = CompletableDeferred()
 
     init {
         applicationScope.coroutineScope.launch {
-            try {
+            val outcome: Outcome<CatalogIndex> = FailureCatcher.catalog("catalog.bootstrap") {
                 val snapshot: CatalogSnapshot = withContext(dispatchers.catalogDatabase) {
-                    CatalogSeeder(catalogDatabase).seedIfEmpty()
-                    CatalogIndex.read(catalogDatabase)
+                    seeder.seedIfEmpty()
+                    snapshotReader.read()
                 }
-                ready.complete(withContext(dispatchers.computation) {
+                withContext(dispatchers.computation) {
                     CatalogIndex.assemble(snapshot)
-                })
-            } catch (error: Throwable) {
-                ready.completeExceptionally(error)
+                }
             }
+            if (outcome is Outcome.Err) {
+                AppLog.e("catalog.bootstrap", outcome.failure.verboseMessage())
+            }
+            ready.complete(outcome)
         }
     }
 
-    suspend fun awaitIndex(): CatalogIndex {
+    override suspend fun awaitIndex(): Outcome<CatalogIndex> {
         return ready.await()
     }
 }
