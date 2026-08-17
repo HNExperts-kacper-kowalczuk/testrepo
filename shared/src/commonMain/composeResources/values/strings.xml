@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="app_name">INCI Scan</string>
+    <string name="tab_scan">Scan</string>
+    <string name="tab_search">Search</string>
+    <string name="tab_history">History</string>
+    <string name="tab_more">More</string>
+
+    <string name="scan_title">Scan a cosmetic</string>
+    <string name="scan_barcode_label">Barcode (EAN / UPC)</string>
+    <string name="scan_barcode_action">Look up barcode</string>
+    <string name="scan_inci_label">Ingredient list (INCI)</string>
+    <string name="scan_inci_action">Evaluate list</string>
+    <string name="scan_camera_note">Camera barcode and label scanning will use the on-device camera in a later build. Until then, type a barcode or paste the INCI list from the pack.</string>
+    <string name="scan_hint_gtin">Try 5901234123457</string>
+    <string name="scan_invalid_barcode">That does not look like a valid barcode.</string>
+    <string name="scan_not_found_title">Product not in the offline catalog</string>
+    <string name="scan_not_found_body">You can still evaluate this product by typing or pasting the ingredient list printed on the pack.</string>
+    <string name="scan_empty_inci">Paste or type at least one ingredient name.</string>
+
+    <string name="search_title">Catalog</string>
+    <string name="search_placeholder">Search by name or brand</string>
+    <string name="search_empty">No products match that query.</string>
+
+    <string name="history_title">Recent scans</string>
+    <string name="history_empty">You have not evaluated a product yet.</string>
+
+    <string name="result_title">Result</string>
+    <string name="result_missing">No evaluation to show. Scan a product first.</string>
+    <string name="result_not_suitable">Not suitable for your current filters.</string>
+    <string name="result_suitable">No personal avoid-list hits.</string>
+    <string name="result_disclaimer">Informational only. This is not a medical device or a substitute for the ingredient list, a dermatologist, or official EU annexes. Data can lag regulatory updates.</string>
+    <string name="result_unverified">Catalog formula is unverified community data.</string>
+    <string name="level_safe">Generally acceptable</string>
+    <string name="level_low">Low concern</string>
+    <string name="level_moderate">Moderate concern</string>
+    <string name="level_restricted">Restricted use</string>
+    <string name="level_high">High concern</string>
+    <string name="level_prohibited">Prohibited</string>
+    <string name="level_unknown">Unknown</string>
+    <string name="finding_personal_avoid">On your avoid list</string>
+    <string name="finding_unmatched">Not in the knowledge base</string>
+    <string name="back">Back</string>
+
+    <string name="prefs_title">Preferences</string>
+    <string name="prefs_pregnancy">Pregnancy / breastfeeding caution</string>
+    <string name="prefs_fragrance_free">Prefer fragrance-free</string>
+    <string name="prefs_language">Language for comments</string>
+    <string name="prefs_language_system">Follow system</string>
+    <string name="prefs_language_en">English</string>
+    <string name="prefs_language_pl">Polish</string>
+    <string name="prefs_avoid_title">Avoid specific ingredients</string>
+
+    <string name="ad_placeholder">Advertisement</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_continue">Continue</string>
+
+    <plurals name="result_unknown_count">
+        <item quantity="one">We could not identify %1$d name — results may be incomplete.</item>
+        <item quantity="other">We could not identify %1$d names — results may be incomplete.</item>
+    </plurals>
+</resources>

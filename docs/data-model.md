@@ -101,6 +101,23 @@ CREATE TABLE scan_history (
     source TEXT NOT NULL           -- 'barcode' | 'ocr' | 'manual'
 );
 
+-- Reserved for post-v1 UI (see further-additions.md); cheap to ship empty.
+CREATE TABLE user_shelf (
+    product_id TEXT,
+    gtin TEXT,
+    inci_raw TEXT NOT NULL,
+    saved_at TEXT NOT NULL
+);
+
+CREATE TABLE report_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    kind TEXT NOT NULL,            -- 'missing_product' | 'wrong_inci' | 'wrong_name'
+    gtin TEXT,
+    payload_json TEXT NOT NULL,
+    flushed INTEGER NOT NULL DEFAULT 0
+);
+
 CREATE INDEX product_name_idx ON product(name);
 CREATE INDEX product_brand_idx ON product(brand);
 CREATE INDEX ingredient_inci_idx ON ingredient(inci_name);
@@ -110,7 +127,7 @@ CREATE VIRTUAL TABLE product_fts USING fts5(
 );
 ```
 
-User tables (`user_profile`, `user_avoid_ingredient`, `scan_history`) live in a **separate writable database** (`user.sqlite`) so a catalog replace never wipes history or preferences.
+User tables (`user_profile`, `user_avoid_ingredient`, `scan_history`, `user_shelf`, `report_queue`) live in a **separate writable database** (`user.sqlite`) so a catalog replace never wipes history or preferences.
 
 ## 3. Evaluation result (in memory, not persisted as source of truth)
 
