@@ -75,6 +75,7 @@ class AdsSession(
                     false
                 }
             }
+            val adsRemoved: Boolean = adsRemovedFlag()
             state.update { current ->
                 current.copy(
                     consentGranted = snapshot.canRequestAds,
@@ -82,7 +83,7 @@ class AdsSession(
                     sdkReady = sdkReady,
                     privacyOptionsRequired = snapshot.privacyOptionsRequired,
                     bannerLoadFailed = if (sdkReady) current.bannerLoadFailed else false,
-                    adsRemoved = adsRemovedFlag()
+                    adsRemoved = adsRemoved
                 )
             }
         }

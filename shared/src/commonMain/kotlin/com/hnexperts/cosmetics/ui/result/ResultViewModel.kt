@@ -11,6 +11,7 @@ import com.hnexperts.cosmetics.evaluation.application.CatalogAlternative
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
 import com.hnexperts.cosmetics.evaluation.application.FindLocalAlternatives
+import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.evaluation.application.ShareResultText
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.failure.AppFailure
@@ -29,12 +30,15 @@ import com.hnexperts.cosmetics.shelf.domain.ShelfItem
 import com.hnexperts.cosmetics.shelf.domain.ShelfKeys
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import kotlin.time.Clock
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 data class ResultUiState(
@@ -59,6 +63,8 @@ class ResultViewModel(
 ) : ViewModel() {
     private val state: MutableStateFlow<ResultUiState> = MutableStateFlow(ResultUiState())
     val uiState: StateFlow<ResultUiState> = state.asStateFlow()
+    private val shelfMutex: Mutex = Mutex()
+    private var extrasJob: Job? = null
 
     init {
         viewModelScope.launch { load() }
@@ -89,31 +95,23 @@ class ResultViewModel(
     fun toggleShelf() {
         val assessment: ProductAssessment = state.value.assessment ?: return
         viewModelScope.launch {
-            val key: String = ShelfKeys.of(assessment)
-            if (state.value.onShelf) {
-                when (val removed: Outcome<Unit> = shelf.remove(key)) {
-                    is Outcome.Err -> state.value = state.value.copy(failure = removed.failure)
-                    is Outcome.Ok -> state.value = state.value.copy(onShelf = false, failure = null)
-                }
-                return@launch
-            }
-            when (val saved: Outcome<Unit> = shelf.save(toShelfItem(assessment, key))) {
-                is Outcome.Err -> state.value = state.value.copy(failure = saved.failure)
-                is Outcome.Ok -> state.value = state.value.copy(onShelf = true, failure = null)
+            shelfMutex.withLock {
+                applyShelfToggle(assessment)
             }
         }
     }
 
-    fun share() {
+    fun share(copy: ShareCopy) {
         val assessment: ProductAssessment = state.value.assessment ?: return
         sharePlainText(
-            title = assessment.productName ?: assessment.gtin ?: "INCI Scan",
-            body = ShareResultText.format(assessment)
+            title = assessment.productName ?: assessment.gtin ?: copy.scannedProduct,
+            body = ShareResultText.format(assessment, copy)
         )
     }
 
     fun openAlternative(alternative: CatalogAlternative) {
-        viewModelScope.launch {
+        extrasJob?.cancel()
+        extrasJob = viewModelScope.launch {
             val product: Product = alternative.product
             when (
                 val scored: Outcome<ProductAssessment> = evaluateProduct.invoke(
@@ -135,6 +133,21 @@ class ResultViewModel(
 
     fun consumeNavigation() {
         state.value = state.value.copy(navigateToCamera = false)
+    }
+
+    private suspend fun applyShelfToggle(assessment: ProductAssessment) {
+        val key: String = ShelfKeys.of(assessment)
+        if (state.value.onShelf) {
+            when (val removed: Outcome<Unit> = shelf.remove(key)) {
+                is Outcome.Err -> state.value = state.value.copy(failure = removed.failure)
+                is Outcome.Ok -> state.value = state.value.copy(onShelf = false, failure = null)
+            }
+            return
+        }
+        when (val saved: Outcome<Unit> = shelf.save(toShelfItem(assessment, key))) {
+            is Outcome.Err -> state.value = state.value.copy(failure = saved.failure)
+            is Outcome.Ok -> state.value = state.value.copy(onShelf = true, failure = null)
+        }
     }
 
     private suspend fun load() {
@@ -164,7 +177,15 @@ class ResultViewModel(
             }
             is Outcome.Ok -> present.value
         }
-        val alternatives: List<CatalogAlternative> = loadAlternatives(assessment)
+        val alternatives: List<CatalogAlternative> = when (val loaded: Outcome<List<CatalogAlternative>> = loadAlternatives(assessment)) {
+            is Outcome.Err -> {
+                if (state.value.failure == null) {
+                    state.value = state.value.copy(failure = loaded.failure)
+                }
+                emptyList()
+            }
+            is Outcome.Ok -> loaded.value
+        }
         state.value = state.value.copy(
             onShelf = onShelf,
             alternatives = alternatives,
@@ -172,31 +193,33 @@ class ResultViewModel(
         )
     }
 
-    private suspend fun loadAlternatives(assessment: ProductAssessment): List<CatalogAlternative> {
+    private suspend fun loadAlternatives(assessment: ProductAssessment): Outcome<List<CatalogAlternative>> {
         val category: String = assessment.category?.trim().orEmpty()
         if (category.isEmpty()) {
-            return emptyList()
+            return Outcome.Ok(emptyList())
         }
         val candidates: List<Product> = when (val found: Outcome<List<Product>> = products.findByCategory(category, FindLocalAlternatives.CANDIDATE_CAP)) {
-            is Outcome.Err -> return emptyList()
+            is Outcome.Err -> return found
             is Outcome.Ok -> found.value
         }
         val index = when (val loaded = catalog.awaitIndex()) {
-            is Outcome.Err -> return emptyList()
+            is Outcome.Err -> return loaded
             is Outcome.Ok -> loaded.value
         }
         val stored: StoredPreferences = when (val prefs: Outcome<StoredPreferences> = preferences.load()) {
-            is Outcome.Err -> return emptyList()
+            is Outcome.Err -> return prefs
             is Outcome.Ok -> prefs.value
         }
-        return withContext(dispatchers.computation) {
-            FindLocalAlternatives.invoke(
-                current = assessment,
-                candidates = candidates,
-                evaluateFormula = index.evaluateFormula,
-                profile = stored.profile
-            )
-        }
+        return Outcome.Ok(
+            withContext(dispatchers.computation) {
+                FindLocalAlternatives.invoke(
+                    current = assessment,
+                    candidates = candidates,
+                    evaluateFormula = index.evaluateFormula,
+                    profile = stored.profile
+                )
+            }
+        )
     }
 
     private fun toShelfItem(assessment: ProductAssessment, key: String): ShelfItem {
@@ -209,6 +232,7 @@ class ResultViewModel(
             inciRaw = assessment.inciRaw,
             rating = assessment.overall.name,
             usage = assessment.usage,
+            category = assessment.category,
             savedAt = Clock.System.now().toString()
         )
     }

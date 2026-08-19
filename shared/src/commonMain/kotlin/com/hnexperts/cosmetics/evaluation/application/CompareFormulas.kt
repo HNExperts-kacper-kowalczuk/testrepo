@@ -5,6 +5,7 @@ import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
 
 data class ComparedProduct(
+    val id: String,
     val label: String,
     val assessment: ProductAssessment
 )
@@ -18,7 +19,7 @@ data class CompareSummary(
 object CompareFormulas {
     fun summarize(products: List<ComparedProduct>): CompareSummary {
         val concernNames: Map<String, Set<String>> = products.associate { product ->
-            product.label to highOrProhibitedNames(product.assessment.findings)
+            product.id to highOrProhibitedNames(product.assessment.findings)
         }
         val unique: Map<String, List<String>> = concernNames.mapValues { entry ->
             val others: Set<String> = concernNames
@@ -34,14 +35,24 @@ object CompareFormulas {
         )
     }
 
-    fun fromAssessments(assessments: List<ProductAssessment>): CompareSummary {
+    fun fromAssessments(
+        assessments: List<ProductAssessment>,
+        unnamedFormat: String = CompareSession.DEFAULT_UNNAMED_FORMAT
+    ): CompareSummary {
         val products: List<ComparedProduct> = assessments.mapIndexed { index, assessment ->
             ComparedProduct(
-                label = assessment.productName ?: assessment.gtin ?: "Product ${index + 1}",
+                id = index.toString(),
+                label = displayLabel(assessment, index, unnamedFormat),
                 assessment = assessment
             )
         }
         return summarize(products)
+    }
+
+    fun displayLabel(assessment: ProductAssessment, index: Int, unnamedFormat: String): String {
+        return assessment.productName
+            ?: assessment.gtin
+            ?: unnamedFormat.replace("{n}", (index + 1).toString())
     }
 
     private fun sharedAvoids(products: List<ComparedProduct>): List<String> {

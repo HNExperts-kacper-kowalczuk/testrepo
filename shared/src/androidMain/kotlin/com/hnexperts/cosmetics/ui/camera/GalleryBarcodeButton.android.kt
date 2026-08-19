@@ -1,5 +1,7 @@
 package com.hnexperts.cosmetics.ui.camera
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -20,6 +22,7 @@ import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.camera_gallery
 import com.hnexperts.cosmetics.scanning.android.AndroidBarcodeMapper
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.jetbrains.compose.resources.stringResource
@@ -30,13 +33,14 @@ actual fun GalleryBarcodeButton(
     enabled: Boolean,
     onBarcode: (BarcodePayload) -> Unit,
     onEmpty: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri == null) {
-            onEmpty()
+            onCancel()
             return@rememberLauncherForActivityResult
         }
         scope.launch {
@@ -57,14 +61,11 @@ actual fun GalleryBarcodeButton(
     }
 }
 
-private suspend fun decodeGalleryBarcode(context: android.content.Context, uri: Uri): BarcodePayload? {
-    val bitmap = try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
-        } else {
-            @Suppress("DEPRECATION")
-            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-        }
+private suspend fun decodeGalleryBarcode(context: Context, uri: Uri): BarcodePayload? {
+    val bitmap: Bitmap = try {
+        softwareArgb8888(decodeGalleryBitmap(context, uri))
+    } catch (cancelled: CancellationException) {
+        throw cancelled
     } catch (_: Exception) {
         return null
     }
@@ -80,13 +81,36 @@ private suspend fun decodeGalleryBarcode(context: android.content.Context, uri: 
             .build()
     )
     return suspendCancellableCoroutine { continuation ->
-        scanner.process(image)
-            .addOnSuccessListener { codes ->
-                val payload: BarcodePayload? = codes.firstNotNullOfOrNull(AndroidBarcodeMapper::toPayload)
-                continuation.resume(payload)
-            }
-            .addOnFailureListener {
-                continuation.resume(null)
-            }
+        val task = scanner.process(image)
+        continuation.invokeOnCancellation { scanner.close() }
+        task.addOnSuccessListener { codes ->
+            val payload: BarcodePayload? = codes.firstNotNullOfOrNull(AndroidBarcodeMapper::toPayload)
+            continuation.resume(payload)
+        }
+        task.addOnFailureListener {
+            continuation.resume(null)
+        }
+        task.addOnCompleteListener {
+            scanner.close()
+        }
     }
+}
+
+private fun decodeGalleryBitmap(context: Context, uri: Uri): Bitmap {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        return ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
+    }
+    @Suppress("DEPRECATION")
+    return MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+}
+
+private fun softwareArgb8888(bitmap: Bitmap): Bitmap {
+    if (bitmap.config != Bitmap.Config.HARDWARE && bitmap.config == Bitmap.Config.ARGB_8888) {
+        return bitmap
+    }
+    val copy: Bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false) ?: return bitmap
+    if (bitmap.config == Bitmap.Config.HARDWARE) {
+        bitmap.recycle()
+    }
+    return copy
 }

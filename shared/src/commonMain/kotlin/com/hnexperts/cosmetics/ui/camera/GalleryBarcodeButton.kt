@@ -9,5 +9,6 @@ expect fun GalleryBarcodeButton(
     enabled: Boolean,
     onBarcode: (BarcodePayload) -> Unit,
     onEmpty: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier = Modifier
 )

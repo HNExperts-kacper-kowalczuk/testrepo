@@ -54,6 +54,7 @@ import com.hnexperts.cosmetics.resources.prefs_remove_ads
 import com.hnexperts.cosmetics.resources.prefs_reports_copy
 import com.hnexperts.cosmetics.resources.prefs_reports_copied
 import com.hnexperts.cosmetics.resources.prefs_reports_count
+import com.hnexperts.cosmetics.resources.prefs_reports_empty
 import com.hnexperts.cosmetics.resources.prefs_ads_removed
 import com.hnexperts.cosmetics.resources.prefs_title
 import com.hnexperts.cosmetics.ui.common.FailureBanner
@@ -145,7 +146,11 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             text = stringResource(Res.string.prefs_reports_count, uiState.openReportCount.toString()),
             style = MaterialTheme.typography.bodyLarge
         )
-        Button(onClick = viewModel::copyReports, modifier = Modifier.fillMaxWidth()) {
+        val emptyReports: String = stringResource(Res.string.prefs_reports_empty)
+        Button(
+            onClick = { viewModel.copyReports(emptyReports) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text(stringResource(Res.string.prefs_reports_copy))
         }
         if (uiState.reportsCopied) {

@@ -47,6 +47,7 @@
     <string name="compare_unique_concerns">Nazwy o wysokim ryzyku lub zakazane, unikalne dla tego produktu</string>
     <string name="compare_shared_avoids">Wspólne trafienia z listy unikania</string>
 
+    <string name="compare_unnamed">Produkt {n}</string>
     <string name="result_title">Wynik</string>
     <string name="result_missing">Brak oceny do pokazania. Najpierw zeskanuj produkt.</string>
     <string name="result_not_suitable">Nieodpowiedni przy Twoich filtrach.</string>
@@ -56,6 +57,8 @@
     <string name="result_check_label">Sprawdź etykietę</string>
     <string name="result_pack_verified">Zeskanowana lista zgadza się z katalogiem.</string>
     <string name="result_share">Udostępnij wynik</string>
+    <string name="share_scanned_product">Zeskanowany produkt</string>
+    <string name="share_scanned_at">Zeskanowano</string>
     <string name="result_shelf_add">Zapisz na półkę</string>
     <string name="result_shelf_remove">Usuń z półki</string>
     <string name="result_alternatives">Produkty o niższych zastrzeżeniach w tej kategorii</string>
@@ -101,6 +104,7 @@
     <string name="prefs_reports_count">Niewysłane zgłoszenia: %1$s</string>
     <string name="prefs_reports_copy">Kopiuj niewysłane zgłoszenia jako tekst</string>
     <string name="prefs_reports_copied">Lista zgłoszeń skopiowana.</string>
+    <string name="prefs_reports_empty">rodzaj	gtin	treść</string>
     <string name="prefs_remove_ads">Usuń reklamy</string>
     <string name="prefs_ads_removed">Reklamy są wyłączone na tym urządzeniu.</string>
 

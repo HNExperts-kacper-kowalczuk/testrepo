@@ -15,7 +15,8 @@ data class UserAvoidanceProfile(
         ingredientId: String,
         functionTags: List<String>,
         regulatoryTags: List<String>,
-        usage: ProductUsage = ProductUsage.UNKNOWN
+        usage: ProductUsage = ProductUsage.UNKNOWN,
+        inciName: String? = null
     ): Boolean {
         if (avoidedIngredientIds.contains(ingredientId)) {
             return true
@@ -32,7 +33,7 @@ data class UserAvoidanceProfile(
         if (childrenCaution && regulatoryTags.contains(TAG_CHILDREN)) {
             return true
         }
-        if (alcoholLeaveOn && isAlcoholLeaveOnHit(ingredientId, usage)) {
+        if (alcoholLeaveOn && isAlcoholLeaveOnHit(ingredientId, usage, inciName)) {
             return true
         }
         if (essentialOilCluster && isEssentialOilHit(ingredientId, functionTags)) {
@@ -41,11 +42,23 @@ data class UserAvoidanceProfile(
         return false
     }
 
-    private fun isAlcoholLeaveOnHit(ingredientId: String, usage: ProductUsage): Boolean {
-        if (!ALCOHOL_DENAT_IDS.contains(ingredientId)) {
+    private fun isAlcoholLeaveOnHit(ingredientId: String, usage: ProductUsage, inciName: String?): Boolean {
+        if (usage.scoringUsage() == ProductUsage.RINSE_OFF) {
             return false
         }
-        return usage.scoringUsage() != ProductUsage.RINSE_OFF
+        if (ALCOHOL_DENAT_IDS.contains(ingredientId)) {
+            return true
+        }
+        return isAlcoholDenatName(inciName)
+    }
+
+    private fun isAlcoholDenatName(inciName: String?): Boolean {
+        val normalized: String = inciName
+            ?.lowercase()
+            ?.replace(".", "")
+            ?.trim()
+            .orEmpty()
+        return ALCOHOL_DENAT_NAMES.contains(normalized)
     }
 
     private fun isEssentialOilHit(ingredientId: String, functionTags: List<String>): Boolean {
@@ -63,6 +76,7 @@ data class UserAvoidanceProfile(
         const val TAG_ESSENTIAL_OIL: String = "ESSENTIAL_OIL"
 
         val ALCOHOL_DENAT_IDS: Set<String> = setOf("alcohol-denat")
+        val ALCOHOL_DENAT_NAMES: Set<String> = setOf("alcohol denat", "alcohol denatured")
         val ESSENTIAL_OIL_IDS: Set<String> = setOf(
             "limonene",
             "linalool",

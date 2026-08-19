@@ -15,12 +15,22 @@ data class CompareCandidate(
 
 class CompareSession {
     private var candidates: List<CompareCandidate> = emptyList()
+    private var unnamedFormat: String = DEFAULT_UNNAMED_FORMAT
 
-    fun publish(next: List<CompareCandidate>) {
+    fun publish(next: List<CompareCandidate>, unnamedFormat: String = DEFAULT_UNNAMED_FORMAT) {
         candidates = next
+        this.unnamedFormat = unnamedFormat.ifBlank { DEFAULT_UNNAMED_FORMAT }
     }
 
     fun current(): List<CompareCandidate> {
         return candidates
+    }
+
+    fun unnamedFormat(): String {
+        return unnamedFormat
+    }
+
+    companion object {
+        const val DEFAULT_UNNAMED_FORMAT: String = "Product {n}"
     }
 }

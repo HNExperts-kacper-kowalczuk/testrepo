@@ -17,10 +17,12 @@ import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
@@ -55,17 +57,19 @@ class SearchViewModel(
     private val catalog: CatalogGateway
 ) : ViewModel() {
     private val queryText: MutableStateFlow<String> = MutableStateFlow("")
+    private val searchMode: MutableStateFlow<SearchMode> = MutableStateFlow(SearchMode.PRODUCTS)
     private val navigation: MutableStateFlow<SearchUiState> = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = navigation.asStateFlow()
-    val results: StateFlow<List<Product>> = queryText
-        .debounce(250)
-        .distinctUntilChanged()
-        .mapLatest { text -> searchProducts(text) }
+    private val queryDebounced: Flow<String> = queryText.debounce(250).distinctUntilChanged()
+    val results: StateFlow<List<Product>> = combine(queryDebounced, searchMode) { text, mode ->
+        text to mode
+    }
+        .mapLatest { (text, mode) -> searchProducts(text, mode) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-    val ingredientResults: StateFlow<List<IngredientHit>> = queryText
-        .debounce(250)
-        .distinctUntilChanged()
-        .mapLatest { text -> searchIngredients(text) }
+    val ingredientResults: StateFlow<List<IngredientHit>> = combine(queryDebounced, searchMode) { text, mode ->
+        text to mode
+    }
+        .mapLatest { (text, mode) -> searchIngredients(text, mode) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     private var openJob: Job? = null
 
@@ -75,6 +79,7 @@ class SearchViewModel(
     }
 
     fun setMode(mode: SearchMode) {
+        searchMode.value = mode
         navigation.update { current -> current.copy(mode = mode, selectedIngredient = null) }
     }
 
@@ -115,8 +120,8 @@ class SearchViewModel(
         navigation.update { current -> current.copy(navigateToResult = false) }
     }
 
-    private suspend fun searchProducts(text: String): List<Product> {
-        if (navigation.value.mode != SearchMode.PRODUCTS) {
+    private suspend fun searchProducts(text: String, mode: SearchMode): List<Product> {
+        if (mode != SearchMode.PRODUCTS) {
             return emptyList()
         }
         return when (val result: Outcome<List<Product>> = products.search(text)) {
@@ -131,8 +136,8 @@ class SearchViewModel(
         }
     }
 
-    private suspend fun searchIngredients(text: String): List<IngredientHit> {
-        if (text.isBlank()) {
+    private suspend fun searchIngredients(text: String, mode: SearchMode): List<IngredientHit> {
+        if (mode != SearchMode.INGREDIENTS || text.isBlank()) {
             return emptyList()
         }
         val index: CatalogIndex = when (val loaded: Outcome<CatalogIndex> = catalog.awaitIndex()) {

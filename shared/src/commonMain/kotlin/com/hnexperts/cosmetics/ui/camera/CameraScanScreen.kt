@@ -185,7 +185,8 @@ private fun CameraControls(
                 GalleryBarcodeButton(
                     enabled = !uiState.busy,
                     onBarcode = viewModel::onBarcode,
-                    onEmpty = viewModel::onGalleryEmpty
+                    onEmpty = viewModel::onGalleryEmpty,
+                    onCancel = viewModel::onGalleryCancelled
                 )
             }
         }

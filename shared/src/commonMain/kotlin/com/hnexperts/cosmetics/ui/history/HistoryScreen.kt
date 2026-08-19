@@ -28,6 +28,7 @@ import com.hnexperts.cosmetics.hazards.domain.DangerLevelParser
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.compare_action
 import com.hnexperts.cosmetics.resources.compare_select_hint
+import com.hnexperts.cosmetics.resources.compare_unnamed
 import com.hnexperts.cosmetics.resources.history_empty
 import com.hnexperts.cosmetics.resources.history_title
 import com.hnexperts.cosmetics.resources.shelf_empty
@@ -87,7 +88,11 @@ private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
     }
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         item {
-            CompareBar(uiState = uiState, onCompare = viewModel::compareSelected)
+            val unnamedFormat: String = stringResource(Res.string.compare_unnamed)
+            CompareBar(
+                uiState = uiState,
+                onCompare = { viewModel.compareSelected(unnamedFormat) }
+            )
         }
         item {
             Text(

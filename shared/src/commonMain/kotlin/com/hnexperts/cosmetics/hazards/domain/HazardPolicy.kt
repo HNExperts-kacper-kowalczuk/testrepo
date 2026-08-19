@@ -25,7 +25,13 @@ class HazardPolicy {
         val tags: List<String> = hazard?.regulatoryTags.orEmpty()
         val functionTags: List<String> = ingredient?.functionTags.orEmpty()
         val personalAvoid: Boolean = reference.id != null &&
-            profile.avoids(reference.id, functionTags, tags, usage.scoringUsage())
+            profile.avoids(
+                ingredientId = reference.id,
+                functionTags = functionTags,
+                regulatoryTags = tags,
+                usage = usage.scoringUsage(),
+                inciName = ingredient?.inciName
+            )
         return Finding(
             ingredient = reference,
             level = level,

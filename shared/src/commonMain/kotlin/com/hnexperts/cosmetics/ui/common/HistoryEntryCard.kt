@@ -57,6 +57,10 @@ fun HistoryEntryCard(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
+                val title: String? = entry.name ?: entry.gtin
+                if (!title.isNullOrBlank()) {
+                    Text(text = title, style = MaterialTheme.typography.titleMedium)
+                }
                 Text(text = dangerLevelText(level), style = MaterialTheme.typography.titleMedium)
                 Text(
                     text = "${sourceLabel(entry.source)} · ${prettyTimestamp(entry.scannedAt)}",

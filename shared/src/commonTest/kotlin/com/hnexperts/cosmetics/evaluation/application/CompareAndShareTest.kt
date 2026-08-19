@@ -9,6 +9,7 @@ import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.time.Instant
 
 class CompareFormulasTest {
     private val evaluateFormula: EvaluateFormula = EvaluationFactory.create()
@@ -25,9 +26,24 @@ class CompareFormulasTest {
         )
         assertEquals(DangerLevel.PROHIBITED, summary.products[0].assessment.overall)
         assertEquals(DangerLevel.LOW, summary.products[1].assessment.overall)
-        assertTrue(summary.uniqueHighOrProhibited.getValue(paste.name).contains("Formaldehyde"))
-        assertTrue(summary.uniqueHighOrProhibited.getValue(cleanser.name).isEmpty())
+        assertTrue(summary.uniqueHighOrProhibited.getValue(summary.products[0].id).contains("Formaldehyde"))
+        assertTrue(summary.uniqueHighOrProhibited.getValue(summary.products[1].id).isEmpty())
         assertTrue(summary.sharedPersonalAvoids.isEmpty())
+    }
+
+    @Test
+    fun sameDisplayNameKeepsSeparateUniqueConcerns() {
+        val paste = FixtureCatalog.products.first { item -> item.product.id == "problem-paste" }.product
+        val cleanser = FixtureCatalog.products.first { item -> item.product.id == "gentle-cleanser" }.product
+        val summary = CompareFormulas.fromAssessments(
+            listOf(
+                evaluateFormula.evaluate(paste.inciRaw, UserAvoidanceProfile.EMPTY, productName = paste.name),
+                evaluateFormula.evaluate(cleanser.inciRaw, UserAvoidanceProfile.EMPTY, productName = paste.name)
+            )
+        )
+        assertTrue(summary.products[0].id != summary.products[1].id)
+        assertTrue(summary.uniqueHighOrProhibited.getValue(summary.products[0].id).contains("Formaldehyde"))
+        assertTrue(summary.uniqueHighOrProhibited.getValue(summary.products[1].id).isEmpty())
     }
 
     @Test
@@ -93,15 +109,29 @@ class FindLocalAlternativesTest {
 
 class ShareResultTextTest {
     @Test
-    fun includesDisclaimerAndRatingWord() {
+    fun includesDisclaimerRatingWordAndDate() {
         val assessment = EvaluationFactory.create().evaluate(
             inciRaw = "Aqua, Glycerin",
             profile = UserAvoidanceProfile.EMPTY,
             productName = "Gentle Cream Cleanser"
         )
-        val text: String = ShareResultText.format(assessment)
+        val copy = ShareCopy(
+            scannedProduct = "Scanned product",
+            suitable = "No personal avoid-list hits.",
+            notSuitable = "Not suitable for your current filters.",
+            disclaimer = "Informational only. This is not a medical device or a substitute for the ingredient list, a dermatologist, or official EU annexes.",
+            overallLabel = "Generally acceptable",
+            scannedAtLabel = "Scanned"
+        )
+        val text: String = ShareResultText.format(
+            assessment = assessment,
+            copy = copy,
+            scannedAt = Instant.parse("2026-08-19T12:00:00Z")
+        )
         assertTrue(text.contains("Gentle Cream Cleanser"))
-        assertTrue(text.contains("SAFE") || text.contains("LOW"))
-        assertTrue(text.contains(ShareResultText.DISCLAIMER))
+        assertTrue(text.contains("Generally acceptable"))
+        assertTrue(text.contains("No personal avoid-list hits."))
+        assertTrue(text.contains("Scanned 2026-08-19"))
+        assertTrue(text.contains(copy.disclaimer))
     }
 }

@@ -43,6 +43,7 @@ class SqlUserShelf(
                     inci_raw = item.inciRaw,
                     rating = item.rating,
                     usage = item.usage.name,
+                    category = item.category,
                     saved_at = item.savedAt.ifBlank { Clock.System.now().toString() }
                 )
             }
@@ -67,6 +68,7 @@ class SqlUserShelf(
             inciRaw = row.inci_raw,
             rating = row.rating,
             usage = ProductUsage.parse(row.usage),
+            category = row.category,
             savedAt = row.saved_at
         )
     }

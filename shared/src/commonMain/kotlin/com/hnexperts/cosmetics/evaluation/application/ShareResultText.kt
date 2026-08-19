@@ -1,28 +1,40 @@
 package com.hnexperts.cosmetics.evaluation.application
 
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
+import kotlin.time.Clock
+import kotlin.time.Instant
+
+data class ShareCopy(
+    val scannedProduct: String,
+    val suitable: String,
+    val notSuitable: String,
+    val disclaimer: String,
+    val overallLabel: String,
+    val scannedAtLabel: String
+)
 
 object ShareResultText {
-    const val DISCLAIMER: String =
-        "Informational only. This is not a medical device or a substitute for the ingredient list, a dermatologist, or official EU annexes."
-
-    fun format(assessment: ProductAssessment): String {
-        val name: String = assessment.productName ?: assessment.gtin ?: "Scanned product"
+    fun format(
+        assessment: ProductAssessment,
+        copy: ShareCopy,
+        scannedAt: Instant = Clock.System.now()
+    ): String {
+        val name: String = assessment.productName ?: assessment.gtin ?: copy.scannedProduct
         val brand: String = assessment.brand?.let { value -> " ($value)" }.orEmpty()
-        val suitable: String = if (assessment.suitableForUser) {
-            "No personal avoid-list hits"
-        } else {
-            "Not suitable for current filters"
-        }
+        val suitable: String = if (assessment.suitableForUser) copy.suitable else copy.notSuitable
         return buildString {
             append(name)
             append(brand)
             append('\n')
-            append(assessment.overall.name)
+            append(copy.overallLabel)
             append('\n')
             append(suitable)
             append('\n')
-            append(DISCLAIMER)
+            append(copy.scannedAtLabel)
+            append(' ')
+            append(scannedAt.toString().substringBefore('T'))
+            append('\n')
+            append(copy.disclaimer)
         }
     }
 }

@@ -54,10 +54,12 @@ class HistoryViewModel(
             val saved: List<ShelfItem>? = runUiAction(onFailure = ::showFailure) {
                 shelf.all()
             }
-            if (entries != null && saved != null) {
-                state.update { current ->
-                    current.copy(entries = entries, shelf = saved, failure = null)
-                }
+            state.update { current ->
+                current.copy(
+                    entries = entries ?: current.entries,
+                    shelf = saved ?: current.shelf,
+                    failure = if (entries != null && saved != null) null else current.failure
+                )
             }
         }
     }
@@ -74,18 +76,27 @@ class HistoryViewModel(
         }
     }
 
-    fun compareSelected() {
+    fun compareSelected(unnamedFormat: String) {
         val snapshot: HistoryUiState = state.value
         if (!snapshot.canCompare) {
             return
         }
         val candidates: List<CompareCandidate> = selectedCandidates(snapshot)
-        compareSession.publish(candidates)
+        compareSession.publish(candidates, unnamedFormat)
         state.update { current -> current.copy(navigateToCompare = true) }
     }
 
     fun reopen(entry: HistoryEntry) {
-        open(inciRaw = entry.inciRaw, source = entry.source, gtin = entry.gtin)
+        open(
+            inciRaw = entry.inciRaw,
+            source = entry.source,
+            gtin = entry.gtin,
+            productName = entry.name,
+            brand = entry.brand,
+            usage = entry.usage,
+            productId = entry.productId,
+            category = entry.category
+        )
     }
 
     fun reopenShelf(item: ShelfItem) {
@@ -96,7 +107,8 @@ class HistoryViewModel(
             productName = item.name,
             brand = item.brand,
             usage = item.usage,
-            productId = item.productId
+            productId = item.productId,
+            category = item.category
         )
     }
 
@@ -111,7 +123,8 @@ class HistoryViewModel(
         productName: String? = null,
         brand: String? = null,
         usage: ProductUsage = ProductUsage.UNKNOWN,
-        productId: String? = null
+        productId: String? = null,
+        category: String? = null
     ) {
         openJob?.cancel()
         openJob = viewModelScope.launch {
@@ -125,7 +138,8 @@ class HistoryViewModel(
                         brand = brand,
                         gtin = gtin,
                         usage = usage,
-                        productId = productId
+                        productId = productId,
+                        category = category
                     )
                 }
                 if (assessment != null) {
@@ -143,11 +157,12 @@ class HistoryViewModel(
             .map { entry ->
                 CompareCandidate(
                     inciRaw = entry.inciRaw,
-                    productName = null,
-                    brand = null,
+                    productName = entry.name,
+                    brand = entry.brand,
                     gtin = entry.gtin,
-                    usage = ProductUsage.UNKNOWN,
-                    productId = entry.productId
+                    usage = entry.usage,
+                    productId = entry.productId,
+                    category = entry.category
                 )
             }
         val fromShelf: List<CompareCandidate> = snapshot.shelf
@@ -159,7 +174,8 @@ class HistoryViewModel(
                     brand = item.brand,
                     gtin = item.gtin,
                     usage = item.usage,
-                    productId = item.productId
+                    productId = item.productId,
+                    category = item.category
                 )
             }
         return fromHistory + fromShelf

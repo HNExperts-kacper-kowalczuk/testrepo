@@ -13,6 +13,7 @@ data class ShelfItem(
     val inciRaw: String,
     val rating: String,
     val usage: ProductUsage,
+    val category: String? = null,
     val savedAt: String
 )
 

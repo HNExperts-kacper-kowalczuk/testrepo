@@ -47,6 +47,7 @@
     <string name="compare_unique_concerns">High or prohibited names unique to this product</string>
     <string name="compare_shared_avoids">Shared personal avoid-list hits</string>
 
+    <string name="compare_unnamed">Product {n}</string>
     <string name="result_title">Result</string>
     <string name="result_missing">No evaluation to show. Scan a product first.</string>
     <string name="result_not_suitable">Not suitable for your current filters.</string>
@@ -56,6 +57,8 @@
     <string name="result_check_label">Check the label</string>
     <string name="result_pack_verified">The photographed list matches the catalog.</string>
     <string name="result_share">Share result</string>
+    <string name="share_scanned_product">Scanned product</string>
+    <string name="share_scanned_at">Scanned</string>
     <string name="result_shelf_add">Save to shelf</string>
     <string name="result_shelf_remove">Remove from shelf</string>
     <string name="result_alternatives">Lower-concern products in this category</string>
@@ -101,6 +104,7 @@
     <string name="prefs_reports_count">Unsent reports: %1$s</string>
     <string name="prefs_reports_copy">Copy unsent reports as text</string>
     <string name="prefs_reports_copied">Report list copied.</string>
+    <string name="prefs_reports_empty">kind	gtin	payload</string>
     <string name="prefs_remove_ads">Remove ads</string>
     <string name="prefs_ads_removed">Ads are turned off on this device.</string>
 

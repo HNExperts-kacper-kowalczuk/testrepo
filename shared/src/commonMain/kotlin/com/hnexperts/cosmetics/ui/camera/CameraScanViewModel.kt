@@ -75,6 +75,10 @@ class CameraScanViewModel(
         showFailure(AppFailure.Camera(operation = "barcode.gallery", detail = "No GTIN barcode was found in that photo"))
     }
 
+    fun onGalleryCancelled() {
+        state.update { current -> current.copy(failure = null) }
+    }
+
     fun onBarcode(payload: BarcodePayload) {
         if (state.value.mode != ScannerMode.BARCODE || acceptingBarcode || state.value.busy) {
             return

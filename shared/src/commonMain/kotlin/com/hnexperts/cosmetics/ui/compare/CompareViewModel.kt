@@ -69,10 +69,10 @@ class CompareViewModel(
         }
         val labelled: List<ComparedProduct> = assessments.mapIndexed { indexValue, assessment ->
             ComparedProduct(
+                id = indexValue.toString(),
                 label = candidates[indexValue].productName
                     ?: candidates[indexValue].gtin
-                    ?: assessment.productName
-                    ?: "Product ${indexValue + 1}",
+                    ?: session.unnamedFormat().replace("{n}", (indexValue + 1).toString()),
                 assessment = assessment
             )
         }

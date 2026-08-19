@@ -14,9 +14,10 @@ actual fun GalleryBarcodeButton(
     enabled: Boolean,
     onBarcode: (BarcodePayload) -> Unit,
     onEmpty: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier
 ) {
-    TextButton(onClick = onEmpty, enabled = enabled, modifier = modifier) {
+    TextButton(onClick = onCancel, enabled = enabled, modifier = modifier) {
         Text(stringResource(Res.string.camera_gallery))
     }
 }

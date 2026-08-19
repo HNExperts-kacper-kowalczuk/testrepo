@@ -7,26 +7,27 @@ import androidx.compose.ui.Modifier
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.camera_gallery
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
+import com.hnexperts.cosmetics.scanning.ios.IosStillBarcodeDecoder
 import org.jetbrains.compose.resources.stringResource
 import platform.UIKit.UIApplication
+import platform.UIKit.UIImage
 import platform.UIKit.UIImagePickerController
 import platform.UIKit.UIImagePickerControllerDelegateProtocol
 import platform.UIKit.UIImagePickerControllerOriginalImage
 import platform.UIKit.UIImagePickerControllerSourceType
 import platform.UIKit.UINavigationControllerDelegateProtocol
 import platform.darwin.NSObject
-import platform.UIKit.UIImage
-import com.hnexperts.cosmetics.scanning.ios.IosStillBarcodeDecoder
 
 @Composable
 actual fun GalleryBarcodeButton(
     enabled: Boolean,
     onBarcode: (BarcodePayload) -> Unit,
     onEmpty: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier
 ) {
     TextButton(
-        onClick = { presentPicker(onBarcode = onBarcode, onEmpty = onEmpty) },
+        onClick = { presentPicker(onBarcode = onBarcode, onEmpty = onEmpty, onCancel = onCancel) },
         enabled = enabled,
         modifier = modifier
     ) {
@@ -36,22 +37,30 @@ actual fun GalleryBarcodeButton(
 
 private var retainedDelegate: GalleryPickerDelegate? = null
 
-private fun presentPicker(onBarcode: (BarcodePayload) -> Unit, onEmpty: () -> Unit) {
-    val root = UIApplication.sharedApplication.keyWindow?.rootViewController ?: run {
-        onEmpty()
+private fun presentPicker(
+    onBarcode: (BarcodePayload) -> Unit,
+    onEmpty: () -> Unit,
+    onCancel: () -> Unit
+) {
+    val root = keyWindowRootController() ?: run {
+        onCancel()
         return
     }
     val picker = UIImagePickerController()
     picker.sourceType = UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypePhotoLibrary
-    val delegate = GalleryPickerDelegate(onBarcode = onBarcode, onEmpty = onEmpty)
+    val delegate = GalleryPickerDelegate(onBarcode = onBarcode, onEmpty = onEmpty, onCancel = onCancel)
     retainedDelegate = delegate
     picker.delegate = delegate
     root.presentViewController(picker, animated = true, completion = null)
 }
 
+private fun keyWindowRootController() =
+    UIApplication.sharedApplication.keyWindow?.rootViewController
+
 private class GalleryPickerDelegate(
     private val onBarcode: (BarcodePayload) -> Unit,
-    private val onEmpty: () -> Unit
+    private val onEmpty: () -> Unit,
+    private val onCancel: () -> Unit
 ) : NSObject(), UIImagePickerControllerDelegateProtocol, UINavigationControllerDelegateProtocol {
     override fun imagePickerController(
         picker: UIImagePickerController,
@@ -75,6 +84,6 @@ private class GalleryPickerDelegate(
     override fun imagePickerControllerDidCancel(picker: UIImagePickerController) {
         picker.dismissViewControllerAnimated(true, completion = null)
         retainedDelegate = null
-        onEmpty()
+        onCancel()
     }
 }

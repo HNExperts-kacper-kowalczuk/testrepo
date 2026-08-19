@@ -110,7 +110,16 @@ class ScanViewModel(
 
     fun reopen(entry: HistoryEntry) {
         startWork {
-            evaluateAndOpen(inciRaw = entry.inciRaw, source = entry.source, gtin = entry.gtin)
+            evaluateAndOpen(
+                inciRaw = entry.inciRaw,
+                source = entry.source,
+                productName = entry.name,
+                brand = entry.brand,
+                gtin = entry.gtin,
+                usage = entry.usage,
+                category = entry.category,
+                productId = entry.productId
+            )
         }
     }
 

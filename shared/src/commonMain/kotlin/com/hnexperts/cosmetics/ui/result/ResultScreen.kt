@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
+import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.resources.Res
@@ -52,6 +53,8 @@ import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
 import com.hnexperts.cosmetics.resources.result_usage
 import com.hnexperts.cosmetics.resources.result_usage_assumed
+import com.hnexperts.cosmetics.resources.share_scanned_at
+import com.hnexperts.cosmetics.resources.share_scanned_product
 import com.hnexperts.cosmetics.resources.usage_eye
 import com.hnexperts.cosmetics.resources.usage_leave_on
 import com.hnexperts.cosmetics.resources.usage_lip
@@ -138,8 +141,16 @@ fun ResultScreen(
                 }
             }
             item {
+                val shareCopy: ShareCopy = ShareCopy(
+                    scannedProduct = stringResource(Res.string.share_scanned_product),
+                    suitable = stringResource(Res.string.result_suitable),
+                    notSuitable = stringResource(Res.string.result_not_suitable),
+                    disclaimer = stringResource(Res.string.result_disclaimer),
+                    overallLabel = dangerLevelText(assessment.overall),
+                    scannedAtLabel = stringResource(Res.string.share_scanned_at)
+                )
                 Button(
-                    onClick = viewModel::share,
+                    onClick = { viewModel.share(shareCopy) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(Res.string.result_share))

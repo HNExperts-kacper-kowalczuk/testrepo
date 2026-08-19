@@ -69,7 +69,7 @@ fun CompareScreen(
                 summary.products.forEach { product ->
                     ComparedProductCard(
                         product = product,
-                        uniqueNames = summary.uniqueHighOrProhibited[product.label].orEmpty()
+                        uniqueNames = summary.uniqueHighOrProhibited[product.id].orEmpty()
                     )
                 }
                 if (summary.sharedPersonalAvoids.isNotEmpty()) {

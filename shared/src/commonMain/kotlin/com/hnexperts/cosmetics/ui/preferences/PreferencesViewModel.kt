@@ -8,6 +8,7 @@ import com.hnexperts.cosmetics.ads.domain.BillingPort
 import com.hnexperts.cosmetics.catalog.application.ApplyCatalogDelta
 import com.hnexperts.cosmetics.catalog.application.CatalogFreshness
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.application.CatalogIndex
 import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
 import com.hnexperts.cosmetics.catalog.domain.CatalogMeta
 import com.hnexperts.cosmetics.failure.AppFailure
@@ -63,7 +64,8 @@ class PreferencesViewModel(
     private val state: MutableStateFlow<PreferencesUiState> = MutableStateFlow(PreferencesUiState())
     val uiState: StateFlow<PreferencesUiState> = state.asStateFlow()
     private val persistMutex: Mutex = Mutex()
-    private var catalogIngredients: List<Ingredient> = emptyList()
+    private var catalogIndex: CatalogIndex? = null
+    private var ingredientsById: Map<String, Ingredient> = emptyMap()
 
     init {
         reload()
@@ -85,27 +87,23 @@ class PreferencesViewModel(
                 val index = indexDeferred.await()
                 val freshness = freshnessDeferred.await()
                 val reportCount: Long = reportsDeferred.await().getOrNull() ?: 0L
-                val ingredientsOutcome: Outcome<List<Ingredient>> = when (index) {
-                    is Outcome.Ok -> Outcome.Ok(index.value.ingredientsSorted)
-                    is Outcome.Err -> index
-                }
-                val combined: Outcome<Pair<StoredPreferences, List<Ingredient>>> =
-                    Outcome.zip(stored, ingredientsOutcome)
-                when (combined) {
+                when (stored) {
                     is Outcome.Ok -> {
-                        catalogIngredients = combined.value.second
-                        val storedPrefs: StoredPreferences = combined.value.first
+                        val indexValue: CatalogIndex? = (index as? Outcome.Ok)?.value
+                        catalogIndex = indexValue
+                        ingredientsById = indexValue?.ingredientsById.orEmpty()
+                        val storedPrefs: StoredPreferences = stored.value
                         state.value = state.value.copy(
                             stored = storedPrefs,
-                            ingredients = displayedAvoid(catalogIngredients, storedPrefs.profile, state.value.avoidQuery),
-                            catalogMeta = (index as? Outcome.Ok)?.value?.meta,
+                            ingredients = displayedAvoid(storedPrefs.profile, state.value.avoidQuery),
+                            catalogMeta = indexValue?.meta,
                             freshness = freshness.getOrNull(),
-                            failure = (freshness as? Outcome.Err)?.failure,
+                            failure = (index as? Outcome.Err)?.failure ?: (freshness as? Outcome.Err)?.failure,
                             openReportCount = reportCount,
                             adsRemoved = storedPrefs.adsRemoved
                         )
                     }
-                    is Outcome.Err -> state.value = state.value.copy(failure = combined.failure)
+                    is Outcome.Err -> state.value = state.value.copy(failure = stored.failure)
                 }
             }
         }
@@ -138,7 +136,7 @@ class PreferencesViewModel(
     fun setAvoidQuery(text: String) {
         state.value = state.value.copy(
             avoidQuery = text,
-            ingredients = displayedAvoid(catalogIngredients, state.value.stored.profile, text)
+            ingredients = displayedAvoid(state.value.stored.profile, text)
         )
     }
 
@@ -185,13 +183,13 @@ class PreferencesViewModel(
         }
     }
 
-    fun copyReports() {
+    fun copyReports(emptyText: String) {
         viewModelScope.launch {
             val items = runUiAction(::showFailure) { reports.openReports() } ?: return@launch
             val text: String = items.joinToString(separator = "\n") { report ->
                 "${report.kind}\t${report.gtin.orEmpty()}\t${report.payloadJson}"
             }
-            copyPlainText(text.ifBlank { "kind\tgtin\tpayload" })
+            copyPlainText(text.ifBlank { emptyText })
             state.value = state.value.copy(reportsCopied = true, failure = null)
         }
     }
@@ -221,7 +219,7 @@ class PreferencesViewModel(
                 if (saved != null) {
                     state.value = state.value.copy(
                         stored = next,
-                        ingredients = displayedAvoid(catalogIngredients, next.profile, state.value.avoidQuery),
+                        ingredients = displayedAvoid(next.profile, state.value.avoidQuery),
                         failure = null
                     )
                 }
@@ -233,19 +231,15 @@ class PreferencesViewModel(
         state.value = state.value.copy(failure = failure)
     }
 
-    private fun displayedAvoid(
-        catalog: List<Ingredient>,
-        profile: UserAvoidanceProfile,
-        query: String
-    ): List<Ingredient> {
+    private fun displayedAvoid(profile: UserAvoidanceProfile, query: String): List<Ingredient> {
         val needle: String = query.trim()
         if (needle.isEmpty()) {
-            return catalog.filter { ingredient -> profile.avoidedIngredientIds.contains(ingredient.id) }
+            return profile.avoidedIngredientIds.mapNotNull { ingredientId -> ingredientsById[ingredientId] }
         }
-        val lowered: String = needle.lowercase()
-        return catalog
-            .filter { ingredient -> ingredient.inciName.lowercase().contains(lowered) }
-            .take(AVOID_SEARCH_LIMIT)
+        return catalogIndex
+            ?.searchIngredients(needle)
+            ?.take(AVOID_SEARCH_LIMIT)
+            .orEmpty()
     }
 
     private companion object {

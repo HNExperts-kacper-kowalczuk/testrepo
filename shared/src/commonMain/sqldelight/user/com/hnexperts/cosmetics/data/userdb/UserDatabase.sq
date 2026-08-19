@@ -22,7 +22,11 @@ CREATE TABLE scan_history (
     product_id TEXT,
     inci_raw TEXT NOT NULL,
     rating TEXT NOT NULL,
-    source TEXT NOT NULL
+    source TEXT NOT NULL,
+    name TEXT,
+    brand TEXT,
+    usage TEXT NOT NULL DEFAULT 'UNKNOWN',
+    category TEXT
 );
 
 CREATE TABLE user_shelf (
@@ -34,6 +38,7 @@ CREATE TABLE user_shelf (
     inci_raw TEXT NOT NULL,
     rating TEXT NOT NULL,
     usage TEXT NOT NULL,
+    category TEXT,
     saved_at TEXT NOT NULL
 );
 
@@ -98,8 +103,8 @@ clearAvoid:
 DELETE FROM user_avoid_ingredient;
 
 insertHistory:
-INSERT INTO scan_history(scanned_at, gtin, product_id, inci_raw, rating, source)
-VALUES (?, ?, ?, ?, ?, ?);
+INSERT INTO scan_history(scanned_at, gtin, product_id, inci_raw, rating, source, name, brand, usage, category)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 clearHistory:
 DELETE FROM scan_history;
@@ -175,9 +180,10 @@ INSERT OR REPLACE INTO user_shelf(
     inci_raw,
     rating,
     usage,
+    category,
     saved_at
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteShelf:
 DELETE FROM user_shelf
