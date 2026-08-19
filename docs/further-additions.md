@@ -199,13 +199,7 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 ## 11. Suggested order after v1
 
-The committed next slice (catalog scale, four-corner INCI OCR, Fitatu-inspired UI) is **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)**. After that:
-
-1. Usage type (leave-on / rinse-off) + allergen checklist + colour-safe ratings + onboarding.  
-2. Verify-label-vs-catalog + multi-shot OCR + fuzzy confirm.  
-3. Shelf, compare, encyclopedia, local alternatives.  
-4. Sync-dependent: formula watch, report flush, ruleset changelog.  
-5. Microplastics chip, remove-ads IAP, share card.
+The committed next slice (catalog scale, four-corner INCI OCR, Fitatu-inspired UI) is **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely implemented). The remaining work is **[plan-next-phases.md](plan-next-phases.md)**: bundled CosIng/OBF catalog, online GTIN cache, pack verify, personal presets, shelf/compare, then share/gallery polish.
 
 Schema to reserve **now** (cheap, even if UI waits): `product.usage`, `product.inci_hash`, `user` shelf table, `report_queue`, `supported_comment_locales` (already planned).
 

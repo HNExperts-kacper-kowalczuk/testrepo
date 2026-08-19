@@ -59,7 +59,7 @@ Unknown barcodes are looked up online automatically when the device is connected
 ## Docs
 
 - **[Product and architecture plan](docs/plan.md)**
-- **[Next slice: catalog scale, OCR crop, Fitatu-style UI](docs/plan-catalog-ocr-ui.md)**
+- **[Next phases](docs/plan-next-phases.md)** — bundled catalog, pack verify, personal presets, compare, polish
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**
