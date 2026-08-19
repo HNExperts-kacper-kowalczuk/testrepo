@@ -3,7 +3,12 @@ CREATE TABLE user_profile (
     pregnancy_caution INTEGER NOT NULL DEFAULT 0,
     fragrance_free INTEGER NOT NULL DEFAULT 0,
     locale_preference TEXT NOT NULL DEFAULT 'system',
-    pinned_locale TEXT
+    pinned_locale TEXT,
+    eu_allergens INTEGER NOT NULL DEFAULT 0,
+    children_caution INTEGER NOT NULL DEFAULT 0,
+    alcohol_leave_on INTEGER NOT NULL DEFAULT 0,
+    essential_oil_cluster INTEGER NOT NULL DEFAULT 0,
+    ads_removed INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE user_avoid_ingredient (
@@ -21,9 +26,14 @@ CREATE TABLE scan_history (
 );
 
 CREATE TABLE user_shelf (
+    shelf_key TEXT NOT NULL PRIMARY KEY,
     product_id TEXT,
     gtin TEXT,
+    name TEXT,
+    brand TEXT,
     inci_raw TEXT NOT NULL,
+    rating TEXT NOT NULL,
+    usage TEXT NOT NULL,
     saved_at TEXT NOT NULL
 );
 
@@ -58,8 +68,19 @@ FROM user_profile
 WHERE id = 1;
 
 upsertProfile:
-INSERT OR REPLACE INTO user_profile(id, pregnancy_caution, fragrance_free, locale_preference, pinned_locale)
-VALUES (1, ?, ?, ?, ?);
+INSERT OR REPLACE INTO user_profile(
+    id,
+    pregnancy_caution,
+    fragrance_free,
+    locale_preference,
+    pinned_locale,
+    eu_allergens,
+    children_caution,
+    alcohol_leave_on,
+    essential_oil_cluster,
+    ads_removed
+)
+VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 selectAvoidIds:
 SELECT ingredient_id
@@ -126,3 +147,38 @@ countOpenReports:
 SELECT COUNT(*)
 FROM report_queue
 WHERE flushed = 0;
+
+selectOpenReports:
+SELECT *
+FROM report_queue
+WHERE flushed = 0
+ORDER BY created_at DESC
+LIMIT 200;
+
+selectShelf:
+SELECT *
+FROM user_shelf
+ORDER BY saved_at DESC;
+
+selectShelfByKey:
+SELECT *
+FROM user_shelf
+WHERE shelf_key = ?;
+
+upsertShelf:
+INSERT OR REPLACE INTO user_shelf(
+    shelf_key,
+    product_id,
+    gtin,
+    name,
+    brand,
+    inci_raw,
+    rating,
+    usage,
+    saved_at
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+deleteShelf:
+DELETE FROM user_shelf
+WHERE shelf_key = ?;

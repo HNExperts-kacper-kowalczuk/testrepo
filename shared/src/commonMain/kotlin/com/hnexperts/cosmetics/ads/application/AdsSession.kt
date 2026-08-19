@@ -7,7 +7,10 @@ import com.hnexperts.cosmetics.ads.domain.ConsentClient
 import com.hnexperts.cosmetics.ads.domain.ConsentSnapshot
 import com.hnexperts.cosmetics.ads.domain.NetworkMonitor
 import com.hnexperts.cosmetics.concurrency.ApplicationScope
+import com.hnexperts.cosmetics.failure.Outcome
 import com.hnexperts.cosmetics.logging.AppLog
+import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
+import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,10 +25,11 @@ data class AdsGate(
     val networkAvailable: Boolean = false,
     val sdkReady: Boolean = false,
     val bannerLoadFailed: Boolean = false,
-    val privacyOptionsRequired: Boolean = false
+    val privacyOptionsRequired: Boolean = false,
+    val adsRemoved: Boolean = false
 ) {
     fun bannerVisible(screen: AppScreen, policy: AdPolicy = AdPolicy()): Boolean {
-        if (!sdkReady || bannerLoadFailed) {
+        if (adsRemoved || !sdkReady || bannerLoadFailed) {
             return false
         }
         return policy.shouldShowBanner(screen, consentGranted, networkAvailable)
@@ -36,7 +40,8 @@ class AdsSession(
     private val consent: ConsentClient,
     private val network: NetworkMonitor,
     private val adsInitializer: AdsInitializer,
-    applicationScope: ApplicationScope
+    applicationScope: ApplicationScope,
+    private val preferences: PreferencesStore
 ) {
     private val state: MutableStateFlow<AdsGate> = MutableStateFlow(AdsGate())
     val gate: StateFlow<AdsGate> = state.asStateFlow()
@@ -76,7 +81,8 @@ class AdsSession(
                     networkAvailable = online,
                     sdkReady = sdkReady,
                     privacyOptionsRequired = snapshot.privacyOptionsRequired,
-                    bannerLoadFailed = if (sdkReady) current.bannerLoadFailed else false
+                    bannerLoadFailed = if (sdkReady) current.bannerLoadFailed else false,
+                    adsRemoved = adsRemovedFlag()
                 )
             }
         }
@@ -94,6 +100,13 @@ class AdsSession(
         } catch (error: Exception) {
             AppLog.e("ads.privacy", error.message ?: error::class.simpleName.orEmpty(), error)
             false
+        }
+    }
+
+    private suspend fun adsRemovedFlag(): Boolean {
+        return when (val loaded: Outcome<StoredPreferences> = preferences.load()) {
+            is Outcome.Ok -> loaded.value.adsRemoved
+            is Outcome.Err -> false
         }
     }
 }

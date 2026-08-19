@@ -2,12 +2,17 @@ package com.hnexperts.cosmetics.ui.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.application.CatalogIndex
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
+import com.hnexperts.cosmetics.hazards.domain.DangerLevel
+import com.hnexperts.cosmetics.hazards.domain.LocalizedText
+import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -23,17 +28,31 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+enum class SearchMode {
+    PRODUCTS,
+    INGREDIENTS
+}
+
+data class IngredientHit(
+    val ingredient: Ingredient,
+    val level: DangerLevel?,
+    val comments: List<LocalizedText>
+)
+
 data class SearchUiState(
     val query: String = "",
+    val mode: SearchMode = SearchMode.PRODUCTS,
     val busy: Boolean = false,
     val failure: AppFailure? = null,
-    val navigateToResult: Boolean = false
+    val navigateToResult: Boolean = false,
+    val selectedIngredient: IngredientHit? = null
 )
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class SearchViewModel(
     private val products: ProductRepository,
-    private val evaluateProduct: EvaluateProduct
+    private val evaluateProduct: EvaluateProduct,
+    private val catalog: CatalogGateway
 ) : ViewModel() {
     private val queryText: MutableStateFlow<String> = MutableStateFlow("")
     private val navigation: MutableStateFlow<SearchUiState> = MutableStateFlow(SearchUiState())
@@ -43,11 +62,20 @@ class SearchViewModel(
         .distinctUntilChanged()
         .mapLatest { text -> searchProducts(text) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val ingredientResults: StateFlow<List<IngredientHit>> = queryText
+        .debounce(250)
+        .distinctUntilChanged()
+        .mapLatest { text -> searchIngredients(text) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     private var openJob: Job? = null
 
     fun onQueryChange(text: String) {
         queryText.value = text
         navigation.update { current -> current.copy(query = text, failure = null) }
+    }
+
+    fun setMode(mode: SearchMode) {
+        navigation.update { current -> current.copy(mode = mode, selectedIngredient = null) }
     }
 
     fun openProduct(product: Product) {
@@ -61,7 +89,9 @@ class SearchViewModel(
                         source = "search",
                         productName = product.name,
                         brand = product.brand,
-                        usage = ProductUsage.parse(product.usage)
+                        usage = ProductUsage.parse(product.usage),
+                        category = product.category,
+                        productId = product.id
                     )
                 }
                 if (assessment != null) {
@@ -73,11 +103,22 @@ class SearchViewModel(
         }
     }
 
+    fun openIngredient(hit: IngredientHit) {
+        navigation.update { current -> current.copy(selectedIngredient = hit) }
+    }
+
+    fun dismissIngredient() {
+        navigation.update { current -> current.copy(selectedIngredient = null) }
+    }
+
     fun consumeNavigation() {
         navigation.update { current -> current.copy(navigateToResult = false) }
     }
 
     private suspend fun searchProducts(text: String): List<Product> {
+        if (navigation.value.mode != SearchMode.PRODUCTS) {
+            return emptyList()
+        }
         return when (val result: Outcome<List<Product>> = products.search(text)) {
             is Outcome.Ok -> {
                 navigation.update { current -> current.copy(failure = null) }
@@ -87,6 +128,26 @@ class SearchViewModel(
                 showFailure(result.failure)
                 emptyList()
             }
+        }
+    }
+
+    private suspend fun searchIngredients(text: String): List<IngredientHit> {
+        if (text.isBlank()) {
+            return emptyList()
+        }
+        val index: CatalogIndex = when (val loaded: Outcome<CatalogIndex> = catalog.awaitIndex()) {
+            is Outcome.Err -> {
+                showFailure(loaded.failure)
+                return emptyList()
+            }
+            is Outcome.Ok -> loaded.value
+        }
+        return index.searchIngredients(text).map { ingredient ->
+            IngredientHit(
+                ingredient = ingredient,
+                level = index.hazardsById[ingredient.id]?.dangerLevel,
+                comments = index.commentsById[ingredient.id].orEmpty()
+            )
         }
     }
 

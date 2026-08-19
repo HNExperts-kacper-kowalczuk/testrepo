@@ -25,6 +25,10 @@ class CatalogIndexAssembleTest {
             index.ingredientsSorted.map { ingredient -> ingredient.inciName }
         )
         assertEquals("aqua", index.matcher.matchToken("Water").id)
+        val glycerinHits: List<String> = index.searchIngredients("Glycerin").map { ingredient -> ingredient.id }
+        assertTrue(glycerinHits.contains("glycerin"))
+        val aliasHits: List<String> = index.searchIngredients("Water").map { ingredient -> ingredient.id }
+        assertTrue(aliasHits.contains("aqua"))
         val assessmentUnknowns: Int = index.evaluateFormula.evaluate("Aqua, Glycerin", UserAvoidanceProfile.EMPTY).unknownCount
         assertTrue(assessmentUnknowns == 0)
     }

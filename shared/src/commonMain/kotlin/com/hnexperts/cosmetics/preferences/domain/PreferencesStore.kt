@@ -7,7 +7,8 @@ import com.hnexperts.cosmetics.i18n.LocalePreference
 data class StoredPreferences(
     val profile: UserAvoidanceProfile,
     val localePreference: LocalePreference,
-    val pinnedLocale: AppLocale?
+    val pinnedLocale: AppLocale?,
+    val adsRemoved: Boolean = false
 )
 
 interface PreferencesStore {

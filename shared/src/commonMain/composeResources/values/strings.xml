@@ -31,10 +31,21 @@
 
     <string name="search_title">Catalog</string>
     <string name="search_placeholder">Search by name or brand</string>
+    <string name="search_placeholder_ingredients">Search INCI names or aliases</string>
     <string name="search_empty">No products match that query.</string>
+    <string name="search_products">Products</string>
+    <string name="search_ingredients">Ingredients</string>
 
     <string name="history_title">Recent scans</string>
     <string name="history_empty">You have not evaluated a product yet.</string>
+    <string name="shelf_title">Shelf</string>
+    <string name="shelf_empty">Star a result to keep it here. Shelf stays on this device if the catalog is replaced.</string>
+    <string name="compare_title">Compare</string>
+    <string name="compare_action">Compare selected</string>
+    <string name="compare_select_hint">Select 2 or 3 items to compare overall ratings and unique high-concern names.</string>
+    <string name="compare_empty">Select two or three scans or shelf items first.</string>
+    <string name="compare_unique_concerns">High or prohibited names unique to this product</string>
+    <string name="compare_shared_avoids">Shared personal avoid-list hits</string>
 
     <string name="result_title">Result</string>
     <string name="result_missing">No evaluation to show. Scan a product first.</string>
@@ -44,6 +55,11 @@
     <string name="result_unverified">Catalog formula is unverified community data.</string>
     <string name="result_check_label">Check the label</string>
     <string name="result_pack_verified">The photographed list matches the catalog.</string>
+    <string name="result_share">Share result</string>
+    <string name="result_shelf_add">Save to shelf</string>
+    <string name="result_shelf_remove">Remove from shelf</string>
+    <string name="result_alternatives">Lower-concern products in this category</string>
+    <string name="result_alternatives_source">In this app’s catalog</string>
     <string name="confirm_add_photo">Add another photo</string>
     <string name="level_safe">Generally acceptable</string>
     <string name="level_low">Low concern</string>
@@ -53,12 +69,18 @@
     <string name="level_prohibited">Prohibited</string>
     <string name="level_unknown">Unknown</string>
     <string name="finding_personal_avoid">On your avoid list</string>
+    <string name="finding_early_list">Near the start of the INCI list (often a higher amount).</string>
     <string name="finding_unmatched">Not in the knowledge base</string>
     <string name="back">Back</string>
 
     <string name="prefs_title">Preferences</string>
     <string name="prefs_pregnancy">Pregnancy / breastfeeding caution</string>
     <string name="prefs_fragrance_free">Prefer fragrance-free</string>
+    <string name="prefs_eu_allergens">Avoid EU-labelled fragrance allergens</string>
+    <string name="prefs_children_caution">Children / not for under 3 caution</string>
+    <string name="prefs_alcohol_leave_on">Avoid alcohol in leave-on products</string>
+    <string name="prefs_essential_oil">Avoid common essential-oil allergens</string>
+    <string name="prefs_avoid_search">Search ingredients to avoid</string>
     <string name="prefs_language">Language for comments</string>
     <string name="prefs_language_system">Follow system</string>
     <string name="prefs_language_en">English</string>
@@ -76,6 +98,11 @@
     <string name="prefs_privacy">Ad privacy options</string>
     <string name="prefs_clear_history">Clear scan history</string>
     <string name="prefs_cleared_history">Scan history was deleted on this device.</string>
+    <string name="prefs_reports_count">Unsent reports: %1$s</string>
+    <string name="prefs_reports_copy">Copy unsent reports as text</string>
+    <string name="prefs_reports_copied">Report list copied.</string>
+    <string name="prefs_remove_ads">Remove ads</string>
+    <string name="prefs_ads_removed">Ads are turned off on this device.</string>
 
     <string name="disclaimer_title">Before you scan</string>
     <string name="disclaimer_body">This app is an informational consumer tool. It is not a medical device and it is not a substitute for the printed ingredient list, a dermatologist, or official EU annexes. Ratings can lag regulatory updates. Unknown names are shown, never treated as safe. Ads never appear on the camera or ingredient review screens.</string>
@@ -113,6 +140,7 @@
 
     <string name="camera_title_barcode">Scan barcode</string>
     <string name="camera_title_inci">Scan ingredient list</string>
+    <string name="camera_gallery">Pick from gallery</string>
     <string name="camera_hint_barcode">Point at an EAN or UPC barcode. Missing catalog codes are looked up online when you have a connection. Ads stay off this screen.</string>
     <string name="camera_hint_inci">Flatten the label, then capture a still of the INCI / skład block.</string>
     <string name="camera_capture">Capture list</string>

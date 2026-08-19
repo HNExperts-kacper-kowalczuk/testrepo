@@ -2,10 +2,15 @@ package com.hnexperts.cosmetics.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
+import com.hnexperts.cosmetics.evaluation.application.CompareCandidate
+import com.hnexperts.cosmetics.evaluation.application.CompareSession
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
+import com.hnexperts.cosmetics.shelf.domain.ShelfItem
+import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +21,26 @@ import kotlinx.coroutines.launch
 
 data class HistoryUiState(
     val entries: List<HistoryEntry> = emptyList(),
+    val shelf: List<ShelfItem> = emptyList(),
+    val selectedHistoryIds: Set<Long> = emptySet(),
+    val selectedShelfKeys: Set<String> = emptySet(),
     val busy: Boolean = false,
     val failure: AppFailure? = null,
-    val navigateToResult: Boolean = false
-)
+    val navigateToResult: Boolean = false,
+    val navigateToCompare: Boolean = false
+) {
+    val compareCount: Int
+        get() = selectedHistoryIds.size + selectedShelfKeys.size
+
+    val canCompare: Boolean
+        get() = compareCount in 2..3
+}
 
 class HistoryViewModel(
     private val history: ScanHistoryRepository,
-    private val evaluateProduct: EvaluateProduct
+    private val evaluateProduct: EvaluateProduct,
+    private val shelf: UserShelf,
+    private val compareSession: CompareSession
 ) : ViewModel() {
     private val state: MutableStateFlow<HistoryUiState> = MutableStateFlow(HistoryUiState())
     val uiState: StateFlow<HistoryUiState> = state.asStateFlow()
@@ -34,22 +51,81 @@ class HistoryViewModel(
             val entries: List<HistoryEntry>? = runUiAction(onFailure = ::showFailure) {
                 history.recent()
             }
-            if (entries != null) {
-                state.update { current -> current.copy(entries = entries, failure = null) }
+            val saved: List<ShelfItem>? = runUiAction(onFailure = ::showFailure) {
+                shelf.all()
+            }
+            if (entries != null && saved != null) {
+                state.update { current ->
+                    current.copy(entries = entries, shelf = saved, failure = null)
+                }
             }
         }
     }
 
+    fun toggleHistorySelection(entry: HistoryEntry) {
+        state.update { current ->
+            current.copy(selectedHistoryIds = toggleId(current.selectedHistoryIds, entry.id, current.compareCount))
+        }
+    }
+
+    fun toggleShelfSelection(item: ShelfItem) {
+        state.update { current ->
+            current.copy(selectedShelfKeys = toggleKey(current.selectedShelfKeys, item.shelfKey, current.compareCount))
+        }
+    }
+
+    fun compareSelected() {
+        val snapshot: HistoryUiState = state.value
+        if (!snapshot.canCompare) {
+            return
+        }
+        val candidates: List<CompareCandidate> = selectedCandidates(snapshot)
+        compareSession.publish(candidates)
+        state.update { current -> current.copy(navigateToCompare = true) }
+    }
+
     fun reopen(entry: HistoryEntry) {
+        open(inciRaw = entry.inciRaw, source = entry.source, gtin = entry.gtin)
+    }
+
+    fun reopenShelf(item: ShelfItem) {
+        open(
+            inciRaw = item.inciRaw,
+            source = "shelf",
+            gtin = item.gtin,
+            productName = item.name,
+            brand = item.brand,
+            usage = item.usage,
+            productId = item.productId
+        )
+    }
+
+    fun consumeNavigation() {
+        state.update { current -> current.copy(navigateToResult = false, navigateToCompare = false) }
+    }
+
+    private fun open(
+        inciRaw: String,
+        source: String,
+        gtin: String?,
+        productName: String? = null,
+        brand: String? = null,
+        usage: ProductUsage = ProductUsage.UNKNOWN,
+        productId: String? = null
+    ) {
         openJob?.cancel()
         openJob = viewModelScope.launch {
             state.update { current -> current.copy(busy = true, failure = null) }
             try {
                 val assessment = runUiAction(onFailure = ::showFailure) {
                     evaluateProduct.invoke(
-                        inciRaw = entry.inciRaw,
-                        source = entry.source,
-                        gtin = entry.gtin
+                        inciRaw = inciRaw,
+                        source = source,
+                        productName = productName,
+                        brand = brand,
+                        gtin = gtin,
+                        usage = usage,
+                        productId = productId
                     )
                 }
                 if (assessment != null) {
@@ -61,11 +137,57 @@ class HistoryViewModel(
         }
     }
 
-    fun consumeNavigation() {
-        state.update { current -> current.copy(navigateToResult = false) }
+    private fun selectedCandidates(snapshot: HistoryUiState): List<CompareCandidate> {
+        val fromHistory: List<CompareCandidate> = snapshot.entries
+            .filter { entry -> snapshot.selectedHistoryIds.contains(entry.id) }
+            .map { entry ->
+                CompareCandidate(
+                    inciRaw = entry.inciRaw,
+                    productName = null,
+                    brand = null,
+                    gtin = entry.gtin,
+                    usage = ProductUsage.UNKNOWN,
+                    productId = entry.productId
+                )
+            }
+        val fromShelf: List<CompareCandidate> = snapshot.shelf
+            .filter { item -> snapshot.selectedShelfKeys.contains(item.shelfKey) }
+            .map { item ->
+                CompareCandidate(
+                    inciRaw = item.inciRaw,
+                    productName = item.name,
+                    brand = item.brand,
+                    gtin = item.gtin,
+                    usage = item.usage,
+                    productId = item.productId
+                )
+            }
+        return fromHistory + fromShelf
+    }
+
+    private fun toggleId(current: Set<Long>, id: Long, selectedCount: Int): Set<Long> {
+        if (current.contains(id)) {
+            return current - id
+        }
+        if (selectedCount >= 3) {
+            return current
+        }
+        return current + id
+    }
+
+    private fun toggleKey(current: Set<String>, key: String, selectedCount: Int): Set<String> {
+        if (current.contains(key)) {
+            return current - key
+        }
+        if (selectedCount >= 3) {
+            return current
+        }
+        return current + key
     }
 
     private fun showFailure(failure: AppFailure) {
-        state.update { current -> current.copy(failure = failure, navigateToResult = false) }
+        state.update { current ->
+            current.copy(failure = failure, navigateToResult = false, navigateToCompare = false)
+        }
     }
 }

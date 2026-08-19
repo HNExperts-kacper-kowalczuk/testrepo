@@ -72,11 +72,12 @@ class EvaluateFormula(
         gtin: String?,
         usage: ProductUsage
     ): ProductAssessment {
-        val findings: List<Finding> = references.map { reference ->
+        val findings: List<Finding> = references.mapIndexed { index, reference ->
             val ingredient: Ingredient? = reference.id?.let { id -> ingredientsById[id] }
             val hazard: IngredientHazard? = reference.id?.let { id -> hazardsById[id] }
             val comments: List<LocalizedText> = reference.id?.let { id -> commentsById[id] }.orEmpty()
             policy.assess(reference, ingredient, hazard, comments, profile, usage)
+                .copy(listIndex = index)
         }
         val unknownCount: Int = findings.count { finding ->
             finding.ingredient.matchedBy == MatchMethod.UNMATCHED || finding.level == DangerLevel.UNKNOWN

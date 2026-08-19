@@ -13,7 +13,9 @@ sealed class GtinResolution {
         val productName: String?,
         val brand: String?,
         val usage: ProductUsage,
-        val source: String
+        val source: String,
+        val category: String? = null,
+        val productId: String? = null
     ) : GtinResolution()
 
     data class Unknown(
@@ -76,7 +78,9 @@ class ResolveGtin(
             productName = lookup.product.name,
             brand = lookup.product.brand,
             usage = ProductUsage.parse(lookup.product.usage),
-            source = "barcode"
+            source = "barcode",
+            category = lookup.product.category,
+            productId = lookup.product.id
         )
     }
 

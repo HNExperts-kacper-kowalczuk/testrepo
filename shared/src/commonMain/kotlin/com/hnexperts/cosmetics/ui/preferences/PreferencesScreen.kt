@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +26,10 @@ import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.resources.Res
+import com.hnexperts.cosmetics.resources.prefs_alcohol_leave_on
+import com.hnexperts.cosmetics.resources.prefs_avoid_search
 import com.hnexperts.cosmetics.resources.prefs_avoid_title
+import com.hnexperts.cosmetics.resources.prefs_children_caution
 import com.hnexperts.cosmetics.resources.prefs_catalog_apply
 import com.hnexperts.cosmetics.resources.prefs_catalog_applied
 import com.hnexperts.cosmetics.resources.prefs_catalog_check_action
@@ -37,6 +41,8 @@ import com.hnexperts.cosmetics.resources.prefs_catalog_update
 import com.hnexperts.cosmetics.resources.prefs_catalog_uptodate
 import com.hnexperts.cosmetics.resources.prefs_clear_history
 import com.hnexperts.cosmetics.resources.prefs_cleared_history
+import com.hnexperts.cosmetics.resources.prefs_essential_oil
+import com.hnexperts.cosmetics.resources.prefs_eu_allergens
 import com.hnexperts.cosmetics.resources.prefs_fragrance_free
 import com.hnexperts.cosmetics.resources.prefs_language
 import com.hnexperts.cosmetics.resources.prefs_language_en
@@ -44,6 +50,11 @@ import com.hnexperts.cosmetics.resources.prefs_language_pl
 import com.hnexperts.cosmetics.resources.prefs_language_system
 import com.hnexperts.cosmetics.resources.prefs_pregnancy
 import com.hnexperts.cosmetics.resources.prefs_privacy
+import com.hnexperts.cosmetics.resources.prefs_remove_ads
+import com.hnexperts.cosmetics.resources.prefs_reports_copy
+import com.hnexperts.cosmetics.resources.prefs_reports_copied
+import com.hnexperts.cosmetics.resources.prefs_reports_count
+import com.hnexperts.cosmetics.resources.prefs_ads_removed
 import com.hnexperts.cosmetics.resources.prefs_title
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import org.jetbrains.compose.resources.stringResource
@@ -72,6 +83,26 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             checked = stored.profile.fragranceFree,
             onCheckedChange = viewModel::setFragranceFree
         )
+        PreferenceSwitch(
+            label = stringResource(Res.string.prefs_eu_allergens),
+            checked = stored.profile.euAllergens,
+            onCheckedChange = viewModel::setEuAllergens
+        )
+        PreferenceSwitch(
+            label = stringResource(Res.string.prefs_children_caution),
+            checked = stored.profile.childrenCaution,
+            onCheckedChange = viewModel::setChildrenCaution
+        )
+        PreferenceSwitch(
+            label = stringResource(Res.string.prefs_alcohol_leave_on),
+            checked = stored.profile.alcoholLeaveOn,
+            onCheckedChange = viewModel::setAlcoholLeaveOn
+        )
+        PreferenceSwitch(
+            label = stringResource(Res.string.prefs_essential_oil),
+            checked = stored.profile.essentialOilCluster,
+            onCheckedChange = viewModel::setEssentialOilCluster
+        )
         Text(text = stringResource(Res.string.prefs_language), style = MaterialTheme.typography.titleMedium)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(
@@ -91,6 +122,13 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             )
         }
         Text(text = stringResource(Res.string.prefs_avoid_title), style = MaterialTheme.typography.titleMedium)
+        OutlinedTextField(
+            value = uiState.avoidQuery,
+            onValueChange = viewModel::setAvoidQuery,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(stringResource(Res.string.prefs_avoid_search)) },
+            singleLine = true
+        )
         uiState.ingredients.forEach { ingredient ->
             PreferenceSwitch(
                 label = ingredient.inciName,
@@ -103,6 +141,23 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             onCheck = viewModel::reload,
             onApply = viewModel::applyCatalogUpdate
         )
+        Text(
+            text = stringResource(Res.string.prefs_reports_count, uiState.openReportCount.toString()),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Button(onClick = viewModel::copyReports, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(Res.string.prefs_reports_copy))
+        }
+        if (uiState.reportsCopied) {
+            Text(text = stringResource(Res.string.prefs_reports_copied))
+        }
+        if (!uiState.adsRemoved) {
+            Button(onClick = viewModel::purchaseRemoveAds, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.prefs_remove_ads))
+            }
+        } else {
+            Text(text = stringResource(Res.string.prefs_ads_removed))
+        }
         if (uiState.ads.privacyOptionsRequired) {
             Button(onClick = viewModel::openPrivacyOptions, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(Res.string.prefs_privacy))

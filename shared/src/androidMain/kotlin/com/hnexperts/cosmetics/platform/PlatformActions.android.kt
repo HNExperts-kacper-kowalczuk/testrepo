@@ -1,5 +1,8 @@
 package com.hnexperts.cosmetics.platform
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -41,4 +44,24 @@ actual fun openUrl(url: String) {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
+}
+
+actual fun sharePlainText(title: String, body: String) {
+    val context = AndroidAppContext.activity() ?: AndroidAppContext.current() ?: return
+    val share = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, title)
+        putExtra(Intent.EXTRA_TEXT, body)
+    }
+    val chooser = Intent.createChooser(share, title).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(chooser)
+}
+
+actual fun copyPlainText(text: String) {
+    val context = AndroidAppContext.current() ?: return
+    val clipboard: ClipboardManager =
+        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(ClipData.newPlainText("INCI Scan", text))
 }

@@ -268,7 +268,7 @@ internal object FixtureIngredients {
             name = "Salicylic Acid",
             aliases = listOf("BHA Acid"),
             level = DangerLevel.RESTRICTED,
-            tags = listOf("KERATOLYTIC", "ANNEX_III", "PREGNANCY_CAUTION"),
+            tags = listOf("KERATOLYTIC", "ANNEX_III", "PREGNANCY_CAUTION", "CHILDREN"),
             en = "Restricted keratolytic. Not for children under three; caution in pregnancy.",
             pl = "Ograniczony keratolotyk. Nie dla dzieci poniżej 3 lat; ostrożnie w ciąży."
         ),
@@ -353,10 +353,11 @@ internal object FixtureIngredients {
         val functionTags: List<String> = tags.filter { tag ->
             tag != "ANNEX_II" && tag != "ANNEX_III" && tag != "ANNEX_IV" &&
                 tag != "ANNEX_V" && tag != "ANNEX_VI" && tag != "ALLERGEN_26" &&
-                tag != "CMR" && tag != "PREGNANCY_CAUTION"
+                tag != "CMR" && tag != "PREGNANCY_CAUTION" && tag != "CHILDREN"
         }
         val regulatoryTags: List<String> = tags.filter { tag ->
-            tag.startsWith("ANNEX_") || tag == "ALLERGEN_26" || tag == "CMR" || tag == "PREGNANCY_CAUTION"
+            tag.startsWith("ANNEX_") || tag == "ALLERGEN_26" || tag == "CMR" ||
+                tag == "PREGNANCY_CAUTION" || tag == "CHILDREN"
         }
         return FixtureIngredient(
             ingredient = Ingredient(

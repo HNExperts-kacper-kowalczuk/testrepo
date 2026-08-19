@@ -125,7 +125,9 @@ class ScanViewModel(
             productName = ready.productName,
             brand = ready.brand,
             gtin = ready.gtin,
-            usage = ready.usage
+            usage = ready.usage,
+            category = ready.category,
+            productId = ready.productId
         )
     }
 
@@ -135,7 +137,9 @@ class ScanViewModel(
         productName: String? = null,
         brand: String? = null,
         gtin: String? = null,
-        usage: ProductUsage = ProductUsage.UNKNOWN
+        usage: ProductUsage = ProductUsage.UNKNOWN,
+        category: String? = null,
+        productId: String? = null
     ) {
         runUiAction(onFailure = ::showFailure) {
             evaluateProduct.invoke(
@@ -144,7 +148,9 @@ class ScanViewModel(
                 productName = productName,
                 brand = brand,
                 gtin = gtin,
-                usage = usage
+                usage = usage,
+                category = category,
+                productId = productId
             )
         } ?: return
         state.update { current ->

@@ -32,15 +32,21 @@ import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
+import com.hnexperts.cosmetics.resources.finding_early_list
 import com.hnexperts.cosmetics.resources.finding_rating_a11y
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
+import com.hnexperts.cosmetics.resources.result_alternatives
+import com.hnexperts.cosmetics.resources.result_alternatives_source
 import com.hnexperts.cosmetics.resources.result_check_label
 import com.hnexperts.cosmetics.resources.result_disclaimer
 import com.hnexperts.cosmetics.resources.result_missing
 import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_pack_verified
 import com.hnexperts.cosmetics.resources.result_rating_a11y
+import com.hnexperts.cosmetics.resources.result_share
+import com.hnexperts.cosmetics.resources.result_shelf_add
+import com.hnexperts.cosmetics.resources.result_shelf_remove
 import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
@@ -118,6 +124,28 @@ fun ResultScreen(
                 }
             }
             item {
+                Button(
+                    onClick = viewModel::toggleShelf,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (uiState.onShelf) {
+                            stringResource(Res.string.result_shelf_remove)
+                        } else {
+                            stringResource(Res.string.result_shelf_add)
+                        }
+                    )
+                }
+            }
+            item {
+                Button(
+                    onClick = viewModel::share,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(Res.string.result_share))
+                }
+            }
+            item {
                 FailureBanner(failure = uiState.failure)
             }
             if (assessment.unknownCount > 0) {
@@ -129,6 +157,31 @@ fun ResultScreen(
                             assessment.unknownCount
                         )
                     )
+                }
+            }
+            if (uiState.alternatives.isNotEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(Res.string.result_alternatives),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(Res.string.result_alternatives_source),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                items(uiState.alternatives, key = { alternative -> alternative.product.id }) { alternative ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { viewModel.openAlternative(alternative) }
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                            Text(text = alternative.product.name, style = MaterialTheme.typography.titleMedium)
+                            Text(text = dangerLevelText(alternative.assessment.overall))
+                        }
+                    }
                 }
             }
             items(assessment.findings) { finding ->
@@ -226,6 +279,12 @@ private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
             val comment = viewModel.commentFor(finding.comments)
             if (comment != null) {
                 Text(text = comment.summary, style = MaterialTheme.typography.bodyLarge)
+            }
+            if (finding.earlyListConcern()) {
+                Text(
+                    text = stringResource(Res.string.finding_early_list),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
             if (finding.usageAdjusted) {
                 Text(

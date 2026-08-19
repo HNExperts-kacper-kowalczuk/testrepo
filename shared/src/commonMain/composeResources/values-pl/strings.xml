@@ -31,10 +31,21 @@
 
     <string name="search_title">Katalog</string>
     <string name="search_placeholder">Szukaj po nazwie lub marce</string>
+    <string name="search_placeholder_ingredients">Szukaj nazw INCI lub aliasów</string>
     <string name="search_empty">Brak produktów pasujących do zapytania.</string>
+    <string name="search_products">Produkty</string>
+    <string name="search_ingredients">Składniki</string>
 
     <string name="history_title">Ostatnie skany</string>
     <string name="history_empty">Nie oceniono jeszcze żadnego produktu.</string>
+    <string name="shelf_title">Półka</string>
+    <string name="shelf_empty">Oznacz wynik gwiazdką, żeby tu został. Półka zostaje na urządzeniu po wymianie katalogu.</string>
+    <string name="compare_title">Porównanie</string>
+    <string name="compare_action">Porównaj wybrane</string>
+    <string name="compare_select_hint">Wybierz 2 lub 3 pozycje, żeby porównać oceny i unikalne składniki wysokiego ryzyka.</string>
+    <string name="compare_empty">Najpierw wybierz dwa lub trzy skany albo pozycje z półki.</string>
+    <string name="compare_unique_concerns">Nazwy o wysokim ryzyku lub zakazane, unikalne dla tego produktu</string>
+    <string name="compare_shared_avoids">Wspólne trafienia z listy unikania</string>
 
     <string name="result_title">Wynik</string>
     <string name="result_missing">Brak oceny do pokazania. Najpierw zeskanuj produkt.</string>
@@ -44,6 +55,11 @@
     <string name="result_unverified">Skład z katalogu pochodzi z niezweryfikowanych danych społecznościowych.</string>
     <string name="result_check_label">Sprawdź etykietę</string>
     <string name="result_pack_verified">Zeskanowana lista zgadza się z katalogiem.</string>
+    <string name="result_share">Udostępnij wynik</string>
+    <string name="result_shelf_add">Zapisz na półkę</string>
+    <string name="result_shelf_remove">Usuń z półki</string>
+    <string name="result_alternatives">Produkty o niższych zastrzeżeniach w tej kategorii</string>
+    <string name="result_alternatives_source">W katalogu tej aplikacji</string>
     <string name="confirm_add_photo">Dodaj kolejne zdjęcie</string>
     <string name="level_safe">Ogólnie akceptowalny</string>
     <string name="level_low">Niskie zastrzeżenia</string>
@@ -53,12 +69,18 @@
     <string name="level_prohibited">Zakazany</string>
     <string name="level_unknown">Nieznany</string>
     <string name="finding_personal_avoid">Na Twojej liście unikania</string>
+    <string name="finding_early_list">Blisko początku listy INCI (często wyższa zawartość).</string>
     <string name="finding_unmatched">Brak w bazie wiedzy</string>
     <string name="back">Wstecz</string>
 
     <string name="prefs_title">Ustawienia</string>
     <string name="prefs_pregnancy">Ostrożność w ciąży / podczas karmienia</string>
     <string name="prefs_fragrance_free">Wolę bez zapachu</string>
+    <string name="prefs_eu_allergens">Unikaj alergenów zapachowych oznaczanych w UE</string>
+    <string name="prefs_children_caution">Ostrożność u dzieci / nie dla dzieci poniżej 3 lat</string>
+    <string name="prefs_alcohol_leave_on">Unikaj alkoholu w produktach leave-on</string>
+    <string name="prefs_essential_oil">Unikaj częstych alergenów z olejków eterycznych</string>
+    <string name="prefs_avoid_search">Szukaj składników do unikania</string>
     <string name="prefs_language">Język komentarzy</string>
     <string name="prefs_language_system">Jak system</string>
     <string name="prefs_language_en">Angielski</string>
@@ -76,6 +98,11 @@
     <string name="prefs_privacy">Opcje prywatności reklam</string>
     <string name="prefs_clear_history">Wyczyść historię skanów</string>
     <string name="prefs_cleared_history">Historia skanów została usunięta z tego urządzenia.</string>
+    <string name="prefs_reports_count">Niewysłane zgłoszenia: %1$s</string>
+    <string name="prefs_reports_copy">Kopiuj niewysłane zgłoszenia jako tekst</string>
+    <string name="prefs_reports_copied">Lista zgłoszeń skopiowana.</string>
+    <string name="prefs_remove_ads">Usuń reklamy</string>
+    <string name="prefs_ads_removed">Reklamy są wyłączone na tym urządzeniu.</string>
 
     <string name="disclaimer_title">Zanim zeskanujesz</string>
     <string name="disclaimer_body">To narzędzie informacyjne dla konsumenta. Nie jest wyrobem medycznym i nie zastępuje składu z etykiety, dermatologa ani oficjalnych załączników UE. Oceny mogą się opóźniać względem przepisów. Nierozpoznane nazwy są pokazywane, nigdy traktowane jako bezpieczne. Reklamy nie pojawiają się na ekranie aparatu ani przy potwierdzaniu składu.</string>
@@ -113,6 +140,7 @@
 
     <string name="camera_title_barcode">Skanuj kod kreskowy</string>
     <string name="camera_title_inci">Skanuj skład</string>
+    <string name="camera_gallery">Wybierz z galerii</string>
     <string name="camera_hint_barcode">Skieruj aparat na kod EAN lub UPC. Kodów spoza katalogu szukamy online, gdy jest połączenie. Reklamy nie pojawiają się na tym ekranie.</string>
     <string name="camera_hint_inci">Wypłaszcz etykietę, a potem zrób zdjęcie bloku INCI / składu.</string>
     <string name="camera_capture">Zrób zdjęcie składu</string>

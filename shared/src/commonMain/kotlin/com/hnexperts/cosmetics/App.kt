@@ -40,6 +40,7 @@ import com.hnexperts.cosmetics.resources.tab_history
 import com.hnexperts.cosmetics.resources.tab_more
 import com.hnexperts.cosmetics.resources.tab_scan
 import com.hnexperts.cosmetics.resources.tab_search
+import com.hnexperts.cosmetics.scanning.application.LaunchIntentSession
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
 import com.hnexperts.cosmetics.ui.camera.CameraScanScreen
 import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
@@ -47,6 +48,8 @@ import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsScreen
 import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
 import com.hnexperts.cosmetics.ui.crop.CropIngredientsScreen
 import com.hnexperts.cosmetics.ui.crop.CropIngredientsViewModel
+import com.hnexperts.cosmetics.ui.compare.CompareScreen
+import com.hnexperts.cosmetics.ui.compare.CompareViewModel
 import com.hnexperts.cosmetics.ui.history.HistoryScreen
 import com.hnexperts.cosmetics.ui.history.HistoryViewModel
 import com.hnexperts.cosmetics.ui.legal.DisclaimerScreen
@@ -80,6 +83,9 @@ object MoreDestination
 
 @Serializable
 object ResultDestination
+
+@Serializable
+object CompareDestination
 
 @Serializable
 data class CameraDestination(val barcode: Boolean)
@@ -122,6 +128,15 @@ private fun AppNavigation() {
         val backStack by navController.currentBackStackEntryAsState()
         val route: String = backStack?.destination?.route.orEmpty()
         val showBottomBar: Boolean = !hidesBottomBar(route)
+        val launchIntents: LaunchIntentSession = koinInject()
+        LaunchedEffect(Unit) {
+            launchIntents.openBarcodeCamera.collect { requested ->
+                if (requested) {
+                    navController.navigate(CameraDestination(barcode = true))
+                    launchIntents.consume()
+                }
+            }
+        }
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
@@ -152,9 +167,11 @@ private fun AppNavigation() {
                 }
                 composable<HistoryDestination> {
                     val viewModel: HistoryViewModel = koinViewModel()
-                    HistoryScreen(viewModel = viewModel, onOpenResult = {
-                        navController.navigate(ResultDestination)
-                    })
+                    HistoryScreen(
+                        viewModel = viewModel,
+                        onOpenResult = { navController.navigate(ResultDestination) },
+                        onOpenCompare = { navController.navigate(CompareDestination) }
+                    )
                 }
                 composable<MoreDestination> {
                     val viewModel: PreferencesViewModel = koinViewModel()
@@ -200,13 +217,20 @@ private fun AppNavigation() {
                         onCheckLabel = { navController.navigate(CameraDestination(barcode = false)) }
                     )
                 }
+                composable<CompareDestination> {
+                    val viewModel: CompareViewModel = koinViewModel()
+                    CompareScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
 }
 
 private fun hidesBottomBar(route: String): Boolean {
     return route.contains("Result") || route.contains("Camera") ||
-        route.contains("Crop") || route.contains("Confirm")
+        route.contains("Crop") || route.contains("Confirm") || route.contains("Compare")
 }
 
 private fun NavHostController.navigateToResultFromCamera() {
