@@ -8,14 +8,11 @@ import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.platform.performScanHaptic
-import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
-import com.hnexperts.cosmetics.scanning.application.PrepareIngredientReview
+import com.hnexperts.cosmetics.scanning.application.PendingCaptureSession
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.domain.CameraFrame
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
-import com.hnexperts.cosmetics.scanning.domain.IngredientListRecognizer
-import com.hnexperts.cosmetics.scanning.domain.OcrDocument
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlin.time.TimeMark
@@ -35,16 +32,14 @@ data class CameraScanUiState(
     val busy: Boolean = false,
     val failure: AppFailure? = null,
     val navigateToResult: Boolean = false,
-    val navigateToConfirm: Boolean = false,
+    val navigateToCrop: Boolean = false,
     val navigateBackNotFound: Boolean = false
 )
 
 class CameraScanViewModel(
     private val resolveBarcode: ResolveBarcode,
     private val evaluateProduct: EvaluateProduct,
-    private val recognizer: IngredientListRecognizer,
-    private val prepareReview: PrepareIngredientReview,
-    private val reviewSession: IngredientReviewSession,
+    private val pendingCapture: PendingCaptureSession,
     private val scanBridge: ScanBridge,
     initialMode: ScannerMode = ScannerMode.BARCODE
 ) : ViewModel() {
@@ -106,22 +101,16 @@ class CameraScanViewModel(
     }
 
     fun onStillCaptured(frame: CameraFrame) {
-        workJob?.cancel()
-        workJob = viewModelScope.launch {
-            state.update { current -> current.copy(busy = true, failure = null) }
-            try {
-                recognizeAndReview(frame)
-            } finally {
-                state.update { current -> current.copy(busy = false) }
-            }
-        }
+        pendingCapture.publish(frame)
+        performScanHaptic()
+        state.update { current -> current.copy(navigateToCrop = true, failure = null) }
     }
 
     fun consumeNavigation() {
         state.update { current ->
             current.copy(
                 navigateToResult = false,
-                navigateToConfirm = false,
+                navigateToCrop = false,
                 navigateBackNotFound = false
             )
         }
@@ -151,14 +140,6 @@ class CameraScanViewModel(
                 state.update { current -> current.copy(navigateToResult = true) }
             }
         }
-    }
-
-    private suspend fun recognizeAndReview(frame: CameraFrame) {
-        val document: OcrDocument = runUiAction(::showFailure) { recognizer.recognize(frame) } ?: return
-        val draft = runUiAction(::showFailure) { prepareReview.invoke(document.rawText) } ?: return
-        reviewSession.publish(draft)
-        performScanHaptic()
-        state.update { current -> current.copy(navigateToConfirm = true) }
     }
 
     private fun passedDebounce(): Boolean {

@@ -51,7 +51,7 @@ class VisionIngredientListRecognizer(
         if (!ok && lines.isEmpty()) {
             throw IllegalStateException("Vision text recognition failed")
         }
-        val joined: String = lines.joinToString(", ")
+        val joined: String = lines.joinToString(separator = "\n")
         return OcrDocument(
             rawText = joined,
             blocks = lines.map { line -> OcrBlock(text = line, confidence = 1f) },
