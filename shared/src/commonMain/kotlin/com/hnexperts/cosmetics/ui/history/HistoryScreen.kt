@@ -24,6 +24,7 @@ import com.hnexperts.cosmetics.resources.history_title
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
+import com.hnexperts.cosmetics.ui.common.HistoryEntryCard
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -79,13 +80,11 @@ private fun HistoryList(
             )
         }
         items(entries, key = { entry -> entry.id }) { entry ->
-            ListItem(
-                headlineContent = { Text(entry.rating) },
-                supportingContent = { Text(entry.scannedAt) },
-                overlineContent = { Text(entry.source) },
-                modifier = Modifier.clickable(enabled = !busy) {
-                    onOpen(entry)
-                }
+            HistoryEntryCard(
+                entry = entry,
+                enabled = !busy,
+                onOpen = onOpen,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
         }
     }

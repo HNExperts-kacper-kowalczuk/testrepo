@@ -67,9 +67,12 @@ fun SearchScreen(
             } else {
                 LazyColumn {
                     items(products, key = { product -> product.id }) { product ->
+                        val details: String = listOfNotNull(product.brand, product.category)
+                            .filter { part -> part.isNotBlank() }
+                            .joinToString(separator = " · ")
                         ListItem(
                             headlineContent = { Text(product.name) },
-                            supportingContent = { Text(product.brand.orEmpty()) },
+                            supportingContent = { if (details.isNotEmpty()) Text(details) },
                             modifier = Modifier.clickable(enabled = !uiState.busy) {
                                 viewModel.openProduct(product)
                             }
