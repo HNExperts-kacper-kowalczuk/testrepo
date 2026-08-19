@@ -11,19 +11,17 @@
     <string name="scan_barcode_action">Szukaj kodu</string>
     <string name="scan_inci_label">Skład INCI</string>
     <string name="scan_inci_action">Oceń skład</string>
-    <string name="scan_camera_note">Zeskanuj kod kreskowy albo skład INCI aparatem. Jeśli aparat nie odczyta etykiety, możesz wpisać kod albo wkleić skład.</string>
+    <string name="scan_camera_note">Zeskanuj kod kreskowy albo skład INCI aparatem. Kodów spoza katalogu szukamy online automatycznie, gdy jest połączenie. Jeśli aparat nie odczyta etykiety, możesz wpisać kod albo wkleić skład.</string>
     <string name="scan_open_barcode">Skanuj kod kreskowy</string>
     <string name="scan_open_inci">Skanuj skład</string>
     <string name="scan_hint_gtin">Spróbuj 5901234123457</string>
     <string name="scan_invalid_barcode">To nie wygląda na poprawny kod kreskowy.</string>
-    <string name="scan_not_found_title">Brak produktu w katalogu offline</string>
-    <string name="scan_not_found_body">Tego kodu nie ma w katalogu offline. Wyszukaj go w internecie, zeskanuj skład z etykiety albo wpisz go z opakowania.</string>
-    <string name="scan_lookup_online">Szukaj GTIN online</string>
-    <string name="scan_search_web">Szukaj w internecie</string>
-    <string name="scan_online_miss">Nie znaleziono produktu online.</string>
-    <string name="scan_online_no_inci">Wpis online nie ma listy składników. Szukaj w internecie albo zeskanuj opakowanie.</string>
+    <string name="scan_not_found_title">Brak produktu w katalogu</string>
+    <string name="scan_not_found_body">Tego kodu nie ma w katalogu offline i nie znaleziono składu online. Zeskanuj listę z etykiety albo wpisz ją z opakowania.</string>
+    <string name="scan_online_no_inci">Znaleziono wpis online, ale bez listy składników. Zeskanuj opakowanie.</string>
     <string name="scan_empty_inci">Wklej lub wpisz przynajmniej jedną nazwę składnika.</string>
     <string name="scan_working">Ocenianie…</string>
+    <string name="scan_looking_up">Szukanie kodu…</string>
     <string name="scan_more_ways">Wpisz kod kreskowy lub wklej skład</string>
     <string name="scan_recent_title">Ostatnie skany</string>
     <string name="source_barcode">Skan kodu</string>
@@ -81,7 +79,7 @@
     <string name="disclaimer_accept">Rozumiem</string>
     <string name="onboarding_next">Dalej</string>
     <string name="onboarding_scan_title">Co robi skan</string>
-    <string name="onboarding_scan_body">Skieruj aparat na kod kreskowy albo skład INCI (skład). Wyszukiwanie i ocena zostają na tym urządzeniu. Możesz też wpisać GTIN albo wkleić skład, jeśli aparat nie odczyta opakowania.</string>
+    <string name="onboarding_scan_body">Skieruj aparat na kod kreskowy albo skład INCI (skład). Ocena zostaje na urządzeniu. Jeśli kodu nie ma w katalogu i jest internet, skład jest pobierany i oceniany automatycznie. Możesz też wpisać GTIN albo wkleić skład, jeśli aparat nie odczyta opakowania.</string>
     <string name="onboarding_unknown_title">Nieznany to nie bezpieczny</string>
     <string name="onboarding_unknown_body">Jeśli nazwy nie ma w bazie wiedzy, jest oznaczona jako nieznana. Wynik może być niepełny. Popraw błędy OCR przed oceną. Składy z katalogu społecznościowego są oznaczone jako niezweryfikowane.</string>
 
@@ -112,7 +110,7 @@
 
     <string name="camera_title_barcode">Skanuj kod kreskowy</string>
     <string name="camera_title_inci">Skanuj skład</string>
-    <string name="camera_hint_barcode">Skieruj aparat na kod EAN lub UPC. Rozpoznawanie działa offline, a reklamy nie pojawiają się na tym ekranie.</string>
+    <string name="camera_hint_barcode">Skieruj aparat na kod EAN lub UPC. Kodów spoza katalogu szukamy online, gdy jest połączenie. Reklamy nie pojawiają się na tym ekranie.</string>
     <string name="camera_hint_inci">Wypłaszcz etykietę, a potem zrób zdjęcie bloku INCI / składu.</string>
     <string name="camera_capture">Zrób zdjęcie składu</string>
     <string name="crop_title">Zaznacz listę składników</string>

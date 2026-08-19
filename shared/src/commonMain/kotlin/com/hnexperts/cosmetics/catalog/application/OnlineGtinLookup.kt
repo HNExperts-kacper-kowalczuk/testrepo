@@ -1,7 +1,6 @@
 package com.hnexperts.cosmetics.catalog.application
 
 import com.hnexperts.cosmetics.ads.domain.NetworkMonitor
-import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
 import com.hnexperts.cosmetics.network.SimpleHttpClient
 
@@ -11,12 +10,7 @@ class OnlineGtinLookup(
 ) {
     suspend fun invoke(gtin: String): Outcome<OnlineGtinHit> {
         if (!network.isOnline()) {
-            return Outcome.Err(
-                AppFailure.Network(
-                    operation = "gtin.online",
-                    detail = "No network connection is available for an online lookup."
-                )
-            )
+            return Outcome.Ok(OnlineGtinHit.NotFound(gtin))
         }
         val beauty: Outcome<String> = http.getText("$OBF_PRODUCT$gtin.json")
         val fromBeauty: OnlineGtinHit? = parseIfOk(gtin, beauty)
@@ -36,14 +30,6 @@ class OnlineGtinLookup(
             else -> OnlineGtinHit.NotFound(gtin)
         }
         return Outcome.Ok(hit)
-    }
-
-    fun webSearchUrl(gtin: String): String {
-        return "https://www.google.com/search?q=$gtin"
-    }
-
-    fun openBeautyFactsUrl(gtin: String): String {
-        return "https://world.openbeautyfacts.org/product/$gtin"
     }
 
     private fun parseIfOk(gtin: String, body: Outcome<String>): OnlineGtinHit? {

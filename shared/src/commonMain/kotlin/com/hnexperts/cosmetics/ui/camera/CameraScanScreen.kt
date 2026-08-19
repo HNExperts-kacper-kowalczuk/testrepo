@@ -39,6 +39,7 @@ import com.hnexperts.cosmetics.resources.camera_title_inci
 import com.hnexperts.cosmetics.resources.camera_torch_off
 import com.hnexperts.cosmetics.resources.camera_torch_on
 import com.hnexperts.cosmetics.resources.camera_unavailable
+import com.hnexperts.cosmetics.resources.scan_looking_up
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
@@ -184,7 +185,13 @@ private fun CameraControls(
         }
         if (uiState.busy) {
             CircularProgressIndicator()
-            Text(text = stringResource(Res.string.scan_working))
+            Text(
+                text = if (uiState.mode == ScannerMode.BARCODE) {
+                    stringResource(Res.string.scan_looking_up)
+                } else {
+                    stringResource(Res.string.scan_working)
+                }
+            )
         }
     }
 }

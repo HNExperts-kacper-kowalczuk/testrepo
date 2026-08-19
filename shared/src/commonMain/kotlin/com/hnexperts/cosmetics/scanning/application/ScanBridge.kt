@@ -4,16 +4,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class ScanBridge {
-    private val notFound: MutableStateFlow<String?> = MutableStateFlow(null)
-    val notFoundGtin: StateFlow<String?> = notFound.asStateFlow()
+data class UnknownGtinNotice(
+    val gtin: String,
+    val onlineNoIngredients: Boolean
+)
 
-    fun publishNotFound(gtin: String) {
-        notFound.value = gtin
+class ScanBridge {
+    private val notFound: MutableStateFlow<UnknownGtinNotice?> = MutableStateFlow(null)
+    val unknownGtin: StateFlow<UnknownGtinNotice?> = notFound.asStateFlow()
+
+    fun publishNotFound(gtin: String, onlineNoIngredients: Boolean) {
+        notFound.value = UnknownGtinNotice(gtin, onlineNoIngredients)
     }
 
-    fun consumeNotFound(): String? {
-        val current: String? = notFound.value
+    fun consumeNotFound(): UnknownGtinNotice? {
+        val current: UnknownGtinNotice? = notFound.value
         notFound.value = null
         return current
     }

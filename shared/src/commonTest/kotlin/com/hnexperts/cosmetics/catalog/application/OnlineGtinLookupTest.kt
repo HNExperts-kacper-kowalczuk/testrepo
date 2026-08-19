@@ -1,13 +1,11 @@
 package com.hnexperts.cosmetics.catalog.application
 
 import com.hnexperts.cosmetics.ads.domain.NetworkMonitor
-import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
 import com.hnexperts.cosmetics.network.SimpleHttpClient
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
 
 class OnlineGtinLookupTest {
@@ -16,8 +14,8 @@ class OnlineGtinLookupTest {
         val http = RecordingHttp()
         val lookup = OnlineGtinLookup(http, Offline)
         val result: Outcome<OnlineGtinHit> = lookup.invoke("5901234123457")
-        val err = assertIs<Outcome.Err>(result)
-        assertIs<AppFailure.Network>(err.failure)
+        val hit = assertIs<OnlineGtinHit.NotFound>((result as Outcome.Ok).value)
+        assertEquals("5901234123457", hit.gtin)
         assertEquals(emptyList(), http.urls)
     }
 
@@ -50,12 +48,6 @@ class OnlineGtinLookupTest {
         val result: Outcome<OnlineGtinHit> = lookup.invoke("1")
         val hit = assertIs<OnlineGtinHit.WithIngredients>((result as Outcome.Ok).value)
         assertEquals("Food-adjacent", hit.name)
-    }
-
-    @Test
-    fun webSearchUrlContainsTheGtin() {
-        val lookup = OnlineGtinLookup(RecordingHttp(), Online)
-        assertTrue(lookup.webSearchUrl("5901234123457").contains("5901234123457"))
     }
 
     private object Online : NetworkMonitor {

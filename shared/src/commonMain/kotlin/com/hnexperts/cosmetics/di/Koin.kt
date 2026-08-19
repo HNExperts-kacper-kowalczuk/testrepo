@@ -12,6 +12,7 @@ import com.hnexperts.cosmetics.catalog.application.CatalogRemote
 import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
 import com.hnexperts.cosmetics.catalog.application.OnlineGtinLookup
 import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
+import com.hnexperts.cosmetics.catalog.application.ResolveGtin
 import com.hnexperts.cosmetics.catalog.data.CatalogSnapshotReader
 import com.hnexperts.cosmetics.catalog.data.CatalogWriter
 import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
@@ -70,11 +71,12 @@ val appModule = module {
     single { CommentLocalizer() }
     single { EvaluateProduct(get(), get(), get(), get(), get()) }
     single { ResolveBarcode(get()) }
+    single { OnlineGtinLookup(get(), get()) }
+    single { ResolveGtin(get(), get()) }
     single { PrepareIngredientReview(get()) }
     single { IngredientReviewSession() }
     single { ScanBridge() }
     single { PendingCaptureSession() }
-    single { OnlineGtinLookup(get(), get()) }
     single<CatalogRemote> { BundledCatalogRemote() }
     single { CheckCatalogUpdates(get(), get(), get()) }
     single { ApplyCatalogDelta(get(), get(), get(), get()) }
@@ -83,7 +85,7 @@ val appModule = module {
     viewModelOf(::ScanViewModel)
     viewModel { parameters ->
         CameraScanViewModel(
-            resolveBarcode = get(),
+            resolveGtin = get(),
             evaluateProduct = get(),
             pendingCapture = get(),
             scanBridge = get(),

@@ -2,7 +2,7 @@
 
 Kotlin Multiplatform (Android + iOS) app that lets people look up a cosmetic product and see whether its ingredients are potentially harmful, restricted, or otherwise worth avoiding.
 
-The evaluator, catalog, and comments work **offline**. v1 ships a fixture catalog (8 products, ~35 ingredients). Scan a barcode or the printed INCI list on device, or type/paste if the camera cannot read the pack.
+The evaluator, catalog, and comments work **offline**. v1 ships a fixture catalog (8 products, ~35 ingredients). Scan a barcode or the printed INCI list on device, or type/paste if the camera cannot read the pack. If a barcode is missing from the offline catalog and the device is online, the printed INCI list is fetched from Open Beauty Facts (Open Food Facts as fallback) and scored immediately.
 
 UI copy and comments are structured for **easy translation** (English and Polish).
 
@@ -54,7 +54,7 @@ iOS: open `iosApp/iosApp.xcodeproj` on macOS after a Gradle sync.
 | `5901234123518` | Niacinamide Serum 10% | Low |
 | `5901234123525` | Plain Petrolatum Balm | Safe |
 
-Unknown barcodes open a fallback to scan or paste the INCI list.
+Unknown barcodes are looked up online automatically when the device is connected. If no ingredient list is found, the Scan tab offers a fallback to photograph or paste the INCI list.
 
 ## Docs
 
