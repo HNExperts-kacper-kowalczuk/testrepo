@@ -10,6 +10,7 @@ import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.catalog.application.CatalogMutationStore
 import com.hnexperts.cosmetics.catalog.application.CatalogRemote
 import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
+import com.hnexperts.cosmetics.catalog.application.OnlineGtinLookup
 import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
 import com.hnexperts.cosmetics.catalog.data.CatalogSnapshotReader
 import com.hnexperts.cosmetics.catalog.data.CatalogWriter
@@ -73,6 +74,7 @@ val appModule = module {
     single { IngredientReviewSession() }
     single { ScanBridge() }
     single { PendingCaptureSession() }
+    single { OnlineGtinLookup(get(), get()) }
     single<CatalogRemote> { BundledCatalogRemote() }
     single { CheckCatalogUpdates(get(), get(), get()) }
     single { ApplyCatalogDelta(get(), get(), get(), get()) }

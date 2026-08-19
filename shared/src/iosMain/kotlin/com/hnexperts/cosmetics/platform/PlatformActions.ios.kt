@@ -14,3 +14,8 @@ actual fun openAppSettings() {
     val url: NSURL = NSURL.URLWithString(UIApplicationOpenSettingsURLString) ?: return
     UIApplication.sharedApplication.openURL(url, options = emptyMap<Any?, Any>(), completionHandler = null)
 }
+
+actual fun openUrl(url: String) {
+    val nsUrl: NSURL = NSURL.URLWithString(url) ?: return
+    UIApplication.sharedApplication.openURL(nsUrl, options = emptyMap<Any?, Any>(), completionHandler = null)
+}

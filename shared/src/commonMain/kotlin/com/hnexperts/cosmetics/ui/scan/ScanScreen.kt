@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -22,10 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.scan_camera_note
+import com.hnexperts.cosmetics.resources.scan_lookup_online
 import com.hnexperts.cosmetics.resources.scan_not_found_body
 import com.hnexperts.cosmetics.resources.scan_not_found_title
+import com.hnexperts.cosmetics.resources.scan_online_miss
+import com.hnexperts.cosmetics.resources.scan_online_no_inci
 import com.hnexperts.cosmetics.resources.scan_open_barcode
 import com.hnexperts.cosmetics.resources.scan_open_inci
+import com.hnexperts.cosmetics.resources.scan_search_web
 import com.hnexperts.cosmetics.resources.scan_recent_title
 import com.hnexperts.cosmetics.resources.scan_title
 import com.hnexperts.cosmetics.resources.scan_working
@@ -56,6 +61,7 @@ fun ScanScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -85,7 +91,15 @@ fun ScanScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (uiState.notFoundGtin != null) {
-            NotFoundCard(busy = uiState.busy, onOpenInciCamera = onOpenInciCamera)
+            NotFoundCard(
+                gtin = uiState.notFoundGtin.orEmpty(),
+                busy = uiState.busy,
+                onlineMiss = uiState.onlineMiss,
+                onlineNoIngredients = uiState.onlineNoIngredients,
+                onOpenInciCamera = onOpenInciCamera,
+                onLookupOnline = viewModel::lookupOnline,
+                onSearchWeb = viewModel::searchGtinOnTheWeb
+            )
         }
         if (uiState.busy) {
             CircularProgressIndicator()
@@ -97,7 +111,15 @@ fun ScanScreen(
 }
 
 @Composable
-private fun NotFoundCard(busy: Boolean, onOpenInciCamera: () -> Unit) {
+private fun NotFoundCard(
+    gtin: String,
+    busy: Boolean,
+    onlineMiss: Boolean,
+    onlineNoIngredients: Boolean,
+    onOpenInciCamera: () -> Unit,
+    onLookupOnline: (String) -> Unit,
+    onSearchWeb: (String) -> Unit
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -105,6 +127,26 @@ private fun NotFoundCard(busy: Boolean, onOpenInciCamera: () -> Unit) {
         ) {
             Text(text = stringResource(Res.string.scan_not_found_title), style = MaterialTheme.typography.titleMedium)
             Text(text = stringResource(Res.string.scan_not_found_body), style = MaterialTheme.typography.bodyMedium)
+            if (onlineMiss) {
+                Text(text = stringResource(Res.string.scan_online_miss), color = MaterialTheme.colorScheme.error)
+            }
+            if (onlineNoIngredients) {
+                Text(text = stringResource(Res.string.scan_online_no_inci), color = MaterialTheme.colorScheme.error)
+            }
+            Button(
+                onClick = { onLookupOnline(gtin) },
+                enabled = !busy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(Res.string.scan_lookup_online))
+            }
+            OutlinedButton(
+                onClick = { onSearchWeb(gtin) },
+                enabled = !busy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(Res.string.scan_search_web))
+            }
             Button(
                 onClick = onOpenInciCamera,
                 enabled = !busy,

@@ -1,15 +1,22 @@
 package com.hnexperts.cosmetics.ui.crop
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,27 +35,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.back
+import com.hnexperts.cosmetics.resources.crop_handle_bottom_left
+import com.hnexperts.cosmetics.resources.crop_handle_bottom_right
+import com.hnexperts.cosmetics.resources.crop_handle_top_left
+import com.hnexperts.cosmetics.resources.crop_handle_top_right
 import com.hnexperts.cosmetics.resources.crop_hint
 import com.hnexperts.cosmetics.resources.crop_reset
 import com.hnexperts.cosmetics.resources.crop_retake
 import com.hnexperts.cosmetics.resources.crop_title
 import com.hnexperts.cosmetics.resources.crop_use
 import com.hnexperts.cosmetics.resources.scan_working
-import com.hnexperts.cosmetics.scanning.domain.CornerPoint
 import com.hnexperts.cosmetics.scanning.domain.QuadCorner
 import com.hnexperts.cosmetics.scanning.domain.SelectionQuad
 import com.hnexperts.cosmetics.ui.common.FailureBanner
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.decodeToImageBitmap
@@ -109,42 +123,117 @@ private fun CropStage(uiState: CropUiState, viewModel: CropIngredientsViewModel)
             withContext(Dispatchers.Default) { bytes.decodeToImageBitmap() }
         }
     }
-    val loaded: ImageBitmap = bitmap ?: run {
+    val loaded: ImageBitmap? = bitmap
+    if (loaded == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
         return
     }
-    val handleRadiusPx: Float = with(LocalDensity.current) { HANDLE_RADIUS.toPx() }
-    val touchRadiusPx: Float = with(LocalDensity.current) { TOUCH_RADIUS.toPx() }
     val accent: Color = MaterialTheme.colorScheme.primary
-    Image(
-        bitmap = loaded,
-        contentDescription = stringResource(Res.string.crop_hint),
-        modifier = Modifier.fillMaxSize()
-    )
-    Canvas(
+    val density = LocalDensity.current
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val rect: FittedImageRect = CropQuadGeometry.fittedRect(
+            containerWidth = with(density) { maxWidth.toPx() },
+            containerHeight = with(density) { maxHeight.toPx() },
+            imageWidth = loaded.width,
+            imageHeight = loaded.height
+        )
+        Image(
+            bitmap = loaded,
+            contentDescription = stringResource(Res.string.crop_hint),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+        )
+        QuadOverlay(rect = rect, quad = uiState.quad, accent = accent)
+        for ((corner, point) in uiState.quad.corners()) {
+            val (cx, cy) = CropQuadGeometry.toCanvas(point.x, point.y, rect)
+            CropHandle(
+                centerX = cx,
+                centerY = cy,
+                accent = accent,
+                enabled = !uiState.busy,
+                label = handleLabel(corner),
+                onDrag = { dx, dy -> viewModel.nudgeCorner(corner, dx, dy, rect.width, rect.height) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuadOverlay(rect: FittedImageRect, quad: SelectionQuad, accent: Color) {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val points: List<Offset> = listOf(
+            Offset(rect.left + quad.topLeft.x * rect.width, rect.top + quad.topLeft.y * rect.height),
+            Offset(rect.left + quad.topRight.x * rect.width, rect.top + quad.topRight.y * rect.height),
+            Offset(rect.left + quad.bottomRight.x * rect.width, rect.top + quad.bottomRight.y * rect.height),
+            Offset(rect.left + quad.bottomLeft.x * rect.width, rect.top + quad.bottomLeft.y * rect.height)
+        )
+        val dim: Path = Path().apply {
+            fillType = PathFillType.EvenOdd
+            addRect(Rect(Offset.Zero, size))
+            moveTo(points[0].x, points[0].y)
+            lineTo(points[1].x, points[1].y)
+            lineTo(points[2].x, points[2].y)
+            lineTo(points[3].x, points[3].y)
+            close()
+        }
+        drawPath(dim, color = Color.Black.copy(alpha = 0.45f))
+        for (index in points.indices) {
+            drawLine(color = accent, start = points[index], end = points[(index + 1) % points.size], strokeWidth = 5f)
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.CropHandle(
+    centerX: Float,
+    centerY: Float,
+    accent: Color,
+    enabled: Boolean,
+    label: String,
+    onDrag: (Float, Float) -> Unit
+) {
+    val handlePx: Float = with(LocalDensity.current) { HANDLE_SIZE.toPx() }
+    Box(
         modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(loaded) {
-                var active: QuadCorner? = null
-                detectDragGestures(
-                    onDragStart = { offset ->
-                        val rect: Rect = fittedRect(Size(size.width.toFloat(), size.height.toFloat()), loaded)
-                        active = nearestCorner(viewModel.uiState.value.quad, rect, offset, touchRadiusPx)
-                    },
-                    onDragEnd = { active = null },
-                    onDragCancel = { active = null }
-                ) { change, _ ->
-                    val corner: QuadCorner = active ?: return@detectDragGestures
-                    change.consume()
-                    val rect: Rect = fittedRect(Size(size.width.toFloat(), size.height.toFloat()), loaded)
-                    viewModel.updateCorner(corner, toNormalized(change.position, rect))
-                }
+            .align(Alignment.TopStart)
+            .offset {
+                IntOffset(
+                    x = (centerX - handlePx / 2f).roundToInt(),
+                    y = (centerY - handlePx / 2f).roundToInt()
+                )
             }
+            .size(HANDLE_SIZE)
+            .semantics { contentDescription = label }
+            .pointerInput(enabled) {
+                if (!enabled) {
+                    return@pointerInput
+                }
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    onDrag(dragAmount.x, dragAmount.y)
+                }
+            },
+        contentAlignment = Alignment.Center
     ) {
-        val rect: Rect = fittedRect(size, loaded)
-        drawQuadOverlay(rect, viewModel.uiState.value.quad, accent, handleRadiusPx)
+        Box(
+            modifier = Modifier
+                .size(22.dp)
+                .background(Color.White, CircleShape)
+                .border(width = 3.dp, color = accent, shape = CircleShape)
+        )
+    }
+}
+
+@Composable
+private fun handleLabel(corner: QuadCorner): String {
+    return when (corner) {
+        QuadCorner.TOP_LEFT -> stringResource(Res.string.crop_handle_top_left)
+        QuadCorner.TOP_RIGHT -> stringResource(Res.string.crop_handle_top_right)
+        QuadCorner.BOTTOM_RIGHT -> stringResource(Res.string.crop_handle_bottom_right)
+        QuadCorner.BOTTOM_LEFT -> stringResource(Res.string.crop_handle_bottom_left)
     }
 }
 
@@ -155,11 +244,11 @@ private fun CropControls(
     onRetake: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = stringResource(Res.string.crop_hint), style = MaterialTheme.typography.bodyMedium)
+        Text(text = stringResource(Res.string.crop_hint), style = MaterialTheme.typography.bodySmall)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TextButton(onClick = viewModel::resetQuad, enabled = !uiState.busy) {
                 Text(stringResource(Res.string.crop_reset))
@@ -182,81 +271,4 @@ private fun CropControls(
     }
 }
 
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawQuadOverlay(
-    rect: Rect,
-    quad: SelectionQuad,
-    accent: Color,
-    handleRadius: Float
-) {
-    val points: List<Offset> = listOf(
-        toCanvas(quad.topLeft, rect),
-        toCanvas(quad.topRight, rect),
-        toCanvas(quad.bottomRight, rect),
-        toCanvas(quad.bottomLeft, rect)
-    )
-    val quadPath: Path = Path().apply {
-        fillType = PathFillType.EvenOdd
-        addRect(Rect(Offset.Zero, size))
-        moveTo(points[0].x, points[0].y)
-        lineTo(points[1].x, points[1].y)
-        lineTo(points[2].x, points[2].y)
-        lineTo(points[3].x, points[3].y)
-        close()
-    }
-    drawPath(quadPath, color = Color.Black.copy(alpha = 0.5f))
-    for (index in points.indices) {
-        val next: Offset = points[(index + 1) % points.size]
-        drawLine(color = accent, start = points[index], end = next, strokeWidth = 4f)
-    }
-    for (point in points) {
-        drawCircle(color = Color.White, radius = handleRadius, center = point)
-        drawCircle(color = accent, radius = handleRadius, center = point, style = Stroke(width = 5f))
-    }
-}
-
-private fun fittedRect(container: Size, bitmap: ImageBitmap): Rect {
-    val imageWidth: Float = bitmap.width.toFloat()
-    val imageHeight: Float = bitmap.height.toFloat()
-    val scale: Float = minOf(container.width / imageWidth, container.height / imageHeight)
-    val width: Float = imageWidth * scale
-    val height: Float = imageHeight * scale
-    val left: Float = (container.width - width) / 2f
-    val top: Float = (container.height - height) / 2f
-    return Rect(left, top, left + width, top + height)
-}
-
-private fun toCanvas(point: CornerPoint, rect: Rect): Offset {
-    return Offset(
-        x = rect.left + point.x * rect.width,
-        y = rect.top + point.y * rect.height
-    )
-}
-
-private fun toNormalized(position: Offset, rect: Rect): CornerPoint {
-    return CornerPoint(
-        x = (position.x - rect.left) / rect.width,
-        y = (position.y - rect.top) / rect.height
-    )
-}
-
-private fun nearestCorner(
-    quad: SelectionQuad,
-    rect: Rect,
-    touch: Offset,
-    touchRadius: Float
-): QuadCorner? {
-    var best: QuadCorner? = null
-    var bestDistance: Float = touchRadius
-    for ((corner, point) in quad.corners()) {
-        val canvasPoint: Offset = toCanvas(point, rect)
-        val distance: Float = (canvasPoint - touch).getDistance()
-        if (distance <= bestDistance) {
-            best = corner
-            bestDistance = distance
-        }
-    }
-    return best
-}
-
-private val HANDLE_RADIUS = 14.dp
-private val TOUCH_RADIUS = 32.dp
+private val HANDLE_SIZE = 48.dp

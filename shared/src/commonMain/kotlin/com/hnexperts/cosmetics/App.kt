@@ -1,8 +1,10 @@
 package com.hnexperts.cosmetics
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -121,6 +123,7 @@ private fun AppNavigation() {
         val route: String = backStack?.destination?.route.orEmpty()
         val showBottomBar: Boolean = !hidesBottomBar(route)
         Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
                 if (showBottomBar) {
                     AppBottomBar(navController)

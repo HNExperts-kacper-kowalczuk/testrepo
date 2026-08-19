@@ -8,6 +8,8 @@ import com.hnexperts.cosmetics.ads.jvm.JvmConsentClient
 import com.hnexperts.cosmetics.ads.jvm.JvmNetworkMonitor
 import com.hnexperts.cosmetics.data.DatabaseDriverFactory
 import com.hnexperts.cosmetics.data.JvmDatabaseDriverFactory
+import com.hnexperts.cosmetics.network.SimpleHttpClient
+import com.hnexperts.cosmetics.network.UrlConnectionHttpClient
 import com.hnexperts.cosmetics.scanning.domain.IngredientListRecognizer
 import com.hnexperts.cosmetics.scanning.domain.PerspectiveCropper
 import com.hnexperts.cosmetics.scanning.jvm.UnsupportedIngredientListRecognizer
@@ -19,6 +21,7 @@ actual fun platformModule(): Module = module {
     single<DatabaseDriverFactory> { JvmDatabaseDriverFactory() }
     single<IngredientListRecognizer> { UnsupportedIngredientListRecognizer() }
     single<PerspectiveCropper> { UnsupportedPerspectiveCropper() }
+    single<SimpleHttpClient> { UrlConnectionHttpClient(get()) }
     single<NetworkMonitor> { JvmNetworkMonitor() }
     single<ConsentClient> { JvmConsentClient() }
     single<AdsInitializer> { JvmAdsInitializer() }

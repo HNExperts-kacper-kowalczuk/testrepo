@@ -17,7 +17,11 @@
     <string name="scan_hint_gtin">Try 5901234123457</string>
     <string name="scan_invalid_barcode">That does not look like a valid barcode.</string>
     <string name="scan_not_found_title">Product not in the offline catalog</string>
-    <string name="scan_not_found_body">This barcode is not in the offline catalog. Scan the printed ingredient list, or type or paste it from the pack.</string>
+    <string name="scan_not_found_body">This barcode is not in the offline catalog. Look it up online, scan the printed ingredient list, or type it from the pack.</string>
+    <string name="scan_lookup_online">Look up GTIN online</string>
+    <string name="scan_search_web">Search the web</string>
+    <string name="scan_online_miss">No matching product was found online.</string>
+    <string name="scan_online_no_inci">The online listing has no ingredient list. Search the web or scan the pack.</string>
     <string name="scan_empty_inci">Paste or type at least one ingredient name.</string>
     <string name="scan_working">Evaluating…</string>
     <string name="scan_more_ways">Type a barcode or paste the list</string>
@@ -25,6 +29,7 @@
     <string name="source_barcode">Barcode scan</string>
     <string name="source_ocr">Label photo</string>
     <string name="source_manual">Typed list</string>
+    <string name="source_online">Online lookup</string>
 
     <string name="search_title">Catalog</string>
     <string name="search_placeholder">Search by name or brand</string>
@@ -102,6 +107,7 @@
     <string name="error_evaluation">Ingredient evaluation failed.</string>
     <string name="error_camera">The camera could not complete this scan.</string>
     <string name="error_ocr">Could not read the ingredient list from the photo.</string>
+    <string name="error_network">The online lookup failed. Check the connection and try again.</string>
     <string name="error_unexpected">Something went wrong.</string>
 
     <string name="camera_title_barcode">Scan barcode</string>
@@ -110,10 +116,14 @@
     <string name="camera_hint_inci">Flatten the label, then capture a still of the INCI / skład block.</string>
     <string name="camera_capture">Capture list</string>
     <string name="crop_title">Select the ingredient list</string>
-    <string name="crop_hint">Drag the corners around the list that starts at “Ingredients” or “Skład”.</string>
+    <string name="crop_hint">Drag the four corners around the list that starts at “Ingredients” or “Skład”.</string>
     <string name="crop_use">Use this area</string>
     <string name="crop_reset">Reset corners</string>
     <string name="crop_retake">Retake photo</string>
+    <string name="crop_handle_top_left">Top left corner</string>
+    <string name="crop_handle_top_right">Top right corner</string>
+    <string name="crop_handle_bottom_right">Bottom right corner</string>
+    <string name="crop_handle_bottom_left">Bottom left corner</string>
     <string name="camera_torch_on">Torch on</string>
     <string name="camera_torch_off">Torch off</string>
     <string name="camera_unavailable">Camera scanning is not available on this device. Type the barcode or paste the ingredient list instead.</string>

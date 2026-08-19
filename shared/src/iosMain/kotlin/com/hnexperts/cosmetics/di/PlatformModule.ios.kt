@@ -8,6 +8,8 @@ import com.hnexperts.cosmetics.ads.ios.IosConsentClient
 import com.hnexperts.cosmetics.ads.ios.IosNetworkMonitor
 import com.hnexperts.cosmetics.data.DatabaseDriverFactory
 import com.hnexperts.cosmetics.data.IosDatabaseDriverFactory
+import com.hnexperts.cosmetics.network.IosHttpClient
+import com.hnexperts.cosmetics.network.SimpleHttpClient
 import com.hnexperts.cosmetics.scanning.domain.IngredientListRecognizer
 import com.hnexperts.cosmetics.scanning.domain.PerspectiveCropper
 import com.hnexperts.cosmetics.scanning.ios.IosPerspectiveCropper
@@ -19,6 +21,7 @@ actual fun platformModule(): Module = module {
     single<DatabaseDriverFactory> { IosDatabaseDriverFactory() }
     single<IngredientListRecognizer> { VisionIngredientListRecognizer(get()) }
     single<PerspectiveCropper> { IosPerspectiveCropper(get()) }
+    single<SimpleHttpClient> { IosHttpClient(get()) }
     single<NetworkMonitor> { IosNetworkMonitor() }
     single<ConsentClient> { IosConsentClient() }
     single<AdsInitializer> { IosAdsInitializer() }
