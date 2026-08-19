@@ -67,14 +67,14 @@ class ResolveGtinTest {
     fun onlineListingWithoutInciStaysUnknown() = runBlocking {
         val http = RecordingHttp(
             mapOf(
-                "https://world.openbeautyfacts.org/api/v2/product/1.json" to
+                "https://world.openbeautyfacts.org/api/v2/product/4000000000002.json" to
                     """{"status":1,"product":{"product_name":"No list"}}""",
-                "https://world.openfoodfacts.org/api/v2/product/1.json" to
+                "https://world.openfoodfacts.org/api/v2/product/4000000000002.json" to
                     """{"status":0}"""
             )
         )
         val resolve = resolver(emptyMap(), http, online = true)
-        val result = requireOk(resolve.invoke("1"))
+        val result = requireOk(resolve.invoke("4000000000002"))
         val unknown = assertIs<GtinResolution.Unknown>(result)
         assertTrue(unknown.onlineNoIngredients)
     }
