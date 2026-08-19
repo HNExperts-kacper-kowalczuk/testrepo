@@ -59,6 +59,7 @@ Unknown barcodes open a fallback to scan or paste the INCI list.
 ## Docs
 
 - **[Product and architecture plan](docs/plan.md)**
+- **[Next slice: catalog scale, OCR crop, Fitatu-style UI](docs/plan-catalog-ocr-ui.md)**
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**

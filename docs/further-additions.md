@@ -199,6 +199,8 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 ## 11. Suggested order after v1
 
+The committed next slice (catalog scale, four-corner INCI OCR, Fitatu-inspired UI) is **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)**. After that:
+
 1. Usage type (leave-on / rinse-off) + allergen checklist + colour-safe ratings + onboarding.  
 2. Verify-label-vs-catalog + multi-shot OCR + fuzzy confirm.  
 3. Shelf, compare, encyclopedia, local alternatives.  
