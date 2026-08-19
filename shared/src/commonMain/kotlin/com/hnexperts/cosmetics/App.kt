@@ -43,6 +43,8 @@ import com.hnexperts.cosmetics.ui.camera.CameraScanScreen
 import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
 import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsScreen
 import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
+import com.hnexperts.cosmetics.ui.crop.CropIngredientsScreen
+import com.hnexperts.cosmetics.ui.crop.CropIngredientsViewModel
 import com.hnexperts.cosmetics.ui.history.HistoryScreen
 import com.hnexperts.cosmetics.ui.history.HistoryViewModel
 import com.hnexperts.cosmetics.ui.legal.DisclaimerScreen
@@ -79,6 +81,9 @@ object ResultDestination
 
 @Serializable
 data class CameraDestination(val barcode: Boolean)
+
+@Serializable
+object CropIngredientsDestination
 
 @Serializable
 object ConfirmIngredientsDestination
@@ -164,7 +169,15 @@ private fun AppNavigation() {
                         viewModel = viewModel,
                         onBack = { navController.popBackStack() },
                         onResult = { navController.navigateToResultFromCamera() },
-                        onConfirm = { navController.navigateToConfirmFromCamera() }
+                        onCrop = { navController.navigate(CropIngredientsDestination) }
+                    )
+                }
+                composable<CropIngredientsDestination> {
+                    val viewModel: CropIngredientsViewModel = koinViewModel()
+                    CropIngredientsScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
+                        onConfirm = { navController.navigateToConfirmFromCrop() }
                     )
                 }
                 composable<ConfirmIngredientsDestination> {
@@ -184,7 +197,8 @@ private fun AppNavigation() {
 }
 
 private fun hidesBottomBar(route: String): Boolean {
-    return route.contains("Result") || route.contains("Camera") || route.contains("Confirm")
+    return route.contains("Result") || route.contains("Camera") ||
+        route.contains("Crop") || route.contains("Confirm")
 }
 
 private fun NavHostController.navigateToResultFromCamera() {
@@ -193,7 +207,7 @@ private fun NavHostController.navigateToResultFromCamera() {
     }
 }
 
-private fun NavHostController.navigateToConfirmFromCamera() {
+private fun NavHostController.navigateToConfirmFromCrop() {
     navigate(ConfirmIngredientsDestination) {
         popUpTo<CameraDestination> { inclusive = true }
     }

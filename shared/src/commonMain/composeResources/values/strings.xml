@@ -109,6 +109,11 @@
     <string name="camera_hint_barcode">Point at an EAN or UPC barcode. Detection is on-device and ads stay off this screen.</string>
     <string name="camera_hint_inci">Flatten the label, then capture a still of the INCI / skład block.</string>
     <string name="camera_capture">Capture list</string>
+    <string name="crop_title">Select the ingredient list</string>
+    <string name="crop_hint">Drag the corners around the list that starts at “Ingredients” or “Skład”.</string>
+    <string name="crop_use">Use this area</string>
+    <string name="crop_reset">Reset corners</string>
+    <string name="crop_retake">Retake photo</string>
     <string name="camera_torch_on">Torch on</string>
     <string name="camera_torch_off">Torch off</string>
     <string name="camera_unavailable">Camera scanning is not available on this device. Type the barcode or paste the ingredient list instead.</string>

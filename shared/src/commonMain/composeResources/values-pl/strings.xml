@@ -109,6 +109,11 @@
     <string name="camera_hint_barcode">Skieruj aparat na kod EAN lub UPC. Rozpoznawanie działa offline, a reklamy nie pojawiają się na tym ekranie.</string>
     <string name="camera_hint_inci">Wypłaszcz etykietę, a potem zrób zdjęcie bloku INCI / składu.</string>
     <string name="camera_capture">Zrób zdjęcie składu</string>
+    <string name="crop_title">Zaznacz listę składników</string>
+    <string name="crop_hint">Przeciągnij narożniki wokół listy zaczynającej się od „Ingredients” lub „Skład”.</string>
+    <string name="crop_use">Użyj tego obszaru</string>
+    <string name="crop_reset">Resetuj narożniki</string>
+    <string name="crop_retake">Zrób zdjęcie ponownie</string>
     <string name="camera_torch_on">Latarka włączona</string>
     <string name="camera_torch_off">Latarka wyłączona</string>
     <string name="camera_unavailable">Skanowanie aparatem nie jest dostępne na tym urządzeniu. Wpisz kod albo wklej skład.</string>
