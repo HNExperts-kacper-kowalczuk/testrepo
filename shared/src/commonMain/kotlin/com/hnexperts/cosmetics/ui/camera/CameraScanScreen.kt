@@ -51,17 +51,17 @@ fun CameraScanScreen(
     viewModel: CameraScanViewModel,
     onBack: () -> Unit,
     onResult: () -> Unit,
-    onConfirm: () -> Unit
+    onCrop: () -> Unit
 ) {
     val uiState: CameraScanUiState by viewModel.uiState.collectAsState()
-    LaunchedEffect(uiState.navigateToResult, uiState.navigateToConfirm, uiState.navigateBackNotFound) {
+    LaunchedEffect(uiState.navigateToResult, uiState.navigateToCrop, uiState.navigateBackNotFound) {
         when {
             uiState.navigateToResult -> {
                 onResult()
                 viewModel.consumeNavigation()
             }
-            uiState.navigateToConfirm -> {
-                onConfirm()
+            uiState.navigateToCrop -> {
+                onCrop()
                 viewModel.consumeNavigation()
             }
             uiState.navigateBackNotFound -> {
