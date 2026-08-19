@@ -1,9 +1,9 @@
 {
-    "catalogVersion": "2026.08-fixture",
+    "catalogVersion": "2026.08-eu-pl",
     "rulesetVersion": "2026.08-fixture",
-    "builtAt": "2026-08-17T00:00:00Z",
+    "builtAt": "2026-08-19T14:42:14.068020477Z",
     "region": "EU",
-    "checksum": "c8a454cd45bec45ce4514d98cc037f9625ccc72bb749b31a27a09bc3a1a8476a",
-    "productCount": 8,
-    "ingredientCount": 36
+    "checksum": "2db2615ef6188d7ec2e87abe166a35970e4313cfb4ce64239acaaaadebd30a3c",
+    "productCount": 17708,
+    "ingredientCount": 36008
 }

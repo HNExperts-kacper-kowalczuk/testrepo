@@ -16,11 +16,6 @@ object ExportCatalogSources {
         sources.resolve("obf-products.json").writeText(CatalogSourceCodec.encodeProducts())
         val manifestJson: String = CatalogManifestCodec.encode(build.manifest)
         sources.resolve("catalog-manifest.json").writeText(manifestJson)
-        val bundled: Path = repoRoot.resolve(
-            "shared/src/commonMain/composeResources/files/catalog-manifest.json"
-        )
-        Files.createDirectories(bundled.parent)
-        bundled.writeText(manifestJson)
         CatalogSqlitePackager.writeGzip(repoRoot.resolve("catalog/build"))
         check(build.manifest.checksum == CatalogIntegrity.fixtureChecksum()) {
             "exported checksum ${build.manifest.checksum} != fixture ${CatalogIntegrity.fixtureChecksum()}"

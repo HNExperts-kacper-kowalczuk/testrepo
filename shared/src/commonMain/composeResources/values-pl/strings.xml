@@ -42,6 +42,9 @@
     <string name="result_suitable">Brak trafień z Twojej listy unikania.</string>
     <string name="result_disclaimer">Tylko informacyjnie. To nie jest wyrób medyczny ani zamiennik składu, dermatologa albo oficjalnych załączników UE. Dane mogą się opóźniać względem przepisów.</string>
     <string name="result_unverified">Skład z katalogu pochodzi z niezweryfikowanych danych społecznościowych.</string>
+    <string name="result_check_label">Sprawdź etykietę</string>
+    <string name="result_pack_verified">Zeskanowana lista zgadza się z katalogiem.</string>
+    <string name="confirm_add_photo">Dodaj kolejne zdjęcie</string>
     <string name="level_safe">Ogólnie akceptowalny</string>
     <string name="level_low">Niskie zastrzeżenia</string>
     <string name="level_moderate">Umiarkowane zastrzeżenia</string>

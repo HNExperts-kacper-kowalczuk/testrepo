@@ -32,7 +32,7 @@ class SqlProductRepository(
         return FailureCatcher.database("catalog.search") {
             withContext(dispatchers.catalogDatabase) {
                 val rows = if (trimmed.isEmpty()) {
-                    database.catalogDatabaseQueries.selectAllProducts().executeAsList()
+                    emptyList()
                 } else {
                     database.catalogDatabaseQueries.searchProducts(trimmed, trimmed).executeAsList()
                 }

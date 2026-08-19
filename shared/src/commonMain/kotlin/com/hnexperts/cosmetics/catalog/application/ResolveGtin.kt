@@ -1,7 +1,10 @@
 package com.hnexperts.cosmetics.catalog.application
 
+import com.hnexperts.cosmetics.catalog.domain.CachedOnlineProduct
+import com.hnexperts.cosmetics.catalog.domain.OnlineProductCache
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.failure.Outcome
+import kotlin.time.Clock
 
 sealed class GtinResolution {
     data class ReadyToEvaluate(
@@ -22,11 +25,12 @@ sealed class GtinResolution {
 }
 
 /**
- * Offline catalog first. If there is no local hit and the device is online,
- * fetch the printed INCI list from Open Beauty Facts and return it ready to score.
+ * Offline catalog, then on-device online cache, then the network.
+ * Successful network hits are stored so the next scan of that GTIN is offline.
  */
 class ResolveGtin(
     private val offline: ResolveBarcode,
+    private val cache: OnlineProductCache,
     private val online: OnlineGtinLookup
 ) {
     suspend fun invoke(raw: String): Outcome<GtinResolution> {
@@ -40,7 +44,21 @@ class ResolveGtin(
         return when (lookup) {
             BarcodeLookup.Invalid -> Outcome.Ok(GtinResolution.Invalid)
             is BarcodeLookup.Found -> Outcome.Ok(fromCatalog(lookup))
-            is BarcodeLookup.NotFound -> fallbackOnline(lookup.gtin)
+            is BarcodeLookup.NotFound -> resolveMiss(lookup.gtin)
+        }
+    }
+
+    private suspend fun resolveMiss(gtin: String): Outcome<GtinResolution> {
+        return when (val cached: Outcome<CachedOnlineProduct?> = cache.find(gtin)) {
+            is Outcome.Err -> cached
+            is Outcome.Ok -> {
+                val hit: CachedOnlineProduct? = cached.value
+                if (hit != null) {
+                    Outcome.Ok(fromCache(hit))
+                } else {
+                    fallbackOnline(gtin)
+                }
+            }
         }
     }
 
@@ -62,18 +80,46 @@ class ResolveGtin(
         )
     }
 
-    private fun fromOnline(gtin: String, hit: OnlineGtinHit): GtinResolution {
+    private fun fromCache(hit: CachedOnlineProduct): GtinResolution.ReadyToEvaluate {
+        return GtinResolution.ReadyToEvaluate(
+            gtin = hit.gtin,
+            inciRaw = hit.inciRaw,
+            productName = hit.name,
+            brand = hit.brand,
+            usage = ProductUsage.parse(hit.usage),
+            source = hit.source
+        )
+    }
+
+    private suspend fun fromOnline(gtin: String, hit: OnlineGtinHit): GtinResolution {
         return when (hit) {
-            is OnlineGtinHit.WithIngredients -> GtinResolution.ReadyToEvaluate(
-                gtin = hit.gtin,
-                inciRaw = hit.inciRaw,
-                productName = hit.name,
-                brand = hit.brand,
-                usage = hit.usage,
-                source = "online"
-            )
+            is OnlineGtinHit.WithIngredients -> {
+                remember(hit)
+                GtinResolution.ReadyToEvaluate(
+                    gtin = hit.gtin,
+                    inciRaw = hit.inciRaw,
+                    productName = hit.name,
+                    brand = hit.brand,
+                    usage = hit.usage,
+                    source = "online"
+                )
+            }
             is OnlineGtinHit.MissingIngredients -> GtinResolution.Unknown(gtin, onlineNoIngredients = true)
             is OnlineGtinHit.NotFound -> GtinResolution.Unknown(gtin, onlineNoIngredients = false)
         }
+    }
+
+    private suspend fun remember(hit: OnlineGtinHit.WithIngredients) {
+        cache.put(
+            CachedOnlineProduct(
+                gtin = hit.gtin,
+                name = hit.name,
+                brand = hit.brand,
+                inciRaw = hit.inciRaw,
+                usage = hit.usage.name,
+                source = "online",
+                cachedAt = Clock.System.now().toString()
+            )
+        )
     }
 }

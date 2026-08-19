@@ -14,5 +14,5 @@ cd "$ROOT"
 ./gradlew :shared:jvmTest --tests com.hnexperts.cosmetics.catalog.pipeline.CatalogPipelineTest --tests com.hnexperts.cosmetics.catalog.application.ApplyCatalogDeltaTest --tests com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdatesTest --tests com.hnexperts.cosmetics.catalog.domain.CatalogIntegrityTest --tests com.hnexperts.cosmetics.catalog.data.CatalogWriterTest
 
 echo
-echo "Wrote catalog/sources (CosIng-derived JSON + OBF JSON), catalog-manifest.json, and catalog/build/catalog.sqlite.gz."
-echo "The mobile app still seeds the same snapshot on first launch; optional sync applies a delta when one is bundled."
+echo "Wrote catalog/sources (fixture JSON) and catalog/build/catalog.sqlite.gz (fixture pack)."
+echo "To ship CosIng/OBF ingest: ./gradlew :shared:packShippedCatalog  (writes composeResources/files/catalog.sqlite.gz)"

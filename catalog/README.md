@@ -18,4 +18,4 @@ Replace those JSON files with a larger EU/PL dump without changing the mobile ev
 
 Pass extra flags with `-PingestArgs="--skip-obf --max-products=5000"`.
 
-The app still seeds from the curated fixture catalog. Shipping the ingested dataset requires the bundled-database bootstrap described in `docs/plan-catalog-ocr-ui.md` (track B): pack `catalog.sqlite.gz` into app resources and decompress on first launch instead of compiling rows into Kotlin. Until then this pipeline exists to validate data quality (see `IngestedCatalogSmokeTest`, which matches a real label against the 36k-ingredient dump in well under a second).
+The app still seeds from the curated fixture catalog **until Phase 1 of [plan-next-phases.md](../docs/plan-next-phases.md)** lands: `./gradlew :shared:packShippedCatalog` writes `composeResources/files/catalog.sqlite.gz` from CosIng + OBF ingest (fixtures win on id/GTIN conflict). JVM tests keep using fixtures.

@@ -188,12 +188,17 @@ private fun AppNavigation() {
                     ConfirmIngredientsScreen(
                         viewModel = viewModel,
                         onBack = { navController.popBackStack() },
-                        onResult = { navController.navigateToResultFromConfirm() }
+                        onResult = { navController.navigateToResultFromConfirm() },
+                        onAddPhoto = { navController.navigate(CameraDestination(barcode = false)) }
                     )
                 }
                 composable<ResultDestination> {
                     val viewModel: ResultViewModel = koinViewModel()
-                    ResultScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
+                    ResultScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
+                        onCheckLabel = { navController.navigate(CameraDestination(barcode = false)) }
+                    )
                 }
             }
         }
@@ -211,9 +216,11 @@ private fun NavHostController.navigateToResultFromCamera() {
 }
 
 private fun NavHostController.navigateToConfirmFromCrop() {
-    navigate(ConfirmIngredientsDestination) {
-        popUpTo<CameraDestination> { inclusive = true }
+    val poppedConfirm: Boolean = popBackStack<ConfirmIngredientsDestination>(inclusive = true)
+    if (!poppedConfirm) {
+        popBackStack<CameraDestination>(inclusive = true)
     }
+    navigate(ConfirmIngredientsDestination)
 }
 
 private fun NavHostController.navigateToResultFromConfirm() {

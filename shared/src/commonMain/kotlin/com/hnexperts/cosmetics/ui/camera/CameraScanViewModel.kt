@@ -8,10 +8,14 @@ import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.platform.performScanHaptic
 import com.hnexperts.cosmetics.scanning.application.PendingCaptureSession
+import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.domain.CameraFrame
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
+import com.hnexperts.cosmetics.scanning.domain.CatalogReport
+import com.hnexperts.cosmetics.scanning.domain.ReportKinds
+import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlin.time.TimeMark
@@ -40,6 +44,8 @@ class CameraScanViewModel(
     private val evaluateProduct: EvaluateProduct,
     private val pendingCapture: PendingCaptureSession,
     private val scanBridge: ScanBridge,
+    private val reports: ReportQueue,
+    private val pendingVerify: PendingVerifySession,
     initialMode: ScannerMode = ScannerMode.BARCODE
 ) : ViewModel() {
     private val state: MutableStateFlow<CameraScanUiState> = MutableStateFlow(CameraScanUiState(mode = initialMode))
@@ -122,6 +128,14 @@ class CameraScanViewModel(
                 AppFailure.Camera(operation = "barcode.invalid", detail = "Decoded value '$raw' is not a GTIN")
             )
             is GtinResolution.Unknown -> {
+                pendingVerify.rememberUnknownGtin(resolution.gtin)
+                reports.enqueue(
+                    CatalogReport(
+                        kind = ReportKinds.MISSING_PRODUCT,
+                        gtin = resolution.gtin,
+                        payloadJson = "{}"
+                    )
+                )
                 scanBridge.publishNotFound(resolution.gtin, resolution.onlineNoIngredients)
                 state.update { current -> current.copy(navigateBackNotFound = true) }
             }

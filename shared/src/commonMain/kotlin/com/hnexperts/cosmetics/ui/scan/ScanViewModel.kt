@@ -7,8 +7,12 @@ import com.hnexperts.cosmetics.catalog.application.ResolveGtin
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
+import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
+import com.hnexperts.cosmetics.scanning.domain.CatalogReport
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
+import com.hnexperts.cosmetics.scanning.domain.ReportKinds
+import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.Job
@@ -33,7 +37,9 @@ class ScanViewModel(
     private val resolveGtin: ResolveGtin,
     private val evaluateProduct: EvaluateProduct,
     private val scanBridge: ScanBridge,
-    private val history: ScanHistoryRepository
+    private val history: ScanHistoryRepository,
+    private val reports: ReportQueue,
+    private val pendingVerify: PendingVerifySession
 ) : ViewModel() {
     private val state: MutableStateFlow<ScanUiState> = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = state.asStateFlow()
@@ -68,12 +74,15 @@ class ScanViewModel(
                         onlineNoIngredients = false
                     )
                 }
-                is GtinResolution.Unknown -> state.update { current ->
-                    current.copy(
-                        invalidBarcode = false,
-                        notFoundGtin = resolution.gtin,
-                        onlineNoIngredients = resolution.onlineNoIngredients
-                    )
+                is GtinResolution.Unknown -> {
+                    recordUnknown(resolution)
+                    state.update { current ->
+                        current.copy(
+                            invalidBarcode = false,
+                            notFoundGtin = resolution.gtin,
+                            onlineNoIngredients = resolution.onlineNoIngredients
+                        )
+                    }
                 }
                 is GtinResolution.ReadyToEvaluate -> evaluateReady(resolution)
             }
@@ -148,6 +157,17 @@ class ScanViewModel(
                 navigateToResult = true
             )
         }
+    }
+
+    private suspend fun recordUnknown(resolution: GtinResolution.Unknown) {
+        pendingVerify.rememberUnknownGtin(resolution.gtin)
+        reports.enqueue(
+            CatalogReport(
+                kind = ReportKinds.MISSING_PRODUCT,
+                gtin = resolution.gtin,
+                payloadJson = "{}"
+            )
+        )
     }
 
     private fun showFailure(failure: AppFailure) {

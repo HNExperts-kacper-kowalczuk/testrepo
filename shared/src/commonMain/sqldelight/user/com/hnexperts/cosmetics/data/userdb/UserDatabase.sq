@@ -36,6 +36,16 @@ CREATE TABLE report_queue (
     flushed INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE cached_online_product (
+    gtin TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT,
+    inci_raw TEXT NOT NULL,
+    usage TEXT NOT NULL,
+    source TEXT NOT NULL,
+    cached_at TEXT NOT NULL
+);
+
 CREATE TABLE user_legal (
     id INTEGER NOT NULL PRIMARY KEY,
     disclaimer_accepted INTEGER NOT NULL DEFAULT 0,
@@ -87,3 +97,32 @@ WHERE id = 1;
 upsertLegal:
 INSERT OR REPLACE INTO user_legal(id, disclaimer_accepted, accepted_at)
 VALUES (1, ?, ?);
+
+selectCachedProduct:
+SELECT *
+FROM cached_online_product
+WHERE gtin = ?;
+
+upsertCachedProduct:
+INSERT OR REPLACE INTO cached_online_product(gtin, name, brand, inci_raw, usage, source, cached_at)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectOpenReport:
+SELECT *
+FROM report_queue
+WHERE gtin = ? AND kind = ? AND flushed = 0
+LIMIT 1;
+
+insertReport:
+INSERT INTO report_queue(created_at, kind, gtin, payload_json, flushed)
+VALUES (?, ?, ?, ?, 0);
+
+updateReportPayload:
+UPDATE report_queue
+SET payload_json = ?
+WHERE id = ?;
+
+countOpenReports:
+SELECT COUNT(*)
+FROM report_queue
+WHERE flushed = 0;

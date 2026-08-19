@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -33,9 +35,11 @@ import com.hnexperts.cosmetics.resources.finding_personal_avoid
 import com.hnexperts.cosmetics.resources.finding_rating_a11y
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
+import com.hnexperts.cosmetics.resources.result_check_label
 import com.hnexperts.cosmetics.resources.result_disclaimer
 import com.hnexperts.cosmetics.resources.result_missing
 import com.hnexperts.cosmetics.resources.result_not_suitable
+import com.hnexperts.cosmetics.resources.result_pack_verified
 import com.hnexperts.cosmetics.resources.result_rating_a11y
 import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_title
@@ -59,10 +63,17 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ResultScreen(
     viewModel: ResultViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onCheckLabel: () -> Unit
 ) {
     val uiState: ResultUiState by viewModel.uiState.collectAsState()
     val assessment: ProductAssessment? = uiState.assessment
+    LaunchedEffect(uiState.navigateToCamera) {
+        if (uiState.navigateToCamera) {
+            onCheckLabel()
+            viewModel.consumeNavigation()
+        }
+    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -92,6 +103,19 @@ fun ResultScreen(
         ) {
             item {
                 ResultHeader(assessment)
+            }
+            if (assessment.packVerified) {
+                item {
+                    Text(text = stringResource(Res.string.result_pack_verified))
+                }
+            }
+            item {
+                Button(
+                    onClick = viewModel::checkTheLabel,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(Res.string.result_check_label))
+                }
             }
             item {
                 FailureBanner(failure = uiState.failure)

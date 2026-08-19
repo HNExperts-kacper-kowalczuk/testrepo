@@ -7,8 +7,15 @@ import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
 import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
+import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
+import com.hnexperts.cosmetics.scanning.application.VerifyRequest
+import com.hnexperts.cosmetics.scanning.domain.CatalogReport
 import com.hnexperts.cosmetics.scanning.domain.FuzzyDecision
+import com.hnexperts.cosmetics.scanning.domain.InciTokenSet
 import com.hnexperts.cosmetics.scanning.domain.IngredientReviewDraft
+import com.hnexperts.cosmetics.scanning.domain.ReportKinds
+import com.hnexperts.cosmetics.scanning.domain.ReportQueue
+import com.hnexperts.cosmetics.scanning.domain.ReviewDraftMerger
 import com.hnexperts.cosmetics.scanning.domain.ReviewToken
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,32 +29,23 @@ data class ConfirmUiState(
     val usage: ProductUsage = ProductUsage.LEAVE_ON,
     val busy: Boolean = false,
     val failure: AppFailure? = null,
-    val navigateToResult: Boolean = false
+    val photoCount: Int = 1,
+    val canAddPhoto: Boolean = true,
+    val navigateToResult: Boolean = false,
+    val navigateToCamera: Boolean = false
 )
 
 class ConfirmIngredientsViewModel(
     private val reviewSession: IngredientReviewSession,
-    private val evaluateProduct: EvaluateProduct
+    private val pendingVerify: PendingVerifySession,
+    private val evaluateProduct: EvaluateProduct,
+    private val reports: ReportQueue
 ) : ViewModel() {
     private val state: MutableStateFlow<ConfirmUiState> = MutableStateFlow(ConfirmUiState())
     val uiState: StateFlow<ConfirmUiState> = state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val draft: IngredientReviewDraft? = reviewSession.current()
-            if (draft == null) {
-                state.update { current ->
-                    current.copy(
-                        failure = AppFailure.Ocr(
-                            operation = "ocr.review.missing",
-                            detail = "No captured ingredient list is waiting for confirmation."
-                        )
-                    )
-                }
-            } else {
-                state.update { current -> current.copy(draft = draft) }
-            }
-        }
+        viewModelScope.launch { loadDraft() }
     }
 
     fun updateRaw(key: Long, rawText: String) {
@@ -98,50 +96,108 @@ class ConfirmIngredientsViewModel(
         state.update { current -> current.copy(usage = usage, failure = null) }
     }
 
-    fun evaluate() {
+    fun addAnotherPhoto() {
         val draft: IngredientReviewDraft = state.value.draft ?: return
-        if (draft.hasPendingFuzzy()) {
-            state.update { current ->
-                current.copy(
-                    failure = AppFailure.Ocr(
-                        operation = "ocr.review.fuzzy",
-                        detail = "Accept or reject each fuzzy match before evaluating."
-                    )
-                )
-            }
-            return
-        }
-        val inciRaw: String = draft.toInciRaw()
-        if (inciRaw.isBlank()) {
-            state.update { current ->
-                current.copy(
-                    failure = AppFailure.Ocr(
-                        operation = "ocr.review.empty",
-                        detail = "Add at least one ingredient name."
-                    )
-                )
-            }
+        if (state.value.photoCount >= ReviewDraftMerger.MAX_SHOTS) {
             return
         }
         viewModelScope.launch {
-            state.update { current -> current.copy(busy = true, failure = null) }
-            try {
-                runUiAction(::showFailure) {
-                    evaluateProduct.invoke(
-                        inciRaw = inciRaw,
-                        source = "ocr",
-                        usage = state.value.usage
-                    )
-                } ?: return@launch
-                state.update { current -> current.copy(navigateToResult = true) }
-            } finally {
-                state.update { current -> current.copy(busy = false) }
-            }
+            pendingVerify.stashDraft(draft)
+            state.update { current -> current.copy(navigateToCamera = true) }
         }
     }
 
+    fun evaluate() {
+        val draft: IngredientReviewDraft = state.value.draft ?: return
+        if (draft.hasPendingFuzzy() || draft.toInciRaw().isBlank()) {
+            state.update { current -> current.copy(failure = reviewProblem(draft)) }
+            return
+        }
+        viewModelScope.launch { evaluateCaptured(draft) }
+    }
+
     fun consumeNavigation() {
-        state.update { current -> current.copy(navigateToResult = false) }
+        state.update { current -> current.copy(navigateToResult = false, navigateToCamera = false) }
+    }
+
+    private suspend fun loadDraft() {
+        val stashed: IngredientReviewDraft? = pendingVerify.takeStashedDraft()
+        val incoming: IngredientReviewDraft? = reviewSession.current()
+        val draft: IngredientReviewDraft? = when {
+            stashed != null && incoming != null -> ReviewDraftMerger.merge(stashed, incoming)
+            incoming != null -> incoming
+            else -> null
+        }
+        if (draft == null) {
+            state.update { current ->
+                current.copy(
+                    failure = AppFailure.Ocr(
+                        operation = "ocr.review.missing",
+                        detail = "No captured ingredient list is waiting for confirmation."
+                    )
+                )
+            }
+            return
+        }
+        val photos: Int = pendingVerify.notePhoto()
+        val verify: VerifyRequest? = pendingVerify.currentVerify()
+        state.update { current ->
+            current.copy(
+                draft = draft,
+                usage = verify?.usage ?: current.usage,
+                photoCount = photos,
+                canAddPhoto = photos < ReviewDraftMerger.MAX_SHOTS
+            )
+        }
+    }
+
+    private suspend fun evaluateCaptured(draft: IngredientReviewDraft) {
+        state.update { current -> current.copy(busy = true, failure = null) }
+        try {
+            val photographed: String = draft.toInciRaw()
+            val verify: VerifyRequest? = pendingVerify.currentVerify()
+            val gtin: String? = verify?.gtin ?: pendingVerify.unknownGtin()
+            val catalogInci: String? = verify?.catalogInci
+            val matched: Boolean = catalogInci != null && InciTokenSet.equal(photographed, catalogInci)
+            runUiAction(::showFailure) {
+                evaluateProduct.invoke(
+                    inciRaw = if (matched && catalogInci != null) catalogInci else photographed,
+                    source = if (matched && verify != null) verify.source else "ocr",
+                    productName = verify?.productName,
+                    brand = verify?.brand,
+                    gtin = gtin,
+                    usage = state.value.usage,
+                    packVerified = matched
+                )
+            } ?: return
+            if (verify != null && !matched) {
+                reports.enqueue(
+                    CatalogReport(
+                        kind = ReportKinds.WRONG_INCI,
+                        gtin = verify.gtin,
+                        payloadJson = "{\"catalog\":true}"
+                    )
+                )
+            }
+            if (gtin != null) {
+                reports.attachPayload(gtin, ReportKinds.MISSING_PRODUCT, photographed)
+            }
+            pendingVerify.clearVerify()
+            state.update { current -> current.copy(navigateToResult = true) }
+        } finally {
+            state.update { current -> current.copy(busy = false) }
+        }
+    }
+
+    private fun reviewProblem(draft: IngredientReviewDraft): AppFailure {
+        return if (draft.hasPendingFuzzy()) {
+            AppFailure.Ocr(
+                operation = "ocr.review.fuzzy",
+                detail = "Accept or reject each fuzzy match before evaluating."
+            )
+        } else {
+            AppFailure.Ocr(operation = "ocr.review.empty", detail = "Add at least one ingredient name.")
+        }
     }
 
     private fun replaceToken(key: Long, transform: (ReviewToken) -> ReviewToken) {

@@ -1,6 +1,8 @@
 package com.hnexperts.cosmetics.catalog.application
 
 import com.hnexperts.cosmetics.ads.domain.NetworkMonitor
+import com.hnexperts.cosmetics.catalog.domain.CachedOnlineProduct
+import com.hnexperts.cosmetics.catalog.domain.OnlineProductCache
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.failure.AppFailure
@@ -54,6 +56,24 @@ class ResolveGtinTest {
     }
 
     @Test
+    fun secondLookupOfAnOnlineHitDoesNotCallTheNetwork() = runBlocking {
+        val http = RecordingHttp(
+            mapOf(
+                "https://world.openbeautyfacts.org/api/v2/product/4000000000001.json" to
+                    """{"status":1,"product":{"product_name":"Online Cream","brands":"TestCo","ingredients_text":"Aqua, Glycerin, Niacinamide, Panthenol"}}"""
+            )
+        )
+        val cache = MemoryCache()
+        val resolve = resolver(emptyMap(), http, online = true, cache = cache)
+        requireOk(resolve.invoke("4000000000001"))
+        http.urls.clear()
+        val again = requireOk(resolve.invoke("4000000000001"))
+        val ready = assertIs<GtinResolution.ReadyToEvaluate>(again)
+        assertEquals("online", ready.source)
+        assertEquals(emptyList(), http.urls)
+    }
+
+    @Test
     fun offlineCatalogMissSkipsTheNetwork() = runBlocking {
         val http = RecordingHttp()
         val resolve = resolver(emptyMap(), http, online = false)
@@ -83,6 +103,7 @@ class ResolveGtinTest {
     fun onlineHttpErrorFallsThroughToUnknownWithoutBlocking() = runBlocking {
         val resolve = ResolveGtin(
             offline = ResolveBarcode(MemoryProducts(emptyMap())),
+            cache = MemoryCache(),
             online = OnlineGtinLookup(FailingHttp(), Online)
         )
         val result = requireOk(resolve.invoke("4000000000001"))
@@ -93,10 +114,12 @@ class ResolveGtinTest {
     private fun resolver(
         catalog: Map<String, Product>,
         http: RecordingHttp,
-        online: Boolean
+        online: Boolean,
+        cache: MemoryCache = MemoryCache()
     ): ResolveGtin {
         return ResolveGtin(
             offline = ResolveBarcode(MemoryProducts(catalog)),
+            cache = cache,
             online = OnlineGtinLookup(http, if (online) Online else Offline)
         )
     }
@@ -123,6 +146,19 @@ class ResolveGtinTest {
 
         override suspend fun search(query: String): Outcome<List<Product>> {
             return Outcome.Ok(emptyList())
+        }
+    }
+
+    private class MemoryCache : OnlineProductCache {
+        private val items: MutableMap<String, CachedOnlineProduct> = mutableMapOf()
+
+        override suspend fun find(gtin: String): Outcome<CachedOnlineProduct?> {
+            return Outcome.Ok(items[gtin])
+        }
+
+        override suspend fun put(product: CachedOnlineProduct): Outcome<Unit> {
+            items[product.gtin] = product
+            return Outcome.Ok(Unit)
         }
     }
 
