@@ -11,20 +11,23 @@
     <string name="scan_barcode_action">Look up barcode</string>
     <string name="scan_inci_label">Ingredient list (INCI)</string>
     <string name="scan_inci_action">Evaluate list</string>
-    <string name="scan_camera_note">Scan a barcode or the printed INCI list with the camera. You can still type a GTIN or paste the list if the camera cannot read it.</string>
+    <string name="scan_camera_note">Scan a barcode or the printed INCI list with the camera. Missing catalog codes are looked up online automatically when you have a connection. You can still type a GTIN or paste the list if the camera cannot read it.</string>
     <string name="scan_open_barcode">Scan barcode</string>
     <string name="scan_open_inci">Scan ingredient list</string>
     <string name="scan_hint_gtin">Try 5901234123457</string>
     <string name="scan_invalid_barcode">That does not look like a valid barcode.</string>
-    <string name="scan_not_found_title">Product not in the offline catalog</string>
-    <string name="scan_not_found_body">This barcode is not in the offline catalog. Scan the printed ingredient list, or type or paste it from the pack.</string>
+    <string name="scan_not_found_title">Product not in the catalog</string>
+    <string name="scan_not_found_body">This barcode is not in the offline catalog, and no ingredient list was found online. Scan the printed list, or type it from the pack.</string>
+    <string name="scan_online_no_inci">An online listing was found, but it has no ingredient list. Scan the pack instead.</string>
     <string name="scan_empty_inci">Paste or type at least one ingredient name.</string>
     <string name="scan_working">Evaluating…</string>
+    <string name="scan_looking_up">Looking up barcode…</string>
     <string name="scan_more_ways">Type a barcode or paste the list</string>
     <string name="scan_recent_title">Recent scans</string>
     <string name="source_barcode">Barcode scan</string>
     <string name="source_ocr">Label photo</string>
     <string name="source_manual">Typed list</string>
+    <string name="source_online">Online lookup</string>
 
     <string name="search_title">Catalog</string>
     <string name="search_placeholder">Search by name or brand</string>
@@ -76,7 +79,7 @@
     <string name="disclaimer_accept">I understand</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_scan_title">What a scan does</string>
-    <string name="onboarding_scan_body">Point the camera at a barcode or the printed INCI list (skład). Lookup and scoring stay on this device. You can also type a GTIN or paste the list if the camera cannot read the pack.</string>
+    <string name="onboarding_scan_body">Point the camera at a barcode or the printed INCI list (skład). Scoring stays on this device. If a barcode is missing from the catalog and you are online, the ingredient list is fetched and evaluated automatically. You can also type a GTIN or paste the list if the camera cannot read the pack.</string>
     <string name="onboarding_unknown_title">Unknown is not safe</string>
     <string name="onboarding_unknown_body">If a name is not in the knowledge base, it is listed as Unknown. Results can be incomplete. Edit OCR mistakes before you evaluate. Community catalog formulas are marked unverified.</string>
 
@@ -102,18 +105,23 @@
     <string name="error_evaluation">Ingredient evaluation failed.</string>
     <string name="error_camera">The camera could not complete this scan.</string>
     <string name="error_ocr">Could not read the ingredient list from the photo.</string>
+    <string name="error_network">The online lookup failed. Check the connection and try again.</string>
     <string name="error_unexpected">Something went wrong.</string>
 
     <string name="camera_title_barcode">Scan barcode</string>
     <string name="camera_title_inci">Scan ingredient list</string>
-    <string name="camera_hint_barcode">Point at an EAN or UPC barcode. Detection is on-device and ads stay off this screen.</string>
+    <string name="camera_hint_barcode">Point at an EAN or UPC barcode. Missing catalog codes are looked up online when you have a connection. Ads stay off this screen.</string>
     <string name="camera_hint_inci">Flatten the label, then capture a still of the INCI / skład block.</string>
     <string name="camera_capture">Capture list</string>
     <string name="crop_title">Select the ingredient list</string>
-    <string name="crop_hint">Drag the corners around the list that starts at “Ingredients” or “Skład”.</string>
+    <string name="crop_hint">Drag the four corners around the list that starts at “Ingredients” or “Skład”.</string>
     <string name="crop_use">Use this area</string>
     <string name="crop_reset">Reset corners</string>
     <string name="crop_retake">Retake photo</string>
+    <string name="crop_handle_top_left">Top left corner</string>
+    <string name="crop_handle_top_right">Top right corner</string>
+    <string name="crop_handle_bottom_right">Bottom right corner</string>
+    <string name="crop_handle_bottom_left">Bottom left corner</string>
     <string name="camera_torch_on">Torch on</string>
     <string name="camera_torch_off">Torch off</string>
     <string name="camera_unavailable">Camera scanning is not available on this device. Type the barcode or paste the ingredient list instead.</string>

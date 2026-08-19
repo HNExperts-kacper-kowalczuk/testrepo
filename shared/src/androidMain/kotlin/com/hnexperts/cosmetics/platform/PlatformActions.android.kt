@@ -34,3 +34,11 @@ actual fun openAppSettings() {
     }
     context.startActivity(intent)
 }
+
+actual fun openUrl(url: String) {
+    val context = AndroidAppContext.current() ?: return
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    context.startActivity(intent)
+}

@@ -2,9 +2,8 @@ package com.hnexperts.cosmetics.ui.camera
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hnexperts.cosmetics.catalog.application.BarcodeLookup
-import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
-import com.hnexperts.cosmetics.catalog.domain.ProductUsage
+import com.hnexperts.cosmetics.catalog.application.GtinResolution
+import com.hnexperts.cosmetics.catalog.application.ResolveGtin
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.platform.performScanHaptic
@@ -37,7 +36,7 @@ data class CameraScanUiState(
 )
 
 class CameraScanViewModel(
-    private val resolveBarcode: ResolveBarcode,
+    private val resolveGtin: ResolveGtin,
     private val evaluateProduct: EvaluateProduct,
     private val pendingCapture: PendingCaptureSession,
     private val scanBridge: ScanBridge,
@@ -117,24 +116,24 @@ class CameraScanViewModel(
     }
 
     private suspend fun handleBarcode(raw: String) {
-        val lookup: BarcodeLookup = runUiAction(::showFailure) { resolveBarcode.invoke(raw) } ?: return
-        when (lookup) {
-            is BarcodeLookup.Invalid -> showFailure(
+        val resolution: GtinResolution = runUiAction(::showFailure) { resolveGtin.invoke(raw) } ?: return
+        when (resolution) {
+            GtinResolution.Invalid -> showFailure(
                 AppFailure.Camera(operation = "barcode.invalid", detail = "Decoded value '$raw' is not a GTIN")
             )
-            is BarcodeLookup.NotFound -> {
-                scanBridge.publishNotFound(lookup.gtin)
+            is GtinResolution.Unknown -> {
+                scanBridge.publishNotFound(resolution.gtin, resolution.onlineNoIngredients)
                 state.update { current -> current.copy(navigateBackNotFound = true) }
             }
-            is BarcodeLookup.Found -> {
+            is GtinResolution.ReadyToEvaluate -> {
                 runUiAction(::showFailure) {
                     evaluateProduct.invoke(
-                        inciRaw = lookup.product.inciRaw,
-                        source = "barcode",
-                        productName = lookup.product.name,
-                        brand = lookup.product.brand,
-                        gtin = lookup.gtin,
-                        usage = ProductUsage.parse(lookup.product.usage)
+                        inciRaw = resolution.inciRaw,
+                        source = resolution.source,
+                        productName = resolution.productName,
+                        brand = resolution.brand,
+                        gtin = resolution.gtin,
+                        usage = resolution.usage
                     )
                 } ?: return
                 state.update { current -> current.copy(navigateToResult = true) }

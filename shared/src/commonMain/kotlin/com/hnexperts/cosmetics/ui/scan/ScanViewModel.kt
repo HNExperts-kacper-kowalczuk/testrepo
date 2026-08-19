@@ -2,8 +2,8 @@ package com.hnexperts.cosmetics.ui.scan
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hnexperts.cosmetics.catalog.application.BarcodeLookup
-import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
+import com.hnexperts.cosmetics.catalog.application.GtinResolution
+import com.hnexperts.cosmetics.catalog.application.ResolveGtin
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
@@ -23,13 +23,14 @@ data class ScanUiState(
     val invalidBarcode: Boolean = false,
     val emptyInci: Boolean = false,
     val notFoundGtin: String? = null,
+    val onlineNoIngredients: Boolean = false,
     val failure: AppFailure? = null,
     val navigateToResult: Boolean = false,
     val recent: List<HistoryEntry> = emptyList()
 )
 
 class ScanViewModel(
-    private val resolveBarcode: ResolveBarcode,
+    private val resolveGtin: ResolveGtin,
     private val evaluateProduct: EvaluateProduct,
     private val scanBridge: ScanBridge,
     private val history: ScanHistoryRepository
@@ -40,10 +41,15 @@ class ScanViewModel(
 
     init {
         viewModelScope.launch {
-            scanBridge.notFoundGtin.collect { gtin ->
-                if (gtin != null) {
+            scanBridge.unknownGtin.collect { notice ->
+                if (notice != null) {
                     state.update { current ->
-                        current.copy(notFoundGtin = gtin, invalidBarcode = false, failure = null)
+                        current.copy(
+                            notFoundGtin = notice.gtin,
+                            onlineNoIngredients = notice.onlineNoIngredients,
+                            invalidBarcode = false,
+                            failure = null
+                        )
                     }
                     scanBridge.consumeNotFound()
                 }
@@ -53,21 +59,23 @@ class ScanViewModel(
 
     fun lookupBarcode(raw: String) {
         startWork {
-            when (val lookup: BarcodeLookup = runUiAction(::showFailure) { resolveBarcode.invoke(raw) } ?: return@startWork) {
-                is BarcodeLookup.Invalid -> state.update { current ->
-                    current.copy(invalidBarcode = true, emptyInci = false, notFoundGtin = null)
+            when (val resolution: GtinResolution = runUiAction(::showFailure) { resolveGtin.invoke(raw) } ?: return@startWork) {
+                GtinResolution.Invalid -> state.update { current ->
+                    current.copy(
+                        invalidBarcode = true,
+                        emptyInci = false,
+                        notFoundGtin = null,
+                        onlineNoIngredients = false
+                    )
                 }
-                is BarcodeLookup.NotFound -> state.update { current ->
-                    current.copy(invalidBarcode = false, notFoundGtin = lookup.gtin)
+                is GtinResolution.Unknown -> state.update { current ->
+                    current.copy(
+                        invalidBarcode = false,
+                        notFoundGtin = resolution.gtin,
+                        onlineNoIngredients = resolution.onlineNoIngredients
+                    )
                 }
-                is BarcodeLookup.Found -> evaluateAndOpen(
-                    inciRaw = lookup.product.inciRaw,
-                    source = "barcode",
-                    productName = lookup.product.name,
-                    brand = lookup.product.brand,
-                    gtin = lookup.gtin,
-                    usage = ProductUsage.parse(lookup.product.usage)
-                )
+                is GtinResolution.ReadyToEvaluate -> evaluateReady(resolution)
             }
         }
     }
@@ -101,6 +109,17 @@ class ScanViewModel(
         state.update { current -> current.copy(navigateToResult = false) }
     }
 
+    private suspend fun evaluateReady(ready: GtinResolution.ReadyToEvaluate) {
+        evaluateAndOpen(
+            inciRaw = ready.inciRaw,
+            source = ready.source,
+            productName = ready.productName,
+            brand = ready.brand,
+            gtin = ready.gtin,
+            usage = ready.usage
+        )
+    }
+
     private suspend fun evaluateAndOpen(
         inciRaw: String,
         source: String,
@@ -123,6 +142,7 @@ class ScanViewModel(
             current.copy(
                 invalidBarcode = false,
                 notFoundGtin = null,
+                onlineNoIngredients = false,
                 emptyInci = false,
                 failure = null,
                 navigateToResult = true
@@ -138,7 +158,14 @@ class ScanViewModel(
         runningJob?.cancel()
         runningJob = viewModelScope.launch {
             state.update { current ->
-                current.copy(busy = true, invalidBarcode = false, emptyInci = false, failure = null)
+                current.copy(
+                    busy = true,
+                    invalidBarcode = false,
+                    emptyInci = false,
+                    failure = null,
+                    notFoundGtin = null,
+                    onlineNoIngredients = false
+                )
             }
             try {
                 block()

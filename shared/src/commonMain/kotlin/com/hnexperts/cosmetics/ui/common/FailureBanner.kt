@@ -19,6 +19,7 @@ import com.hnexperts.cosmetics.resources.error_database
 import com.hnexperts.cosmetics.resources.error_evaluation
 import com.hnexperts.cosmetics.resources.error_camera
 import com.hnexperts.cosmetics.resources.error_ocr
+import com.hnexperts.cosmetics.resources.error_network
 import com.hnexperts.cosmetics.resources.error_unexpected
 import org.jetbrains.compose.resources.stringResource
 
@@ -61,6 +62,7 @@ private fun titleFor(failure: AppFailure): String {
         is AppFailure.Evaluation -> stringResource(Res.string.error_evaluation)
         is AppFailure.Camera -> stringResource(Res.string.error_camera)
         is AppFailure.Ocr -> stringResource(Res.string.error_ocr)
+        is AppFailure.Network -> stringResource(Res.string.error_network)
         is AppFailure.Unexpected -> stringResource(Res.string.error_unexpected)
     }
 }

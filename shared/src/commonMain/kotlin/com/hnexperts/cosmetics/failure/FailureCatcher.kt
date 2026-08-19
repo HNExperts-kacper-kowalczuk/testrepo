@@ -31,6 +31,10 @@ object FailureCatcher {
         return wrap(operation, { error -> AppFailure.Ocr(operation, error.toVerboseString()) }, block)
     }
 
+    suspend fun <T> network(operation: String, block: suspend () -> T): Outcome<T> {
+        return wrap(operation, { error -> AppFailure.Network(operation, error.toVerboseString()) }, block)
+    }
+
     suspend fun <T> unexpected(operation: String, block: suspend () -> T): Outcome<T> {
         return wrap(operation, { error -> AppFailure.Unexpected(operation, error.toVerboseString()) }, block)
     }

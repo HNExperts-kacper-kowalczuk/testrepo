@@ -49,6 +49,20 @@ class CropIngredientsViewModel(
         state.update { current -> current.copy(quad = current.quad.withCorner(corner, position)) }
     }
 
+    fun nudgeCorner(corner: QuadCorner, deltaX: Float, deltaY: Float, rectWidth: Float, rectHeight: Float) {
+        if (rectWidth <= 1f || rectHeight <= 1f) {
+            return
+        }
+        val current: CornerPoint = state.value.quad.corner(corner)
+        updateCorner(
+            corner,
+            CornerPoint(
+                x = current.x + deltaX / rectWidth,
+                y = current.y + deltaY / rectHeight
+            )
+        )
+    }
+
     fun resetQuad() {
         state.update { current -> current.copy(quad = SelectionQuad.defaultInset()) }
     }

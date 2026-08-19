@@ -24,6 +24,7 @@ import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.source_barcode
 import com.hnexperts.cosmetics.resources.source_manual
 import com.hnexperts.cosmetics.resources.source_ocr
+import com.hnexperts.cosmetics.resources.source_online
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.ui.theme.RatingColors
 import org.jetbrains.compose.resources.stringResource
@@ -72,6 +73,7 @@ private fun sourceLabel(source: String): String {
     return when (source) {
         "barcode" -> stringResource(Res.string.source_barcode)
         "ocr" -> stringResource(Res.string.source_ocr)
+        "online" -> stringResource(Res.string.source_online)
         else -> stringResource(Res.string.source_manual)
     }
 }

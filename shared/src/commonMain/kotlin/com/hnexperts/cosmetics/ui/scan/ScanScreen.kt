@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.scan_camera_note
 import com.hnexperts.cosmetics.resources.scan_not_found_body
 import com.hnexperts.cosmetics.resources.scan_not_found_title
+import com.hnexperts.cosmetics.resources.scan_online_no_inci
 import com.hnexperts.cosmetics.resources.scan_open_barcode
 import com.hnexperts.cosmetics.resources.scan_open_inci
 import com.hnexperts.cosmetics.resources.scan_recent_title
@@ -56,6 +58,7 @@ fun ScanScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -85,7 +88,11 @@ fun ScanScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (uiState.notFoundGtin != null) {
-            NotFoundCard(busy = uiState.busy, onOpenInciCamera = onOpenInciCamera)
+            NotFoundCard(
+                busy = uiState.busy,
+                onlineNoIngredients = uiState.onlineNoIngredients,
+                onOpenInciCamera = onOpenInciCamera
+            )
         }
         if (uiState.busy) {
             CircularProgressIndicator()
@@ -97,7 +104,11 @@ fun ScanScreen(
 }
 
 @Composable
-private fun NotFoundCard(busy: Boolean, onOpenInciCamera: () -> Unit) {
+private fun NotFoundCard(
+    busy: Boolean,
+    onlineNoIngredients: Boolean,
+    onOpenInciCamera: () -> Unit
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -105,6 +116,9 @@ private fun NotFoundCard(busy: Boolean, onOpenInciCamera: () -> Unit) {
         ) {
             Text(text = stringResource(Res.string.scan_not_found_title), style = MaterialTheme.typography.titleMedium)
             Text(text = stringResource(Res.string.scan_not_found_body), style = MaterialTheme.typography.bodyMedium)
+            if (onlineNoIngredients) {
+                Text(text = stringResource(Res.string.scan_online_no_inci), color = MaterialTheme.colorScheme.error)
+            }
             Button(
                 onClick = onOpenInciCamera,
                 enabled = !busy,
