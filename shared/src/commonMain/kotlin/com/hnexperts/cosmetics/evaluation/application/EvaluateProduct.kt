@@ -29,7 +29,8 @@ class EvaluateProduct(
         productName: String? = null,
         brand: String? = null,
         gtin: String? = null,
-        usage: ProductUsage = ProductUsage.UNKNOWN
+        usage: ProductUsage = ProductUsage.UNKNOWN,
+        packVerified: Boolean = false
     ): Outcome<ProductAssessment> {
         val inputs: EvaluationInputs = when (val loaded: Outcome<EvaluationInputs> = loadInputs()) {
             is Outcome.Err -> return loaded
@@ -46,7 +47,11 @@ class EvaluateProduct(
         )
         val assessment: ProductAssessment = when (scored) {
             is Outcome.Err -> return scored
-            is Outcome.Ok -> scored.value
+            is Outcome.Ok -> if (packVerified) {
+                scored.value.copy(packVerified = true)
+            } else {
+                scored.value
+            }
         }
         persist(assessment, source)
         return Outcome.Ok(assessment)

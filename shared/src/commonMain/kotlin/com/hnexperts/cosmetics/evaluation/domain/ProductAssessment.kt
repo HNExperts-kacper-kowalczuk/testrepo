@@ -25,5 +25,6 @@ data class ProductAssessment(
     val unknownCount: Int,
     val rulesetVersion: String,
     val usage: ProductUsage = ProductUsage.UNKNOWN,
-    val usageAssumed: Boolean = false
+    val usageAssumed: Boolean = false,
+    val packVerified: Boolean = false
 )

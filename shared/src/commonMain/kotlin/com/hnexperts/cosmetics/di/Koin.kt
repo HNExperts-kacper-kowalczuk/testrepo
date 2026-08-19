@@ -34,9 +34,12 @@ import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
 import com.hnexperts.cosmetics.scanning.application.PendingCaptureSession
+import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
 import com.hnexperts.cosmetics.scanning.application.PrepareIngredientReview
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
 import com.hnexperts.cosmetics.scanning.data.SqlHistoryRepository
+import com.hnexperts.cosmetics.scanning.data.SqlReportQueue
+import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
 import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
@@ -80,6 +83,8 @@ val appModule = module {
     single { IngredientReviewSession() }
     single { ScanBridge() }
     single { PendingCaptureSession() }
+    single { PendingVerifySession() }
+    single<ReportQueue> { SqlReportQueue(get(), get()) }
     single<CatalogRemote> { LocalPublishedCatalogRemote(get()) }
     single { CheckCatalogUpdates(get(), get(), get()) }
     single { ApplyCatalogDelta(get(), get(), get(), get()) }
@@ -92,6 +97,8 @@ val appModule = module {
             evaluateProduct = get(),
             pendingCapture = get(),
             scanBridge = get(),
+            reports = get(),
+            pendingVerify = get(),
             initialMode = parameters.getOrNull<ScannerMode>() ?: ScannerMode.BARCODE
         )
     }

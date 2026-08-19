@@ -27,6 +27,7 @@ import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.confirm_add
+import com.hnexperts.cosmetics.resources.confirm_add_photo
 import com.hnexperts.cosmetics.resources.confirm_empty
 import com.hnexperts.cosmetics.resources.confirm_evaluate
 import com.hnexperts.cosmetics.resources.confirm_fuzzy_accept
@@ -48,12 +49,19 @@ import org.jetbrains.compose.resources.stringResource
 fun ConfirmIngredientsScreen(
     viewModel: ConfirmIngredientsViewModel,
     onBack: () -> Unit,
-    onResult: () -> Unit
+    onResult: () -> Unit,
+    onAddPhoto: () -> Unit
 ) {
     val uiState: ConfirmUiState by viewModel.uiState.collectAsState()
     LaunchedEffect(uiState.navigateToResult) {
         if (uiState.navigateToResult) {
             onResult()
+            viewModel.consumeNavigation()
+        }
+    }
+    LaunchedEffect(uiState.navigateToCamera) {
+        if (uiState.navigateToCamera) {
+            onAddPhoto()
             viewModel.consumeNavigation()
         }
     }
@@ -96,6 +104,11 @@ fun ConfirmIngredientsScreen(
             }
             TextButton(onClick = viewModel::addToken, enabled = !uiState.busy) {
                 Text(stringResource(Res.string.confirm_add))
+            }
+            if (uiState.canAddPhoto) {
+                TextButton(onClick = viewModel::addAnotherPhoto, enabled = !uiState.busy) {
+                    Text(stringResource(Res.string.confirm_add_photo))
+                }
             }
             UsagePicker(
                 selected = uiState.usage,

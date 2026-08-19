@@ -106,3 +106,23 @@ WHERE gtin = ?;
 upsertCachedProduct:
 INSERT OR REPLACE INTO cached_online_product(gtin, name, brand, inci_raw, usage, source, cached_at)
 VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectOpenReport:
+SELECT *
+FROM report_queue
+WHERE gtin = ? AND kind = ? AND flushed = 0
+LIMIT 1;
+
+insertReport:
+INSERT INTO report_queue(created_at, kind, gtin, payload_json, flushed)
+VALUES (?, ?, ?, ?, 0);
+
+updateReportPayload:
+UPDATE report_queue
+SET payload_json = ?
+WHERE id = ?;
+
+countOpenReports:
+SELECT COUNT(*)
+FROM report_queue
+WHERE flushed = 0;

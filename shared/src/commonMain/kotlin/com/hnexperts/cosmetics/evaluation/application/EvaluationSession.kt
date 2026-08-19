@@ -16,6 +16,10 @@ class EvaluationSession {
         }
     }
 
+    suspend fun currentSource(): String {
+        return mutex.withLock { lastSource }
+    }
+
     suspend fun currentAssessment(): ProductAssessment? {
         return mutex.withLock { lastAssessment }
     }
