@@ -334,6 +334,56 @@
             ]
         },
         {
+            "id": "caprylic-capric-triglyceride",
+            "inciName": "Caprylic/Capric Triglyceride",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "SAFE",
+            "regulatoryTags": [],
+            "functionTags": [
+                "EMOLLIENT"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Coconut-derived emollient. The slash is part of one INCI name.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Emolient pochodzenia kokosowego. Ukośnik jest częścią jednej nazwy INCI.",
+                    "detail": null
+                }
+            ]
+        },
+        {
+            "id": "styrene-acrylates-copolymer",
+            "inciName": "Styrene/Acrylates Copolymer",
+            "casNumbers": null,
+            "aliases": [],
+            "commaException": false,
+            "dangerLevel": "LOW",
+            "regulatoryTags": [],
+            "functionTags": [
+                "FILM_FORMER"
+            ],
+            "restriction": null,
+            "comments": [
+                {
+                    "locale": "en",
+                    "summary": "Film-forming polymer. One substance despite the slash in the name.",
+                    "detail": null
+                },
+                {
+                    "locale": "pl",
+                    "summary": "Polimer błonotwórczy. Jedna substancja mimo ukośnika w nazwie.",
+                    "detail": null
+                }
+            ]
+        },
+        {
             "id": "hexanediol",
             "inciName": "1,2-Hexanediol",
             "casNumbers": null,

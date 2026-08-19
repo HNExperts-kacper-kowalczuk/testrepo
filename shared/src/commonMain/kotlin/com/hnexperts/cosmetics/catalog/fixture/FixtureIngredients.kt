@@ -118,6 +118,24 @@ internal object FixtureIngredients {
             restriction = UsageRestriction(leaveOn = "MODERATE", rinseOff = "LOW")
         ),
         ing(
+            id = "caprylic-capric-triglyceride",
+            name = "Caprylic/Capric Triglyceride",
+            aliases = emptyList(),
+            level = DangerLevel.SAFE,
+            tags = listOf("EMOLLIENT"),
+            en = "Coconut-derived emollient. The slash is part of one INCI name.",
+            pl = "Emolient pochodzenia kokosowego. Ukośnik jest częścią jednej nazwy INCI."
+        ),
+        ing(
+            id = "styrene-acrylates-copolymer",
+            name = "Styrene/Acrylates Copolymer",
+            aliases = emptyList(),
+            level = DangerLevel.LOW,
+            tags = listOf("FILM_FORMER"),
+            en = "Film-forming polymer. One substance despite the slash in the name.",
+            pl = "Polimer błonotwórczy. Jedna substancja mimo ukośnika w nazwie."
+        ),
+        ing(
             id = "hexanediol",
             name = "1,2-Hexanediol",
             aliases = emptyList(),

@@ -124,4 +124,13 @@ afterEvaluate {
         mainClass.set("com.hnexperts.cosmetics.catalog.pipeline.ExportCatalogSourcesKt")
         args(rootProject.projectDir.absolutePath)
     }
+    tasks.register<JavaExec>("ingestCatalogSources") {
+        group = "catalog"
+        description = "Fetch CosIng + Open Beauty Facts and write candidate dumps to catalog/ingest"
+        dependsOn(jvmMain.compileTaskProvider)
+        classpath = files(jvmMain.output.allOutputs, jvmMain.runtimeDependencyFiles)
+        mainClass.set("com.hnexperts.cosmetics.catalog.pipeline.ingest.IngestCatalogSourcesKt")
+        args(rootProject.projectDir.absolutePath)
+        (project.findProperty("ingestArgs") as String?)?.split(' ')?.forEach { extra -> args(extra) }
+    }
 }

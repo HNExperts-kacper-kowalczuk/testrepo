@@ -42,7 +42,7 @@ class IngredientMatcher(
         if (early != null) {
             return early
         }
-        return finishMatch(rawToken, fuzzyIndex.find(InciNormalizer.normalize(rawToken)))
+        return finishMatch(rawToken, fuzzyIndex.find(lookupKey(rawToken)))
     }
 
     private suspend fun matchShortListWithParallelFuzzy(tokens: List<String>): List<IngredientRef> {
@@ -54,19 +54,23 @@ class IngredientMatcher(
         if (early != null) {
             return early
         }
-        val fuzzy: Ingredient? = fuzzyIndex.findParallel(InciNormalizer.normalize(token))
+        val fuzzy: Ingredient? = fuzzyIndex.findParallel(lookupKey(token))
         return finishMatch(token, fuzzy)
     }
 
+    private fun lookupKey(rawToken: String): String {
+        return InciNormalizer.stripNanoSuffix(InciNormalizer.normalize(rawToken))
+    }
+
     private fun matchWithoutFuzzy(rawToken: String): IngredientRef? {
-        val normalized: String = InciNormalizer.normalize(rawToken)
+        val normalized: String = lookupKey(rawToken)
         if (normalized.isEmpty()) {
             return unmatched(rawToken)
         }
         exactMatch(normalized)?.let { return it }
         aliasMatch(normalized)?.let { return it }
         parentheticalMatch(normalized)?.let { return it }
-        slashMatch(normalized)?.let { return it }
+        slashSynonymMatch(normalized)?.let { return it }
         return null
     }
 
@@ -98,20 +102,27 @@ class IngredientMatcher(
         return innerMatch?.let(::aliased)
     }
 
-    private fun slashMatch(normalized: String): IngredientRef? {
+    /**
+     * A slash is only a synonym separator ("Aqua/Water") when every part
+     * resolves to the same ingredient. Compound INCI names such as
+     * "Caprylic/Capric Triglyceride" must match as a whole token or not at all;
+     * matching only the first part would score the wrong substance.
+     */
+    private fun slashSynonymMatch(normalized: String): IngredientRef? {
         val slashParts: List<String> = normalized.split('/')
             .map { part -> part.trim() }
             .filter { part -> part.isNotEmpty() }
         if (slashParts.size <= 1) {
             return null
         }
-        for (part in slashParts) {
-            val match: Ingredient? = lookupExactOrAlias(part)
-            if (match != null) {
-                return aliased(match)
-            }
+        val first: Ingredient = lookupExactOrAlias(slashParts.first()) ?: return null
+        val allSame: Boolean = slashParts.drop(1).all { part ->
+            lookupExactOrAlias(part)?.id == first.id
         }
-        return null
+        if (!allSame) {
+            return null
+        }
+        return aliased(first)
     }
 
     private fun lookupExactOrAlias(normalized: String): Ingredient? {

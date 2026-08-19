@@ -29,6 +29,7 @@ import com.hnexperts.cosmetics.legal.domain.LegalStore
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
+import com.hnexperts.cosmetics.scanning.application.PendingCaptureSession
 import com.hnexperts.cosmetics.scanning.application.PrepareIngredientReview
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
 import com.hnexperts.cosmetics.scanning.data.SqlHistoryRepository
@@ -36,6 +37,7 @@ import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
 import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
 import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
+import com.hnexperts.cosmetics.ui.crop.CropIngredientsViewModel
 import com.hnexperts.cosmetics.ui.legal.DisclaimerViewModel
 import com.hnexperts.cosmetics.ui.history.HistoryViewModel
 import com.hnexperts.cosmetics.ui.preferences.PreferencesViewModel
@@ -70,6 +72,7 @@ val appModule = module {
     single { PrepareIngredientReview(get()) }
     single { IngredientReviewSession() }
     single { ScanBridge() }
+    single { PendingCaptureSession() }
     single<CatalogRemote> { BundledCatalogRemote() }
     single { CheckCatalogUpdates(get(), get(), get()) }
     single { ApplyCatalogDelta(get(), get(), get(), get()) }
@@ -80,13 +83,12 @@ val appModule = module {
         CameraScanViewModel(
             resolveBarcode = get(),
             evaluateProduct = get(),
-            recognizer = get(),
-            prepareReview = get(),
-            reviewSession = get(),
+            pendingCapture = get(),
             scanBridge = get(),
             initialMode = parameters.getOrNull<ScannerMode>() ?: ScannerMode.BARCODE
         )
     }
+    viewModelOf(::CropIngredientsViewModel)
     viewModelOf(::DisclaimerViewModel)
     viewModelOf(::ConfirmIngredientsViewModel)
     viewModelOf(::ResultViewModel)
