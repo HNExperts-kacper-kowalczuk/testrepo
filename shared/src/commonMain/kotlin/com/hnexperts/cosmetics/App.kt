@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -213,7 +213,7 @@ private fun AppBottomBar(navController: NavHostController) {
         NavigationBarItem(
             selected = destination?.hierarchy?.any { it.route?.contains("Scan") == true } == true,
             onClick = { navController.navigateTab(ScanDestination) },
-            icon = { Icon(Icons.Default.Add, contentDescription = null) },
+            icon = { Icon(Icons.Default.Home, contentDescription = null) },
             label = { Text(stringResource(Res.string.tab_scan)) }
         )
         NavigationBarItem(

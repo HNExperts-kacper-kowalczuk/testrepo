@@ -8,6 +8,8 @@ import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
+import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
+import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,13 +24,15 @@ data class ScanUiState(
     val emptyInci: Boolean = false,
     val notFoundGtin: String? = null,
     val failure: AppFailure? = null,
-    val navigateToResult: Boolean = false
+    val navigateToResult: Boolean = false,
+    val recent: List<HistoryEntry> = emptyList()
 )
 
 class ScanViewModel(
     private val resolveBarcode: ResolveBarcode,
     private val evaluateProduct: EvaluateProduct,
-    private val scanBridge: ScanBridge
+    private val scanBridge: ScanBridge,
+    private val history: ScanHistoryRepository
 ) : ViewModel() {
     private val state: MutableStateFlow<ScanUiState> = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = state.asStateFlow()
@@ -75,6 +79,21 @@ class ScanViewModel(
         }
         startWork {
             evaluateAndOpen(inciRaw = inciRaw, source = "manual", usage = usage)
+        }
+    }
+
+    fun refreshRecent() {
+        viewModelScope.launch {
+            val entries: List<HistoryEntry>? = runUiAction(::showFailure) { history.recent() }
+            if (entries != null) {
+                state.update { current -> current.copy(recent = entries.take(RECENT_LIMIT)) }
+            }
+        }
+    }
+
+    fun reopen(entry: HistoryEntry) {
+        startWork {
+            evaluateAndOpen(inciRaw = entry.inciRaw, source = entry.source, gtin = entry.gtin)
         }
     }
 
@@ -127,5 +146,9 @@ class ScanViewModel(
                 state.update { current -> current.copy(busy = false) }
             }
         }
+    }
+
+    private companion object {
+        const val RECENT_LIMIT: Int = 5
     }
 }

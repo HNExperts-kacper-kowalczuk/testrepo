@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -48,6 +51,7 @@ import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.theme.RatingColors
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -118,7 +122,12 @@ fun ResultScreen(
 
 @Composable
 private fun ResultHeader(assessment: ProductAssessment) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    val headerColor = RatingColors.of(assessment.overall)
+    val onHeader = RatingColors.onColor(assessment.overall)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = headerColor, contentColor = onHeader)
+    ) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -130,14 +139,7 @@ private fun ResultHeader(assessment: ProductAssessment) {
             assessment.brand?.let { brand ->
                 Text(text = brand, style = MaterialTheme.typography.titleMedium)
             }
-            val overallLabel: String = dangerLevelText(assessment.overall)
-            val overallDescription: String = stringResource(Res.string.result_rating_a11y, overallLabel)
-            RatingBadge(
-                level = assessment.overall,
-                label = overallLabel,
-                contentDescription = overallDescription,
-                large = true
-            )
+            RatingChip(assessment)
             Text(
                 text = if (assessment.suitableForUser) {
                     stringResource(Res.string.result_suitable)
@@ -157,6 +159,28 @@ private fun ResultHeader(assessment: ProductAssessment) {
                 )
             }
         }
+    }
+}
+
+/**
+ * The shape+word rating mark sits on a white chip so its colour-independent
+ * shape stays visible on the tinted header.
+ */
+@Composable
+private fun RatingChip(assessment: ProductAssessment) {
+    val overallLabel: String = dangerLevelText(assessment.overall)
+    val overallDescription: String = stringResource(Res.string.result_rating_a11y, overallLabel)
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        RatingBadge(
+            level = assessment.overall,
+            label = overallLabel,
+            contentDescription = overallDescription,
+            large = true,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+        )
     }
 }
 
