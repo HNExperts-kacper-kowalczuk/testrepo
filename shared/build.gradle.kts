@@ -124,6 +124,15 @@ afterEvaluate {
         mainClass.set("com.hnexperts.cosmetics.catalog.pipeline.ExportCatalogSourcesKt")
         args(rootProject.projectDir.absolutePath)
     }
+    tasks.register<JavaExec>("packShippedCatalog") {
+        group = "catalog"
+        description = "Pack CosIng/OBF ingest (or fixture sources) into composeResources/files/catalog.sqlite.gz"
+        dependsOn(jvmMain.compileTaskProvider)
+        classpath = files(jvmMain.output.allOutputs, jvmMain.runtimeDependencyFiles)
+        mainClass.set("com.hnexperts.cosmetics.catalog.pipeline.PackShippedCatalogKt")
+        args(rootProject.projectDir.absolutePath)
+        (project.findProperty("maxProducts") as String?)?.let { extra -> args(extra) }
+    }
     tasks.register<JavaExec>("ingestCatalogSources") {
         group = "catalog"
         description = "Fetch CosIng + Open Beauty Facts and write candidate dumps to catalog/ingest"

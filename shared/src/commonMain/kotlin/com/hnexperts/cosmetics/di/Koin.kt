@@ -3,19 +3,21 @@ package com.hnexperts.cosmetics.di
 import com.hnexperts.cosmetics.ads.application.AdsSession
 import com.hnexperts.cosmetics.catalog.application.ApplyCatalogDelta
 import com.hnexperts.cosmetics.catalog.application.BundledCatalogDeltaSource
-import com.hnexperts.cosmetics.catalog.application.BundledCatalogRemote
 import com.hnexperts.cosmetics.catalog.application.CatalogBootstrap
 import com.hnexperts.cosmetics.catalog.application.CatalogDeltaSource
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.catalog.application.CatalogMutationStore
 import com.hnexperts.cosmetics.catalog.application.CatalogRemote
 import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
+import com.hnexperts.cosmetics.catalog.application.LocalPublishedCatalogRemote
 import com.hnexperts.cosmetics.catalog.application.OnlineGtinLookup
 import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
 import com.hnexperts.cosmetics.catalog.application.ResolveGtin
 import com.hnexperts.cosmetics.catalog.data.CatalogSnapshotReader
 import com.hnexperts.cosmetics.catalog.data.CatalogWriter
+import com.hnexperts.cosmetics.catalog.data.SqlOnlineProductCache
 import com.hnexperts.cosmetics.catalog.data.SqlProductRepository
+import com.hnexperts.cosmetics.catalog.domain.OnlineProductCache
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.concurrency.AppDispatchers
 import com.hnexperts.cosmetics.concurrency.ApplicationScope
@@ -72,12 +74,13 @@ val appModule = module {
     single { EvaluateProduct(get(), get(), get(), get(), get()) }
     single { ResolveBarcode(get()) }
     single { OnlineGtinLookup(get(), get()) }
-    single { ResolveGtin(get(), get()) }
+    single<OnlineProductCache> { SqlOnlineProductCache(get(), get()) }
+    single { ResolveGtin(get(), get(), get()) }
     single { PrepareIngredientReview(get()) }
     single { IngredientReviewSession() }
     single { ScanBridge() }
     single { PendingCaptureSession() }
-    single<CatalogRemote> { BundledCatalogRemote() }
+    single<CatalogRemote> { LocalPublishedCatalogRemote(get()) }
     single { CheckCatalogUpdates(get(), get(), get()) }
     single { ApplyCatalogDelta(get(), get(), get(), get()) }
     single { AdsSession(get(), get(), get(), get()) }

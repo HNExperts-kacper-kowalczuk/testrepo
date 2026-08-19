@@ -66,15 +66,8 @@ class CatalogWriter(
     }
 
     fun seedFromFixturesIfNeeded() {
-        val existing = database.catalogDatabaseQueries.selectMeta().executeAsOneOrNull()
-        if (existing == null) {
+        if (isEmpty()) {
             replaceAll(FixtureCatalog.ingredients, FixtureCatalog.products, CatalogIntegrity.fixtureMeta())
-            return
-        }
-        if (existing.checksum != CatalogIntegrity.fixtureChecksum() &&
-            existing.catalog_version == FixtureCatalog.CATALOG_VERSION
-        ) {
-            upsertMeta(CatalogIntegrity.fixtureMeta())
         }
     }
 

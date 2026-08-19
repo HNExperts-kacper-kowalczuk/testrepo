@@ -15,6 +15,7 @@ class JvmDatabaseDriverFactory : DatabaseDriverFactory {
     override fun createUserDriver(): SqlDriver {
         val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
         UserDatabase.Schema.create(driver)
+        UserSchemaGuard.ensure(driver)
         return driver
     }
 }
