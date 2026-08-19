@@ -20,6 +20,11 @@
     <string name="scan_not_found_body">This barcode is not in the offline catalog. Scan the printed ingredient list, or type or paste it from the pack.</string>
     <string name="scan_empty_inci">Paste or type at least one ingredient name.</string>
     <string name="scan_working">Evaluating…</string>
+    <string name="scan_more_ways">Type a barcode or paste the list</string>
+    <string name="scan_recent_title">Recent scans</string>
+    <string name="source_barcode">Barcode scan</string>
+    <string name="source_ocr">Label photo</string>
+    <string name="source_manual">Typed list</string>
 
     <string name="search_title">Catalog</string>
     <string name="search_placeholder">Search by name or brand</string>

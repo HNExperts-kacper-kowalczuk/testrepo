@@ -20,6 +20,11 @@
     <string name="scan_not_found_body">Tego kodu nie ma w katalogu offline. Zeskanuj skład z etykiety albo wpisz lub wklej go z opakowania.</string>
     <string name="scan_empty_inci">Wklej lub wpisz przynajmniej jedną nazwę składnika.</string>
     <string name="scan_working">Ocenianie…</string>
+    <string name="scan_more_ways">Wpisz kod kreskowy lub wklej skład</string>
+    <string name="scan_recent_title">Ostatnie skany</string>
+    <string name="source_barcode">Skan kodu</string>
+    <string name="source_ocr">Zdjęcie etykiety</string>
+    <string name="source_manual">Wpisany skład</string>
 
     <string name="search_title">Katalog</string>
     <string name="search_placeholder">Szukaj po nazwie lub marce</string>
