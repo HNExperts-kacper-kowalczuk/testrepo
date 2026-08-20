@@ -41,6 +41,7 @@
     <string name="history_empty">You have not evaluated a product yet.</string>
     <string name="shelf_title">Shelf</string>
     <string name="shelf_empty">Star a result to keep it here. Shelf stays on this device if the catalog is replaced.</string>
+    <string name="shelf_formula_changed">Catalog formula differs — check the label.</string>
     <string name="compare_title">Compare</string>
     <string name="compare_action">Compare selected</string>
     <string name="compare_select_hint">Select 2 or 3 items to compare overall ratings and unique high-concern names.</string>

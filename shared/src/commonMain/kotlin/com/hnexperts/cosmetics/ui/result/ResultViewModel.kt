@@ -3,6 +3,7 @@ package com.hnexperts.cosmetics.ui.result
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.domain.InciIdentity
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
@@ -279,7 +280,8 @@ class ResultViewModel(
             rating = assessment.overall.name,
             usage = assessment.usage,
             category = assessment.category,
-            savedAt = Clock.System.now().toString()
+            savedAt = Clock.System.now().toString(),
+            inciHash = InciIdentity.hash(assessment.inciRaw)
         )
     }
 

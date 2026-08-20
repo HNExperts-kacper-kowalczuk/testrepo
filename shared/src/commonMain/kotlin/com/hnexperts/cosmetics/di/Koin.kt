@@ -47,6 +47,7 @@ import com.hnexperts.cosmetics.scanning.data.SqlReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.shelf.application.WatchShelfFormulas
 import com.hnexperts.cosmetics.shelf.data.SqlUserShelf
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
@@ -100,6 +101,7 @@ val appModule = module {
     single<BillingPort> { NoOpBillingPort() }
     single { CompareSession() }
     single<UserShelf> { SqlUserShelf(get(), get()) }
+    single { WatchShelfFormulas(get(), get()) }
     single { UserDataReset(get(), get(), get(), get(), get()) }
     single { LaunchIntentSession() }
 

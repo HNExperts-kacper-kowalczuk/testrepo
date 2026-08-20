@@ -35,6 +35,7 @@ import com.hnexperts.cosmetics.resources.history_empty
 import com.hnexperts.cosmetics.resources.history_select_compare
 import com.hnexperts.cosmetics.resources.history_title
 import com.hnexperts.cosmetics.resources.shelf_empty
+import com.hnexperts.cosmetics.resources.shelf_formula_changed
 import com.hnexperts.cosmetics.resources.shelf_title
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.shelf.domain.ShelfItem
@@ -116,6 +117,7 @@ private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
                 ShelfRow(
                     item = item,
                     selected = uiState.selectedShelfKeys.contains(item.shelfKey),
+                    formulaChanged = uiState.formulaChangedKeys.contains(item.shelfKey),
                     busy = uiState.busy,
                     onToggle = { viewModel.toggleShelfSelection(item) },
                     onOpen = { viewModel.reopenShelf(item) }
@@ -187,6 +189,7 @@ private fun HistorySelectableRow(
 private fun ShelfRow(
     item: ShelfItem,
     selected: Boolean,
+    formulaChanged: Boolean,
     busy: Boolean,
     onToggle: () -> Unit,
     onOpen: () -> Unit
@@ -200,7 +203,16 @@ private fun ShelfRow(
         ListItem(
             headlineContent = { Text(title) },
             supportingContent = {
-                Text("${dangerLevelText(DangerLevelParser.parse(item.rating))} · ${item.savedAt.replace('T', ' ').take(16)}")
+                Column {
+                    Text("${dangerLevelText(DangerLevelParser.parse(item.rating))} · ${item.savedAt.replace('T', ' ').take(16)}")
+                    if (formulaChanged) {
+                        Text(
+                            text = stringResource(Res.string.shelf_formula_changed),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             },
             modifier = Modifier.clickable(enabled = !busy, onClick = onOpen).weight(1f)
         )

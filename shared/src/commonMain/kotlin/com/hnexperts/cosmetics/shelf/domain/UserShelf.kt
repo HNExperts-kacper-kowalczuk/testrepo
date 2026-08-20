@@ -14,7 +14,8 @@ data class ShelfItem(
     val rating: String,
     val usage: ProductUsage,
     val category: String? = null,
-    val savedAt: String
+    val savedAt: String,
+    val inciHash: String = ""
 )
 
 interface UserShelf {

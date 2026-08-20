@@ -4,6 +4,7 @@ import com.hnexperts.cosmetics.catalog.application.CatalogDelta
 import com.hnexperts.cosmetics.catalog.application.CatalogMutationStore
 import com.hnexperts.cosmetics.catalog.domain.CatalogIntegrity
 import com.hnexperts.cosmetics.catalog.domain.CatalogMeta
+import com.hnexperts.cosmetics.catalog.domain.InciIdentity
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
 import com.hnexperts.cosmetics.catalog.fixture.FixtureIngredient
 import com.hnexperts.cosmetics.catalog.fixture.FixtureProduct
@@ -113,7 +114,7 @@ class CatalogWriter(
             brand = item.product.brand,
             category = item.product.category,
             inci_raw = item.product.inciRaw,
-            inci_hash = item.product.inciRaw.hashCode().toString(),
+            inci_hash = InciIdentity.hash(item.product.inciRaw),
             usage = item.product.usage,
             source = item.product.source,
             verified = if (item.product.verified) 1 else 0

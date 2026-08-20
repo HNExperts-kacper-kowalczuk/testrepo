@@ -9,6 +9,7 @@ import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
+import com.hnexperts.cosmetics.shelf.application.WatchShelfFormulas
 import com.hnexperts.cosmetics.shelf.domain.ShelfItem
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.runUiAction
@@ -27,7 +28,8 @@ data class HistoryUiState(
     val busy: Boolean = false,
     val failure: AppFailure? = null,
     val navigateToResult: Boolean = false,
-    val navigateToCompare: Boolean = false
+    val navigateToCompare: Boolean = false,
+    val formulaChangedKeys: Set<String> = emptySet()
 ) {
     val compareCount: Int
         get() = selectedHistoryIds.size + selectedShelfKeys.size
@@ -40,7 +42,8 @@ class HistoryViewModel(
     private val history: ScanHistoryRepository,
     private val evaluateProduct: EvaluateProduct,
     private val shelf: UserShelf,
-    private val compareSession: CompareSession
+    private val compareSession: CompareSession,
+    private val watchFormulas: WatchShelfFormulas
 ) : ViewModel() {
     private val state: MutableStateFlow<HistoryUiState> = MutableStateFlow(HistoryUiState())
     val uiState: StateFlow<HistoryUiState> = state.asStateFlow()
@@ -54,11 +57,21 @@ class HistoryViewModel(
             val saved: List<ShelfItem>? = runUiAction(onFailure = ::showFailure) {
                 shelf.all()
             }
+            val changedKeys: Set<String>? = if (saved == null) {
+                emptySet()
+            } else {
+                runUiAction(onFailure = ::showFailure) { watchFormulas.changedKeys(saved) }
+            }
             state.update { current ->
                 current.copy(
                     entries = entries ?: current.entries,
                     shelf = saved ?: current.shelf,
-                    failure = if (entries != null && saved != null) null else current.failure
+                    formulaChangedKeys = changedKeys ?: current.formulaChangedKeys,
+                    failure = if (entries != null && saved != null && changedKeys != null) {
+                        null
+                    } else {
+                        current.failure
+                    }
                 )
             }
         }
