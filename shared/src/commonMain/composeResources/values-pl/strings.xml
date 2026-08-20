@@ -67,6 +67,8 @@
     <string name="result_shelf_remove">Usuń z półki</string>
     <string name="result_alternatives">Produkty o niższych zastrzeżeniach w tej kategorii</string>
     <string name="result_alternatives_source">W katalogu tej aplikacji</string>
+    <string name="result_category_pick">Wybierz kategorię, aby szukać produktów o niższych zastrzeżeniach w katalogu tej aplikacji.</string>
+    <string name="result_category_skip">Pomiń</string>
     <string name="confirm_add_photo">Dodaj kolejne zdjęcie</string>
     <string name="level_safe">Ogólnie akceptowalny</string>
     <string name="level_low">Niskie zastrzeżenia</string>

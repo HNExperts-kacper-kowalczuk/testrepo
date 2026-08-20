@@ -124,6 +124,15 @@ fun ResultScreen(
                     ResultUsageConfirm(onSelect = viewModel::setUsage)
                 }
             }
+            if (showCategoryPicker(assessment, uiState)) {
+                item {
+                    ResultCategoryPicker(
+                        choices = uiState.categoryChoices,
+                        onPick = viewModel::setCategory,
+                        onSkip = viewModel::skipCategory
+                    )
+                }
+            }
             if (assessment.packVerified) {
                 item {
                     Text(text = stringResource(Res.string.result_pack_verified))
@@ -350,6 +359,16 @@ private fun ResultUsageConfirm(onSelect: (ProductUsage) -> Unit) {
         )
         UsagePicker(selected = ProductUsage.UNKNOWN, onSelect = onSelect)
     }
+}
+
+private fun showCategoryPicker(assessment: ProductAssessment, uiState: ResultUiState): Boolean {
+    if (!assessment.category.isNullOrBlank()) {
+        return false
+    }
+    if (uiState.categorySkipped) {
+        return false
+    }
+    return uiState.categoryChoices.isNotEmpty()
 }
 
 @Composable

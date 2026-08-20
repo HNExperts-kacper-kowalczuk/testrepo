@@ -72,5 +72,11 @@ class CatalogWriterTest {
             .executeAsOne()
             .inci_hash
         assertEquals(InciIdentity.hash("Aqua, Petrolatum"), writtenHash)
+        val frequent: List<String> = database.catalogDatabaseQueries
+            .selectFrequentCategories(20L)
+            .executeAsList()
+            .mapNotNull { category -> category }
+        assertEquals("balm", frequent.first())
+        assertTrue(frequent.contains("moisturizer"))
     }
 }
