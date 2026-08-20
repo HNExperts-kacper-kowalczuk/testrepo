@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="scan_barcode"
+        android:shortcutShortLabel="@string/shortcut_scan_barcode"
+        android:shortcutLongLabel="@string/shortcut_scan_barcode_long">
+        <intent
+            android:action="com.hnexperts.cosmetics.SCAN_BARCODE"
+            android:targetPackage="com.hnexperts.cosmetics.scanner"
+            android:targetClass="com.hnexperts.cosmetics.MainActivity" />
+    </shortcut>
+</shortcuts>

@@ -71,6 +71,14 @@ class CameraScanViewModel(
         state.update { current -> current.copy(failure = failure, busy = false) }
     }
 
+    fun onGalleryEmpty() {
+        showFailure(AppFailure.Camera(operation = "barcode.gallery", detail = "No GTIN barcode was found in that photo"))
+    }
+
+    fun onGalleryCancelled() {
+        state.update { current -> current.copy(failure = null) }
+    }
+
     fun onBarcode(payload: BarcodePayload) {
         if (state.value.mode != ScannerMode.BARCODE || acceptingBarcode || state.value.busy) {
             return
@@ -147,7 +155,9 @@ class CameraScanViewModel(
                         productName = resolution.productName,
                         brand = resolution.brand,
                         gtin = resolution.gtin,
-                        usage = resolution.usage
+                        usage = resolution.usage,
+                        category = resolution.category,
+                        productId = resolution.productId
                     )
                 } ?: return
                 state.update { current -> current.copy(navigateToResult = true) }

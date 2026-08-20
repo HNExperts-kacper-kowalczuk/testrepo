@@ -22,6 +22,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>The camera is used to scan product barcodes and ingredient lists.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photos are used only to read a product barcode from a gallery image. Nothing is uploaded.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Tracking is used only to show relevant ads. Scan history and avoid-lists stay on this device.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

@@ -11,8 +11,20 @@ data class Finding(
     val regulatoryTags: List<String>,
     val comments: List<LocalizedText>,
     val personalAvoid: Boolean,
-    val usageAdjusted: Boolean = false
-)
+    val usageAdjusted: Boolean = false,
+    val listIndex: Int = 0
+) {
+    fun earlyListConcern(): Boolean {
+        if (listIndex >= EARLY_LIST_LIMIT) {
+            return false
+        }
+        return level == DangerLevel.HIGH || level == DangerLevel.RESTRICTED
+    }
+
+    private companion object {
+        const val EARLY_LIST_LIMIT: Int = 5
+    }
+}
 
 data class ProductAssessment(
     val productName: String?,
@@ -26,5 +38,7 @@ data class ProductAssessment(
     val rulesetVersion: String,
     val usage: ProductUsage = ProductUsage.UNKNOWN,
     val usageAssumed: Boolean = false,
-    val packVerified: Boolean = false
+    val packVerified: Boolean = false,
+    val category: String? = null,
+    val productId: String? = null
 )

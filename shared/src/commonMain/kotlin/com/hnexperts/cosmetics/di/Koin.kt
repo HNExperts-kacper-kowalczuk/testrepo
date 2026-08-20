@@ -1,6 +1,8 @@
 package com.hnexperts.cosmetics.di
 
 import com.hnexperts.cosmetics.ads.application.AdsSession
+import com.hnexperts.cosmetics.ads.domain.BillingPort
+import com.hnexperts.cosmetics.ads.domain.NoOpBillingPort
 import com.hnexperts.cosmetics.catalog.application.ApplyCatalogDelta
 import com.hnexperts.cosmetics.catalog.application.BundledCatalogDeltaSource
 import com.hnexperts.cosmetics.catalog.application.CatalogBootstrap
@@ -27,12 +29,14 @@ import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import com.hnexperts.cosmetics.data.userdb.UserDatabase
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
+import com.hnexperts.cosmetics.evaluation.application.CompareSession
 import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.legal.data.SqlLegalRepository
 import com.hnexperts.cosmetics.legal.domain.LegalStore
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
+import com.hnexperts.cosmetics.scanning.application.LaunchIntentSession
 import com.hnexperts.cosmetics.scanning.application.PendingCaptureSession
 import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
 import com.hnexperts.cosmetics.scanning.application.PrepareIngredientReview
@@ -42,7 +46,10 @@ import com.hnexperts.cosmetics.scanning.data.SqlReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.shelf.data.SqlUserShelf
+import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
+import com.hnexperts.cosmetics.ui.compare.CompareViewModel
 import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientsViewModel
 import com.hnexperts.cosmetics.ui.crop.CropIngredientsViewModel
 import com.hnexperts.cosmetics.ui.legal.DisclaimerViewModel
@@ -88,7 +95,11 @@ val appModule = module {
     single<CatalogRemote> { LocalPublishedCatalogRemote(get()) }
     single { CheckCatalogUpdates(get(), get(), get()) }
     single { ApplyCatalogDelta(get(), get(), get(), get()) }
-    single { AdsSession(get(), get(), get(), get()) }
+    single { AdsSession(get(), get(), get(), get(), get()) }
+    single<BillingPort> { NoOpBillingPort() }
+    single { CompareSession() }
+    single<UserShelf> { SqlUserShelf(get(), get()) }
+    single { LaunchIntentSession() }
 
     viewModelOf(::ScanViewModel)
     viewModel { parameters ->
@@ -109,6 +120,7 @@ val appModule = module {
     viewModelOf(::SearchViewModel)
     viewModelOf(::HistoryViewModel)
     viewModelOf(::PreferencesViewModel)
+    viewModelOf(::CompareViewModel)
 }
 
 fun initKoin(config: KoinAppDeclaration = {}) {

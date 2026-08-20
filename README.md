@@ -13,7 +13,9 @@ Working now:
 - Live camera barcode scan (CameraX + ML Kit on Android, AVFoundation on iOS) with 800 ms debounce
 - Still-image INCI OCR and a confirm-ingredients screen (edit / add / remove; fuzzy matches must be accepted or rejected)
 - INCI matching (aliases, `1,2-Hexanediol`, fuzzy OCR typos)
-- Hazard scoring + personal avoid-list (fragrance-free, pregnancy caution)
+- Hazard scoring + personal avoid-list (fragrance-free, pregnancy caution, EU allergens, children caution, alcohol in leave-on, essential-oil cluster)
+- Shelf, compare, local catalog alternatives, ingredient encyclopedia
+- Share a plain-text result, gallery barcode, unsent report copy
 - Leave-on vs rinse-off scoring when the catalog or the user provides a product type
 - SQLDelight catalog + user preferences/history, SHA-256 catalog checksum, last-updated stamp
 - CosIng-derived + OBF-style catalog pipeline (`./scripts/build-catalog.sh`) and optional delta apply
@@ -64,5 +66,6 @@ Unknown barcodes are looked up online automatically when the device is connected
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**
 - **[Quality checklist](docs/quality-checklist.md)** — 11 points; run `./scripts/check-quality.sh` before every commit
+- **[User data backup](docs/user-data-backup.md)** — Auto Backup / iCloud of `user.db`
 - **[Store listings and privacy labels](docs/store/play-en.md)**
 - **[Catalog pipeline](catalog/README.md)**

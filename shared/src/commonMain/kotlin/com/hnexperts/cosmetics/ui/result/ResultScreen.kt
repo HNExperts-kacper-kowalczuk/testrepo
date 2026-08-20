@@ -27,25 +27,34 @@ import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
+import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
+import com.hnexperts.cosmetics.resources.finding_early_list
 import com.hnexperts.cosmetics.resources.finding_rating_a11y
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
+import com.hnexperts.cosmetics.resources.result_alternatives
+import com.hnexperts.cosmetics.resources.result_alternatives_source
 import com.hnexperts.cosmetics.resources.result_check_label
 import com.hnexperts.cosmetics.resources.result_disclaimer
 import com.hnexperts.cosmetics.resources.result_missing
 import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_pack_verified
 import com.hnexperts.cosmetics.resources.result_rating_a11y
+import com.hnexperts.cosmetics.resources.result_share
+import com.hnexperts.cosmetics.resources.result_shelf_add
+import com.hnexperts.cosmetics.resources.result_shelf_remove
 import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
 import com.hnexperts.cosmetics.resources.result_usage
 import com.hnexperts.cosmetics.resources.result_usage_assumed
+import com.hnexperts.cosmetics.resources.share_scanned_at
+import com.hnexperts.cosmetics.resources.share_scanned_product
 import com.hnexperts.cosmetics.resources.usage_eye
 import com.hnexperts.cosmetics.resources.usage_leave_on
 import com.hnexperts.cosmetics.resources.usage_lip
@@ -118,6 +127,36 @@ fun ResultScreen(
                 }
             }
             item {
+                Button(
+                    onClick = viewModel::toggleShelf,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (uiState.onShelf) {
+                            stringResource(Res.string.result_shelf_remove)
+                        } else {
+                            stringResource(Res.string.result_shelf_add)
+                        }
+                    )
+                }
+            }
+            item {
+                val shareCopy: ShareCopy = ShareCopy(
+                    scannedProduct = stringResource(Res.string.share_scanned_product),
+                    suitable = stringResource(Res.string.result_suitable),
+                    notSuitable = stringResource(Res.string.result_not_suitable),
+                    disclaimer = stringResource(Res.string.result_disclaimer),
+                    overallLabel = dangerLevelText(assessment.overall),
+                    scannedAtLabel = stringResource(Res.string.share_scanned_at)
+                )
+                Button(
+                    onClick = { viewModel.share(shareCopy) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(Res.string.result_share))
+                }
+            }
+            item {
                 FailureBanner(failure = uiState.failure)
             }
             if (assessment.unknownCount > 0) {
@@ -129,6 +168,31 @@ fun ResultScreen(
                             assessment.unknownCount
                         )
                     )
+                }
+            }
+            if (uiState.alternatives.isNotEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(Res.string.result_alternatives),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(Res.string.result_alternatives_source),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                items(uiState.alternatives, key = { alternative -> alternative.product.id }) { alternative ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { viewModel.openAlternative(alternative) }
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                            Text(text = alternative.product.name, style = MaterialTheme.typography.titleMedium)
+                            Text(text = dangerLevelText(alternative.assessment.overall))
+                        }
+                    }
                 }
             }
             items(assessment.findings) { finding ->
@@ -226,6 +290,12 @@ private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
             val comment = viewModel.commentFor(finding.comments)
             if (comment != null) {
                 Text(text = comment.summary, style = MaterialTheme.typography.bodyLarge)
+            }
+            if (finding.earlyListConcern()) {
+                Text(
+                    text = stringResource(Res.string.finding_early_list),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
             if (finding.usageAdjusted) {
                 Text(

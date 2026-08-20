@@ -181,6 +181,13 @@ private fun CameraControls(
                 ) {
                     Text(stringResource(Res.string.camera_capture))
                 }
+            } else {
+                GalleryBarcodeButton(
+                    enabled = !uiState.busy,
+                    onBarcode = viewModel::onBarcode,
+                    onEmpty = viewModel::onGalleryEmpty,
+                    onCancel = viewModel::onGalleryCancelled
+                )
             }
         }
         if (uiState.busy) {

@@ -19,3 +19,16 @@ actual fun openUrl(url: String) {
     val nsUrl: NSURL = NSURL.URLWithString(url) ?: return
     UIApplication.sharedApplication.openURL(nsUrl, options = emptyMap<Any?, Any>(), completionHandler = null)
 }
+
+actual fun sharePlainText(title: String, body: String) {
+    val controller = platform.UIKit.UIActivityViewController(
+        activityItems = listOf(body),
+        applicationActivities = null
+    )
+    val root = UIApplication.sharedApplication.keyWindow?.rootViewController ?: return
+    root.presentViewController(controller, animated = true, completion = null)
+}
+
+actual fun copyPlainText(text: String) {
+    platform.UIKit.UIPasteboard.generalPasteboard.string = text
+}

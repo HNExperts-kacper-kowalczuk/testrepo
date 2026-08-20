@@ -52,4 +52,18 @@ class SqlReportQueue(
             }
         }
     }
+
+    override suspend fun openReports(): Outcome<List<CatalogReport>> {
+        return FailureCatcher.database("report.list") {
+            withContext(dispatchers.userDatabase) {
+                database.userDatabaseQueries.selectOpenReports().executeAsList().map { row ->
+                    CatalogReport(
+                        kind = row.kind,
+                        gtin = row.gtin,
+                        payloadJson = row.payload_json
+                    )
+                }
+            }
+        }
+    }
 }

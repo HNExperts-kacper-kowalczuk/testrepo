@@ -12,6 +12,7 @@ interface ReportQueue {
     suspend fun enqueue(report: CatalogReport): Outcome<Unit>
     suspend fun attachPayload(gtin: String, kind: String, payloadJson: String): Outcome<Unit>
     suspend fun openCount(): Outcome<Long>
+    suspend fun openReports(): Outcome<List<CatalogReport>>
 }
 
 object ReportKinds {

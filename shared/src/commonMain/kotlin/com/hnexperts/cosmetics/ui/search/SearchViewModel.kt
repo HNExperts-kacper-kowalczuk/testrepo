@@ -2,20 +2,27 @@ package com.hnexperts.cosmetics.ui.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.application.CatalogIndex
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
+import com.hnexperts.cosmetics.hazards.domain.DangerLevel
+import com.hnexperts.cosmetics.hazards.domain.LocalizedText
+import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapLatest
@@ -23,31 +30,57 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+enum class SearchMode {
+    PRODUCTS,
+    INGREDIENTS
+}
+
+data class IngredientHit(
+    val ingredient: Ingredient,
+    val level: DangerLevel?,
+    val comments: List<LocalizedText>
+)
+
 data class SearchUiState(
     val query: String = "",
+    val mode: SearchMode = SearchMode.PRODUCTS,
     val busy: Boolean = false,
     val failure: AppFailure? = null,
-    val navigateToResult: Boolean = false
+    val navigateToResult: Boolean = false,
+    val selectedIngredient: IngredientHit? = null
 )
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class SearchViewModel(
     private val products: ProductRepository,
-    private val evaluateProduct: EvaluateProduct
+    private val evaluateProduct: EvaluateProduct,
+    private val catalog: CatalogGateway
 ) : ViewModel() {
     private val queryText: MutableStateFlow<String> = MutableStateFlow("")
+    private val searchMode: MutableStateFlow<SearchMode> = MutableStateFlow(SearchMode.PRODUCTS)
     private val navigation: MutableStateFlow<SearchUiState> = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = navigation.asStateFlow()
-    val results: StateFlow<List<Product>> = queryText
-        .debounce(250)
-        .distinctUntilChanged()
-        .mapLatest { text -> searchProducts(text) }
+    private val queryDebounced: Flow<String> = queryText.debounce(250).distinctUntilChanged()
+    val results: StateFlow<List<Product>> = combine(queryDebounced, searchMode) { text, mode ->
+        text to mode
+    }
+        .mapLatest { (text, mode) -> searchProducts(text, mode) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val ingredientResults: StateFlow<List<IngredientHit>> = combine(queryDebounced, searchMode) { text, mode ->
+        text to mode
+    }
+        .mapLatest { (text, mode) -> searchIngredients(text, mode) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     private var openJob: Job? = null
 
     fun onQueryChange(text: String) {
         queryText.value = text
         navigation.update { current -> current.copy(query = text, failure = null) }
+    }
+
+    fun setMode(mode: SearchMode) {
+        searchMode.value = mode
+        navigation.update { current -> current.copy(mode = mode, selectedIngredient = null) }
     }
 
     fun openProduct(product: Product) {
@@ -61,7 +94,9 @@ class SearchViewModel(
                         source = "search",
                         productName = product.name,
                         brand = product.brand,
-                        usage = ProductUsage.parse(product.usage)
+                        usage = ProductUsage.parse(product.usage),
+                        category = product.category,
+                        productId = product.id
                     )
                 }
                 if (assessment != null) {
@@ -73,11 +108,22 @@ class SearchViewModel(
         }
     }
 
+    fun openIngredient(hit: IngredientHit) {
+        navigation.update { current -> current.copy(selectedIngredient = hit) }
+    }
+
+    fun dismissIngredient() {
+        navigation.update { current -> current.copy(selectedIngredient = null) }
+    }
+
     fun consumeNavigation() {
         navigation.update { current -> current.copy(navigateToResult = false) }
     }
 
-    private suspend fun searchProducts(text: String): List<Product> {
+    private suspend fun searchProducts(text: String, mode: SearchMode): List<Product> {
+        if (mode != SearchMode.PRODUCTS) {
+            return emptyList()
+        }
         return when (val result: Outcome<List<Product>> = products.search(text)) {
             is Outcome.Ok -> {
                 navigation.update { current -> current.copy(failure = null) }
@@ -87,6 +133,26 @@ class SearchViewModel(
                 showFailure(result.failure)
                 emptyList()
             }
+        }
+    }
+
+    private suspend fun searchIngredients(text: String, mode: SearchMode): List<IngredientHit> {
+        if (mode != SearchMode.INGREDIENTS || text.isBlank()) {
+            return emptyList()
+        }
+        val index: CatalogIndex = when (val loaded: Outcome<CatalogIndex> = catalog.awaitIndex()) {
+            is Outcome.Err -> {
+                showFailure(loaded.failure)
+                return emptyList()
+            }
+            is Outcome.Ok -> loaded.value
+        }
+        return index.searchIngredients(text).map { ingredient ->
+            IngredientHit(
+                ingredient = ingredient,
+                level = index.hazardsById[ingredient.id]?.dangerLevel,
+                comments = index.commentsById[ingredient.id].orEmpty()
+            )
         }
     }
 

@@ -22,5 +22,6 @@ class AdsGateTest {
         assertFalse(ready.copy(bannerLoadFailed = true).bannerVisible(AppScreen.RESULT))
         assertFalse(ready.copy(networkAvailable = false).bannerVisible(AppScreen.RESULT))
         assertFalse(ready.copy(consentGranted = false).bannerVisible(AppScreen.RESULT))
+        assertFalse(ready.copy(adsRemoved = true).bannerVisible(AppScreen.RESULT))
     }
 }

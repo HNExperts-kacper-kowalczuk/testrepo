@@ -41,6 +41,21 @@ class SqlProductRepository(
         }
     }
 
+    override suspend fun findByCategory(category: String, limit: Int): Outcome<List<Product>> {
+        val trimmed: String = category.trim()
+        if (trimmed.isEmpty() || limit <= 0) {
+            return Outcome.Ok(emptyList())
+        }
+        return FailureCatcher.database("catalog.findByCategory") {
+            withContext(dispatchers.catalogDatabase) {
+                database.catalogDatabaseQueries
+                    .selectProductsByCategory(trimmed, limit.toLong())
+                    .executeAsList()
+                    .map(::toProduct)
+            }
+        }
+    }
+
     private fun toProduct(row: ProductRow): Product {
         return Product(
             id = row.id,

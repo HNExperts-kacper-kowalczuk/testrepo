@@ -113,6 +113,13 @@ WHERE name LIKE '%' || ? || '%'
 ORDER BY name
 LIMIT 50;
 
+selectProductsByCategory:
+SELECT *
+FROM product
+WHERE category = ?
+ORDER BY name
+LIMIT ?;
+
 selectAllProducts:
 SELECT *
 FROM product
