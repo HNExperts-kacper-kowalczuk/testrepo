@@ -87,6 +87,7 @@
     <string name="prefs_pregnancy">Ostrożność w ciąży / podczas karmienia</string>
     <string name="prefs_fragrance_free">Wolę bez zapachu</string>
     <string name="prefs_eu_allergens">Unikaj alergenów zapachowych oznaczanych w UE</string>
+    <string name="prefs_eu_allergens_hint">Lista odpowiada zrzutowi załącznika alergenów w tej wersji katalogu.</string>
     <string name="prefs_children_caution">Ostrożność u dzieci / nie dla dzieci poniżej 3 lat</string>
     <string name="prefs_alcohol_leave_on">Unikaj alkoholu w produktach leave-on</string>
     <string name="prefs_essential_oil">Unikaj częstych alergenów z olejków eterycznych</string>

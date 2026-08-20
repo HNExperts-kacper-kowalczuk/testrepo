@@ -87,6 +87,7 @@
     <string name="prefs_pregnancy">Pregnancy / breastfeeding caution</string>
     <string name="prefs_fragrance_free">Prefer fragrance-free</string>
     <string name="prefs_eu_allergens">Avoid EU-labelled fragrance allergens</string>
+    <string name="prefs_eu_allergens_hint">The list follows the labelled-allergen annex snapshot in this catalog version.</string>
     <string name="prefs_children_caution">Children / not for under 3 caution</string>
     <string name="prefs_alcohol_leave_on">Avoid alcohol in leave-on products</string>
     <string name="prefs_essential_oil">Avoid common essential-oil allergens</string>
