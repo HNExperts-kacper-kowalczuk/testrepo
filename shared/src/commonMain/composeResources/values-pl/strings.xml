@@ -41,6 +41,7 @@
     <string name="history_empty">Nie oceniono jeszcze żadnego produktu.</string>
     <string name="shelf_title">Półka</string>
     <string name="shelf_empty">Oznacz wynik gwiazdką, żeby tu został. Półka zostaje na urządzeniu po wymianie katalogu.</string>
+    <string name="shelf_formula_changed">Skład w katalogu się zmienił — sprawdź etykietę.</string>
     <string name="compare_title">Porównanie</string>
     <string name="compare_action">Porównaj wybrane</string>
     <string name="compare_select_hint">Wybierz 2 lub 3 pozycje, żeby porównać oceny i unikalne składniki wysokiego ryzyka.</string>

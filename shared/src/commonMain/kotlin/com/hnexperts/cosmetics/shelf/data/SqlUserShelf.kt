@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.shelf.data
 
+import com.hnexperts.cosmetics.catalog.domain.InciIdentity
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.concurrency.AppDispatchers
 import com.hnexperts.cosmetics.data.userdb.UserDatabase
@@ -44,7 +45,8 @@ class SqlUserShelf(
                     rating = item.rating,
                     usage = item.usage.name,
                     category = item.category,
-                    saved_at = item.savedAt.ifBlank { Clock.System.now().toString() }
+                    saved_at = item.savedAt.ifBlank { Clock.System.now().toString() },
+                    inci_hash = storedHash(item)
                 )
             }
         }
@@ -77,7 +79,19 @@ class SqlUserShelf(
             rating = row.rating,
             usage = ProductUsage.parse(row.usage),
             category = row.category,
-            savedAt = row.saved_at
+            savedAt = row.saved_at,
+            inciHash = storedHash(row.inci_hash, row.inci_raw)
         )
+    }
+
+    private fun storedHash(item: ShelfItem): String {
+        return storedHash(item.inciHash, item.inciRaw)
+    }
+
+    private fun storedHash(inciHash: String?, inciRaw: String): String {
+        if (!inciHash.isNullOrBlank()) {
+            return inciHash
+        }
+        return InciIdentity.hash(inciRaw)
     }
 }
