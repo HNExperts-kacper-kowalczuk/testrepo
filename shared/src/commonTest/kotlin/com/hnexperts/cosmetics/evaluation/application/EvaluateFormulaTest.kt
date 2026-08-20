@@ -224,4 +224,17 @@ class EvaluateFormulaTest {
         assertEquals(DangerLevel.PROHIBITED, assessment.overall)
         assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "formaldehyde" }.earlyListConcern())
     }
+
+    @Test
+    fun phototoxicTagIsACommentBadgeNotANewDangerLevel() {
+        val assessment: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = "Aqua, Salicylic Acid, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        val salicylic = assessment.findings.first { finding -> finding.ingredient.id == "salicylic-acid" }
+        assertTrue(salicylic.sunCaution())
+        assertEquals(DangerLevel.RESTRICTED, salicylic.level)
+        assertEquals(DangerLevel.RESTRICTED, assessment.overall)
+        assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "aqua" }.sunCaution())
+    }
 }

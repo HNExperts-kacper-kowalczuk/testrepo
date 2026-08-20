@@ -79,6 +79,7 @@
     <string name="level_unknown">Unknown</string>
     <string name="finding_personal_avoid">On your avoid list</string>
     <string name="finding_early_list">Near the start of the INCI list (often a higher amount).</string>
+    <string name="finding_sun_caution">Sun caution in this catalog — not a diagnosis.</string>
     <string name="finding_unmatched">Not in the knowledge base</string>
     <string name="back">Back</string>
 

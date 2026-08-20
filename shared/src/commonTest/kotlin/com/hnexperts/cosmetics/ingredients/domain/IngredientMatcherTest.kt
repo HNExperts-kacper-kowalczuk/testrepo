@@ -131,4 +131,19 @@ class IngredientMatcherTest {
         assertEquals(MatchMethod.UNMATCHED, ref.matchedBy)
         assertTrue(ref.displayName.contains("Unknown", ignoreCase = true))
     }
+
+    @Test
+    fun allergenAppendixTokensJoinTheSameFormula() {
+        val refs: List<IngredientRef> = matcher.matchList("Aqua, Parfum. Allergens: Limonene, Linalool")
+        assertEquals(listOf("aqua", "parfum", "limonene", "linalool"), refs.map { ref -> ref.id })
+        assertTrue(refs.none { ref -> ref.matchedBy == MatchMethod.UNMATCHED })
+    }
+
+    @Test
+    fun polishAlergenyAndContainsHeadersSplitTheSameWay() {
+        val polish: List<IngredientRef> = matcher.matchList("Aqua, Parfum. Alergeny: Limonene, Linalool")
+        assertEquals(listOf("aqua", "parfum", "limonene", "linalool"), polish.map { ref -> ref.id })
+        val contains: List<IngredientRef> = matcher.matchList("Aqua, Parfum. Contains: Limonene, Linalool")
+        assertEquals(listOf("aqua", "parfum", "limonene", "linalool"), contains.map { ref -> ref.id })
+    }
 }

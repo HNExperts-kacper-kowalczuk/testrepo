@@ -21,8 +21,13 @@ data class Finding(
         return level == DangerLevel.HIGH || level == DangerLevel.RESTRICTED
     }
 
+    fun sunCaution(): Boolean {
+        return regulatoryTags.contains(TAG_PHOTOTOXIC)
+    }
+
     private companion object {
         const val EARLY_LIST_LIMIT: Int = 5
+        const val TAG_PHOTOTOXIC: String = "PHOTOTOXIC"
     }
 }
 
