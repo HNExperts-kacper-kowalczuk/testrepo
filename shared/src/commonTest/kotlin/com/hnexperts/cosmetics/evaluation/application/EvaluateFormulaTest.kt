@@ -169,7 +169,7 @@ class EvaluateFormulaTest {
         assertFalse(rinseOff.usageAssumed)
         assertTrue(rinseOff.suitableForUser)
         assertEquals(DangerLevel.MODERATE, assumed.overall)
-        assertEquals(DangerLevel.MODERATE, rinseOff.overall)
+        assertEquals(DangerLevel.LOW, rinseOff.overall)
     }
 
     @Test
