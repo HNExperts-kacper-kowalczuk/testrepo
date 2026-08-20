@@ -13,7 +13,8 @@ class InciTokenizer(
         if (normalized.isEmpty()) {
             return emptyList()
         }
-        val protectedText: String = protectExceptions(normalized)
+        val withoutHeaders: String = InciAppendixSplitter.apply(normalized)
+        val protectedText: String = protectExceptions(withoutHeaders)
         return protectedText
             .split(TOKEN_SPLIT)
             .map { token -> restoreExceptions(token.trim()) }
