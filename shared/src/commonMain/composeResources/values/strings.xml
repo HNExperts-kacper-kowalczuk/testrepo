@@ -37,6 +37,7 @@
     <string name="search_ingredients">Ingredients</string>
 
     <string name="history_title">Recent scans</string>
+    <string name="history_select_compare">Select to compare</string>
     <string name="history_empty">You have not evaluated a product yet.</string>
     <string name="shelf_title">Shelf</string>
     <string name="shelf_empty">Star a result to keep it here. Shelf stays on this device if the catalog is replaced.</string>
@@ -101,11 +102,23 @@
     <string name="prefs_privacy">Ad privacy options</string>
     <string name="prefs_clear_history">Clear scan history</string>
     <string name="prefs_cleared_history">Scan history was deleted on this device.</string>
+    <string name="prefs_clear_history_body">This deletes scan history on this device. Shelf items are kept.</string>
+    <string name="prefs_clear_shelf">Clear shelf</string>
+    <string name="prefs_cleared_shelf">Shelf items were deleted on this device.</string>
+    <string name="prefs_clear_shelf_body">This removes every starred product from this device. Scan history is kept.</string>
+    <string name="prefs_clear_avoid">Reset avoid-list</string>
+    <string name="prefs_cleared_avoid">Custom avoid-list ingredients were removed. Presets were kept.</string>
+    <string name="prefs_clear_avoid_body">This removes ingredients you added to the avoid list. Pregnancy, fragrance-free, and other presets stay on.</string>
+    <string name="prefs_reset_device">Reset this device</string>
+    <string name="prefs_reset_device_body">This deletes scan history, shelf, avoid-list, unsent reports, and cached online products on this device. The catalog and the legal disclaimer stay. Language preference stays.</string>
+    <string name="prefs_reset_device_done">Personal data on this device was reset.</string>
+    <string name="prefs_reset_confirm">Confirm</string>
     <string name="prefs_reports_count">Unsent reports: %1$s</string>
     <string name="prefs_reports_copy">Copy unsent reports as text</string>
     <string name="prefs_reports_copied">Report list copied.</string>
     <string name="prefs_reports_empty">kind	gtin	payload</string>
     <string name="prefs_remove_ads">Remove ads</string>
+    <string name="prefs_remove_ads_unavailable">In-app purchase to remove ads is not available yet.</string>
     <string name="prefs_ads_removed">Ads are turned off on this device.</string>
 
     <string name="disclaimer_title">Before you scan</string>
@@ -128,6 +141,7 @@
     <string name="finding_usage_adjusted">Level adjusted for this product type.</string>
 
     <string name="result_rating_a11y">Overall rating: %1$s</string>
+    <string name="result_a11y_summary">%1$s. Prohibited: %2$d. High concern: %3$d. Unidentified: %4$d.</string>
     <string name="finding_rating_a11y">Ingredient rating: %1$s</string>
 
     <string name="ad_placeholder">Advertisement</string>

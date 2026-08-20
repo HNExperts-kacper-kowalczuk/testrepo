@@ -21,6 +21,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
@@ -30,6 +32,7 @@ import com.hnexperts.cosmetics.resources.compare_action
 import com.hnexperts.cosmetics.resources.compare_select_hint
 import com.hnexperts.cosmetics.resources.compare_unnamed
 import com.hnexperts.cosmetics.resources.history_empty
+import com.hnexperts.cosmetics.resources.history_select_compare
 import com.hnexperts.cosmetics.resources.history_title
 import com.hnexperts.cosmetics.resources.shelf_empty
 import com.hnexperts.cosmetics.resources.shelf_title
@@ -170,7 +173,7 @@ private fun HistorySelectableRow(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(checked = selected, onCheckedChange = { onToggle() }, enabled = !busy)
+        CompareCheckbox(selected = selected, busy = busy, onToggle = onToggle)
         HistoryEntryCard(
             entry = entry,
             enabled = !busy,
@@ -192,7 +195,7 @@ private fun ShelfRow(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(checked = selected, onCheckedChange = { onToggle() }, enabled = !busy)
+        CompareCheckbox(selected = selected, busy = busy, onToggle = onToggle)
         val title: String = item.name ?: item.gtin ?: item.inciRaw.take(40)
         ListItem(
             headlineContent = { Text(title) },
@@ -202,4 +205,19 @@ private fun ShelfRow(
             modifier = Modifier.clickable(enabled = !busy, onClick = onOpen).weight(1f)
         )
     }
+}
+
+@Composable
+private fun CompareCheckbox(
+    selected: Boolean,
+    busy: Boolean,
+    onToggle: () -> Unit
+) {
+    val label: String = stringResource(Res.string.history_select_compare)
+    Checkbox(
+        checked = selected,
+        onCheckedChange = { onToggle() },
+        enabled = !busy,
+        modifier = Modifier.semantics { contentDescription = label }
+    )
 }

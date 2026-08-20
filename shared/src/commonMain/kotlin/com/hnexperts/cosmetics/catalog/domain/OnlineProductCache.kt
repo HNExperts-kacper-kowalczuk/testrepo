@@ -15,4 +15,5 @@ data class CachedOnlineProduct(
 interface OnlineProductCache {
     suspend fun find(gtin: String): Outcome<CachedOnlineProduct?>
     suspend fun put(product: CachedOnlineProduct): Outcome<Unit>
+    suspend fun clear(): Outcome<Unit>
 }

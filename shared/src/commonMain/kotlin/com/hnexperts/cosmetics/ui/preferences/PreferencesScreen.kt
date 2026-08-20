@@ -39,8 +39,6 @@ import com.hnexperts.cosmetics.resources.prefs_catalog_title
 import com.hnexperts.cosmetics.resources.prefs_catalog_unknown
 import com.hnexperts.cosmetics.resources.prefs_catalog_update
 import com.hnexperts.cosmetics.resources.prefs_catalog_uptodate
-import com.hnexperts.cosmetics.resources.prefs_clear_history
-import com.hnexperts.cosmetics.resources.prefs_cleared_history
 import com.hnexperts.cosmetics.resources.prefs_essential_oil
 import com.hnexperts.cosmetics.resources.prefs_eu_allergens
 import com.hnexperts.cosmetics.resources.prefs_fragrance_free
@@ -51,6 +49,7 @@ import com.hnexperts.cosmetics.resources.prefs_language_system
 import com.hnexperts.cosmetics.resources.prefs_pregnancy
 import com.hnexperts.cosmetics.resources.prefs_privacy
 import com.hnexperts.cosmetics.resources.prefs_remove_ads
+import com.hnexperts.cosmetics.resources.prefs_remove_ads_unavailable
 import com.hnexperts.cosmetics.resources.prefs_reports_copy
 import com.hnexperts.cosmetics.resources.prefs_reports_copied
 import com.hnexperts.cosmetics.resources.prefs_reports_count
@@ -156,25 +155,43 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
         if (uiState.reportsCopied) {
             Text(text = stringResource(Res.string.prefs_reports_copied))
         }
-        if (!uiState.adsRemoved) {
-            Button(onClick = viewModel::purchaseRemoveAds, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(Res.string.prefs_remove_ads))
-            }
-        } else {
-            Text(text = stringResource(Res.string.prefs_ads_removed))
-        }
+        AdsPurchaseSection(
+            adsRemoved = uiState.adsRemoved,
+            billingAvailable = uiState.billingAvailable,
+            onPurchase = viewModel::purchaseRemoveAds
+        )
         if (uiState.ads.privacyOptionsRequired) {
             Button(onClick = viewModel::openPrivacyOptions, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(Res.string.prefs_privacy))
             }
         }
-        Button(onClick = viewModel::clearHistory, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(Res.string.prefs_clear_history))
-        }
-        if (uiState.historyCleared) {
-            Text(text = stringResource(Res.string.prefs_cleared_history))
-        }
+        PreferencesDataResetSection(
+            pendingReset = uiState.pendingReset,
+            cleared = uiState.cleared,
+            onRequestReset = viewModel::requestReset,
+            onCancelReset = viewModel::cancelReset,
+            onConfirmReset = viewModel::confirmReset
+        )
     }
+}
+
+@Composable
+private fun AdsPurchaseSection(
+    adsRemoved: Boolean,
+    billingAvailable: Boolean,
+    onPurchase: () -> Unit
+) {
+    if (adsRemoved) {
+        Text(text = stringResource(Res.string.prefs_ads_removed))
+        return
+    }
+    if (billingAvailable) {
+        Button(onClick = onPurchase, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(Res.string.prefs_remove_ads))
+        }
+        return
+    }
+    Text(text = stringResource(Res.string.prefs_remove_ads_unavailable))
 }
 
 @Composable

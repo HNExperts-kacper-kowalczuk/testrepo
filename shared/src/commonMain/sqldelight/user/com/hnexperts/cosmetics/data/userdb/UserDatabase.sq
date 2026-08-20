@@ -188,3 +188,12 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 deleteShelf:
 DELETE FROM user_shelf
 WHERE shelf_key = ?;
+
+clearShelf:
+DELETE FROM user_shelf;
+
+clearReports:
+DELETE FROM report_queue;
+
+clearCachedProducts:
+DELETE FROM cached_online_product;

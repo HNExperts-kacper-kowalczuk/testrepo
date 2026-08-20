@@ -37,6 +37,7 @@
     <string name="search_ingredients">Składniki</string>
 
     <string name="history_title">Ostatnie skany</string>
+    <string name="history_select_compare">Zaznacz do porównania</string>
     <string name="history_empty">Nie oceniono jeszcze żadnego produktu.</string>
     <string name="shelf_title">Półka</string>
     <string name="shelf_empty">Oznacz wynik gwiazdką, żeby tu został. Półka zostaje na urządzeniu po wymianie katalogu.</string>
@@ -101,11 +102,23 @@
     <string name="prefs_privacy">Opcje prywatności reklam</string>
     <string name="prefs_clear_history">Wyczyść historię skanów</string>
     <string name="prefs_cleared_history">Historia skanów została usunięta z tego urządzenia.</string>
+    <string name="prefs_clear_history_body">Usunie historię skanów na tym urządzeniu. Produkty z półki zostaną.</string>
+    <string name="prefs_clear_shelf">Wyczyść półkę</string>
+    <string name="prefs_cleared_shelf">Produkty z półki zostały usunięte z tego urządzenia.</string>
+    <string name="prefs_clear_shelf_body">Usunie wszystkie oznaczone gwiazdką produkty z tego urządzenia. Historia skanów zostanie.</string>
+    <string name="prefs_clear_avoid">Resetuj listę unikanych składników</string>
+    <string name="prefs_cleared_avoid">Własne składniki z listy unikania zostały usunięte. Presety zostały.</string>
+    <string name="prefs_clear_avoid_body">Usunie składniki dodane do listy unikania. Presety (ciąża, bez zapachu i inne) zostaną.</string>
+    <string name="prefs_reset_device">Resetuj to urządzenie</string>
+    <string name="prefs_reset_device_body">Usunie historię skanów, półkę, listę unikania, niewysłane zgłoszenia i bufor produktów online na tym urządzeniu. Katalog i zgoda na zastrzeżenie prawne zostaną. Preferencja języka zostanie.</string>
+    <string name="prefs_reset_device_done">Dane osobiste na tym urządzeniu zostały zresetowane.</string>
+    <string name="prefs_reset_confirm">Potwierdź</string>
     <string name="prefs_reports_count">Niewysłane zgłoszenia: %1$s</string>
     <string name="prefs_reports_copy">Kopiuj niewysłane zgłoszenia jako tekst</string>
     <string name="prefs_reports_copied">Lista zgłoszeń skopiowana.</string>
     <string name="prefs_reports_empty">rodzaj	gtin	treść</string>
     <string name="prefs_remove_ads">Usuń reklamy</string>
+    <string name="prefs_remove_ads_unavailable">Zakup w aplikacji, który wyłącza reklamy, nie jest jeszcze dostępny.</string>
     <string name="prefs_ads_removed">Reklamy są wyłączone na tym urządzeniu.</string>
 
     <string name="disclaimer_title">Zanim zeskanujesz</string>
@@ -128,6 +141,7 @@
     <string name="finding_usage_adjusted">Poziom dostosowany do typu produktu.</string>
 
     <string name="result_rating_a11y">Ocena ogólna: %1$s</string>
+    <string name="result_a11y_summary">%1$s. Zakazane: %2$d. Wysokie ryzyko: %3$d. Nierozpoznane: %4$d.</string>
     <string name="finding_rating_a11y">Ocena składnika: %1$s</string>
 
     <string name="ad_placeholder">Reklama</string>

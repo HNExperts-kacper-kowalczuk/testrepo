@@ -17,11 +17,11 @@ import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.platform.copyPlainText
+import com.hnexperts.cosmetics.preferences.application.UserDataReset
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
-import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -31,6 +31,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
+enum class DataResetKind {
+    HISTORY,
+    SHELF,
+    AVOID_LIST,
+    DEVICE
+}
 
 data class PreferencesUiState(
     val stored: StoredPreferences = StoredPreferences(
@@ -42,13 +49,15 @@ data class PreferencesUiState(
     val catalogMeta: CatalogMeta? = null,
     val freshness: CatalogFreshness? = null,
     val ads: AdsGate = AdsGate(),
-    val historyCleared: Boolean = false,
     val catalogApplied: Boolean = false,
     val failure: AppFailure? = null,
     val avoidQuery: String = "",
     val openReportCount: Long = 0,
     val reportsCopied: Boolean = false,
-    val adsRemoved: Boolean = false
+    val adsRemoved: Boolean = false,
+    val billingAvailable: Boolean = false,
+    val pendingReset: DataResetKind? = null,
+    val cleared: DataResetKind? = null
 )
 
 class PreferencesViewModel(
@@ -57,9 +66,9 @@ class PreferencesViewModel(
     private val catalogUpdates: CheckCatalogUpdates,
     private val applyCatalogDelta: ApplyCatalogDelta,
     private val adsSession: AdsSession,
-    private val history: ScanHistoryRepository,
     private val reports: ReportQueue,
-    private val billing: BillingPort
+    private val billing: BillingPort,
+    private val userDataReset: UserDataReset
 ) : ViewModel() {
     private val state: MutableStateFlow<PreferencesUiState> = MutableStateFlow(PreferencesUiState())
     val uiState: StateFlow<PreferencesUiState> = state.asStateFlow()
@@ -68,6 +77,7 @@ class PreferencesViewModel(
     private var ingredientsById: Map<String, Ingredient> = emptyMap()
 
     init {
+        state.value = state.value.copy(billingAvailable = billing.isAvailable())
         reload()
         viewModelScope.launch {
             adsSession.gate.collect { gate ->
@@ -166,10 +176,26 @@ class PreferencesViewModel(
         }
     }
 
-    fun clearHistory() {
+    fun requestReset(kind: DataResetKind) {
+        state.value = state.value.copy(pendingReset = kind)
+    }
+
+    fun cancelReset() {
+        state.value = state.value.copy(pendingReset = null)
+    }
+
+    fun confirmReset() {
+        val kind: DataResetKind = state.value.pendingReset ?: return
+        state.value = state.value.copy(pendingReset = null)
         viewModelScope.launch {
-            runUiAction(::showFailure) { history.clear() } ?: return@launch
-            state.value = state.value.copy(historyCleared = true, failure = null)
+            runUiAction(::showFailure) { resetAction(kind) } ?: return@launch
+            state.value = state.value.copy(cleared = kind, failure = null)
+            if (kind == DataResetKind.DEVICE || kind == DataResetKind.AVOID_LIST) {
+                reload()
+            }
+            if (kind == DataResetKind.DEVICE) {
+                adsSession.refresh()
+            }
         }
     }
 
@@ -195,6 +221,9 @@ class PreferencesViewModel(
     }
 
     fun purchaseRemoveAds() {
+        if (!billing.isAvailable()) {
+            return
+        }
         viewModelScope.launch {
             val purchased = runUiAction(::showFailure) { billing.purchaseRemoveAds() } ?: return@launch
             if (!purchased) {
@@ -208,6 +237,15 @@ class PreferencesViewModel(
                     adsSession.refresh()
                 }
             }
+        }
+    }
+
+    private suspend fun resetAction(kind: DataResetKind): Outcome<Unit> {
+        return when (kind) {
+            DataResetKind.HISTORY -> userDataReset.clearHistory()
+            DataResetKind.SHELF -> userDataReset.clearShelf()
+            DataResetKind.AVOID_LIST -> userDataReset.clearAvoidList()
+            DataResetKind.DEVICE -> userDataReset.resetDevice()
         }
     }
 

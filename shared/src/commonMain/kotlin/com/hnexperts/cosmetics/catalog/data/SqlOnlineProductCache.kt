@@ -50,4 +50,12 @@ class SqlOnlineProductCache(
             }
         }
     }
+
+    override suspend fun clear(): Outcome<Unit> {
+        return FailureCatcher.database("cache.clear") {
+            withContext(dispatchers.userDatabase) {
+                database.userDatabaseQueries.clearCachedProducts()
+            }
+        }
+    }
 }

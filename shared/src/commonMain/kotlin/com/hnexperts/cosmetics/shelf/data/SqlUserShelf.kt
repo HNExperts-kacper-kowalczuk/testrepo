@@ -58,6 +58,14 @@ class SqlUserShelf(
         }
     }
 
+    override suspend fun clearAll(): Outcome<Unit> {
+        return FailureCatcher.database("shelf.clear") {
+            withContext(dispatchers.userDatabase) {
+                database.userDatabaseQueries.clearShelf()
+            }
+        }
+    }
+
     private fun toItem(row: User_shelf): ShelfItem {
         return ShelfItem(
             shelfKey = row.shelf_key,
