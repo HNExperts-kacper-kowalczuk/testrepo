@@ -66,4 +66,12 @@ class SqlReportQueue(
             }
         }
     }
+
+    override suspend fun clear(): Outcome<Unit> {
+        return FailureCatcher.database("report.clear") {
+            withContext(dispatchers.userDatabase) {
+                database.userDatabaseQueries.clearReports()
+            }
+        }
+    }
 }

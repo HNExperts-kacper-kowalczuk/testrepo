@@ -33,6 +33,7 @@ import com.hnexperts.cosmetics.evaluation.application.CompareSession
 import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.legal.data.SqlLegalRepository
 import com.hnexperts.cosmetics.legal.domain.LegalStore
+import com.hnexperts.cosmetics.preferences.application.UserDataReset
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
@@ -99,6 +100,7 @@ val appModule = module {
     single<BillingPort> { NoOpBillingPort() }
     single { CompareSession() }
     single<UserShelf> { SqlUserShelf(get(), get()) }
+    single { UserDataReset(get(), get(), get(), get(), get()) }
     single { LaunchIntentSession() }
 
     viewModelOf(::ScanViewModel)

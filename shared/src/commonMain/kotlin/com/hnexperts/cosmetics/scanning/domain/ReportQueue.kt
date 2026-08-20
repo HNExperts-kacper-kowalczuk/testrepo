@@ -13,6 +13,7 @@ interface ReportQueue {
     suspend fun attachPayload(gtin: String, kind: String, payloadJson: String): Outcome<Unit>
     suspend fun openCount(): Outcome<Long>
     suspend fun openReports(): Outcome<List<CatalogReport>>
+    suspend fun clear(): Outcome<Unit>
 }
 
 object ReportKinds {

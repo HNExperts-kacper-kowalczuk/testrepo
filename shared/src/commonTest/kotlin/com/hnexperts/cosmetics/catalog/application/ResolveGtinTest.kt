@@ -164,6 +164,11 @@ class ResolveGtinTest {
             items[product.gtin] = product
             return Outcome.Ok(Unit)
         }
+
+        override suspend fun clear(): Outcome<Unit> {
+            items.clear()
+            return Outcome.Ok(Unit)
+        }
     }
 
     private class FailingHttp : SimpleHttpClient {

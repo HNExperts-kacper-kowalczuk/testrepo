@@ -23,6 +23,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
@@ -30,6 +32,7 @@ import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
+import com.hnexperts.cosmetics.evaluation.domain.ResultA11yCounts
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
@@ -37,6 +40,7 @@ import com.hnexperts.cosmetics.resources.finding_early_list
 import com.hnexperts.cosmetics.resources.finding_rating_a11y
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
+import com.hnexperts.cosmetics.resources.result_a11y_summary
 import com.hnexperts.cosmetics.resources.result_alternatives
 import com.hnexperts.cosmetics.resources.result_alternatives_source
 import com.hnexperts.cosmetics.resources.result_check_label
@@ -212,8 +216,18 @@ fun ResultScreen(
 private fun ResultHeader(assessment: ProductAssessment) {
     val headerColor = RatingColors.of(assessment.overall)
     val onHeader = RatingColors.onColor(assessment.overall)
+    val counts: ResultA11yCounts = ResultA11yCounts.of(assessment)
+    val headerSummary: String = stringResource(
+        Res.string.result_a11y_summary,
+        dangerLevelText(assessment.overall),
+        counts.prohibited,
+        counts.high,
+        counts.unknown
+    )
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {
+            contentDescription = headerSummary
+        },
         colors = CardDefaults.cardColors(containerColor = headerColor, contentColor = onHeader)
     ) {
         Column(

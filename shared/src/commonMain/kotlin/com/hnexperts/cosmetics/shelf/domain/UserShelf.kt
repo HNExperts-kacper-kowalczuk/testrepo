@@ -22,6 +22,7 @@ interface UserShelf {
     suspend fun contains(shelfKey: String): Outcome<Boolean>
     suspend fun save(item: ShelfItem): Outcome<Unit>
     suspend fun remove(shelfKey: String): Outcome<Unit>
+    suspend fun clearAll(): Outcome<Unit>
 }
 
 object ShelfKeys {

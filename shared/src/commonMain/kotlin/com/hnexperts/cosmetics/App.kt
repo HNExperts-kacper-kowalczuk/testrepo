@@ -261,25 +261,25 @@ private fun AppBottomBar(navController: NavHostController) {
         NavigationBarItem(
             selected = destination?.hierarchy?.any { it.route?.contains("Scan") == true } == true,
             onClick = { navController.navigateTab(ScanDestination) },
-            icon = { Icon(Icons.Default.Home, contentDescription = null) },
+            icon = { Icon(Icons.Default.Home, contentDescription = stringResource(Res.string.tab_scan)) },
             label = { Text(stringResource(Res.string.tab_scan)) }
         )
         NavigationBarItem(
             selected = destination?.hierarchy?.any { it.route?.contains("Search") == true } == true,
             onClick = { navController.navigateTab(SearchDestination) },
-            icon = { Icon(Icons.Default.Search, contentDescription = null) },
+            icon = { Icon(Icons.Default.Search, contentDescription = stringResource(Res.string.tab_search)) },
             label = { Text(stringResource(Res.string.tab_search)) }
         )
         NavigationBarItem(
             selected = destination?.hierarchy?.any { it.route?.contains("History") == true } == true,
             onClick = { navController.navigateTab(HistoryDestination) },
-            icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) },
+            icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = stringResource(Res.string.tab_history)) },
             label = { Text(stringResource(Res.string.tab_history)) }
         )
         NavigationBarItem(
             selected = destination?.hierarchy?.any { it.route?.contains("More") == true } == true,
             onClick = { navController.navigateTab(MoreDestination) },
-            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            icon = { Icon(Icons.Default.Settings, contentDescription = stringResource(Res.string.tab_more)) },
             label = { Text(stringResource(Res.string.tab_more)) }
         )
     }
