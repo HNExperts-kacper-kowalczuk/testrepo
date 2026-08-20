@@ -38,6 +38,8 @@
 
     <string name="history_title">Ostatnie skany</string>
     <string name="history_select_compare">Zaznacz do porównania</string>
+    <string name="history_insight_title">W Twoich ostatnich skanach</string>
+    <string name="history_insight_hint">Nazwy, które często mają ocenę wysokiego ryzyka lub zakazane w Twoich ostatnich skanach. Tylko informacyjnie — to nie diagnoza.</string>
     <string name="history_empty">Nie oceniono jeszcze żadnego produktu.</string>
     <string name="shelf_title">Półka</string>
     <string name="shelf_empty">Oznacz wynik gwiazdką, żeby tu został. Półka zostaje na urządzeniu po wymianie katalogu.</string>
@@ -118,6 +120,12 @@
     <string name="prefs_reports_copy">Kopiuj niewysłane zgłoszenia jako tekst</string>
     <string name="prefs_reports_copied">Lista zgłoszeń skopiowana.</string>
     <string name="prefs_reports_empty">rodzaj	gtin	treść</string>
+    <string name="prefs_export_avoid">Kopiuj listę unikania</string>
+    <string name="prefs_export_avoid_copied">Lista unikania skopiowana.</string>
+    <string name="prefs_export_avoid_empty">(brak składników na liście unikania)</string>
+    <string name="prefs_export_shelf">Kopiuj półkę</string>
+    <string name="prefs_export_shelf_copied">Półka skopiowana.</string>
+    <string name="prefs_export_shelf_empty">(brak produktów na półce)</string>
     <string name="prefs_remove_ads">Usuń reklamy</string>
     <string name="prefs_remove_ads_unavailable">Zakup w aplikacji, który wyłącza reklamy, nie jest jeszcze dostępny.</string>
     <string name="prefs_ads_removed">Reklamy są wyłączone na tym urządzeniu.</string>

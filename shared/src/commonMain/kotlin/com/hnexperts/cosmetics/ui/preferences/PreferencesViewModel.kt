@@ -17,11 +17,13 @@ import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.platform.copyPlainText
+import com.hnexperts.cosmetics.preferences.application.PreferencesExportText
 import com.hnexperts.cosmetics.preferences.application.UserDataReset
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
+import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -57,7 +59,9 @@ data class PreferencesUiState(
     val adsRemoved: Boolean = false,
     val billingAvailable: Boolean = false,
     val pendingReset: DataResetKind? = null,
-    val cleared: DataResetKind? = null
+    val cleared: DataResetKind? = null,
+    val avoidCopied: Boolean = false,
+    val shelfCopied: Boolean = false
 )
 
 class PreferencesViewModel(
@@ -68,7 +72,8 @@ class PreferencesViewModel(
     private val adsSession: AdsSession,
     private val reports: ReportQueue,
     private val billing: BillingPort,
-    private val userDataReset: UserDataReset
+    private val userDataReset: UserDataReset,
+    private val shelf: UserShelf
 ) : ViewModel() {
     private val state: MutableStateFlow<PreferencesUiState> = MutableStateFlow(PreferencesUiState())
     val uiState: StateFlow<PreferencesUiState> = state.asStateFlow()
@@ -217,6 +222,24 @@ class PreferencesViewModel(
             }
             copyPlainText(text.ifBlank { emptyText })
             state.value = state.value.copy(reportsCopied = true, failure = null)
+        }
+    }
+
+    fun copyAvoidList(emptyText: String) {
+        val text: String = PreferencesExportText.avoidList(
+            avoidedIngredientIds = state.value.stored.profile.avoidedIngredientIds,
+            ingredientsById = ingredientsById,
+            emptyText = emptyText
+        )
+        copyPlainText(text)
+        state.value = state.value.copy(avoidCopied = true, failure = null)
+    }
+
+    fun copyShelf(emptyText: String) {
+        viewModelScope.launch {
+            val items = runUiAction(::showFailure) { shelf.all() } ?: return@launch
+            copyPlainText(PreferencesExportText.shelf(items, emptyText))
+            state.value = state.value.copy(shelfCopied = true, failure = null)
         }
     }
 

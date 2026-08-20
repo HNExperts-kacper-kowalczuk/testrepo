@@ -41,6 +41,17 @@ fun UsagePicker(
 }
 
 @Composable
+fun usageWord(usage: ProductUsage): String {
+    return when (usage) {
+        ProductUsage.LEAVE_ON, ProductUsage.UNKNOWN -> stringResource(Res.string.usage_leave_on)
+        ProductUsage.RINSE_OFF -> stringResource(Res.string.usage_rinse_off)
+        ProductUsage.SPRAY -> stringResource(Res.string.usage_spray)
+        ProductUsage.LIP -> stringResource(Res.string.usage_lip)
+        ProductUsage.EYE -> stringResource(Res.string.usage_eye)
+    }
+}
+
+@Composable
 private fun UsageChip(
     usage: ProductUsage,
     selected: ProductUsage,
