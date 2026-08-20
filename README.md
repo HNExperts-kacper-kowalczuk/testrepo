@@ -25,10 +25,12 @@ Working now:
 - AdMob test banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, or on no-fill; never on Scan, camera, OCR review, or Preferences
 - Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
-Not in this slice yet (see `docs/plan.md` and `docs/further-additions.md`):
+Not in this slice yet (see `docs/plan-further-improvements.md`):
 
+- Honest Remove-ads UX, wipe shelf / reset device, TalkBack on chrome
+- Usage picker after barcode hits with unknown product type
+- Stable INCI hash + shelf “formula changed” watch
 - Production AdMob unit IDs (debug uses Google sample IDs)
-- A full CosIng + Open Beauty Facts regional dump (pipeline + packer exist; Phase 1 bundles `catalog.sqlite.gz`)
 - Live HTTP catalog hosting (the client applies a bundled delta when one is present)
 
 ## Run
@@ -61,7 +63,8 @@ Unknown barcodes are looked up online automatically when the device is connected
 ## Docs
 
 - **[Product and architecture plan](docs/plan.md)**
-- **[Next phases](docs/plan-next-phases.md)** — bundled catalog, pack verify, personal presets, compare, polish
+- **[Next phases 1–5](docs/plan-next-phases.md)** — bundled catalog, pack verify, personal presets, compare, polish (shipped)
+- **[Further improvements 6–15](docs/plan-further-improvements.md)** — one PR per phase
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**
