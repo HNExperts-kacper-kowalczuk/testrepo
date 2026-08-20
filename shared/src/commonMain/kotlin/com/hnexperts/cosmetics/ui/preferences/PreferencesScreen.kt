@@ -41,6 +41,7 @@ import com.hnexperts.cosmetics.resources.prefs_catalog_update
 import com.hnexperts.cosmetics.resources.prefs_catalog_uptodate
 import com.hnexperts.cosmetics.resources.prefs_essential_oil
 import com.hnexperts.cosmetics.resources.prefs_eu_allergens
+import com.hnexperts.cosmetics.resources.prefs_eu_allergens_hint
 import com.hnexperts.cosmetics.resources.prefs_fragrance_free
 import com.hnexperts.cosmetics.resources.prefs_language
 import com.hnexperts.cosmetics.resources.prefs_language_en
@@ -87,6 +88,10 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             label = stringResource(Res.string.prefs_eu_allergens),
             checked = stored.profile.euAllergens,
             onCheckedChange = viewModel::setEuAllergens
+        )
+        Text(
+            text = stringResource(Res.string.prefs_eu_allergens_hint),
+            style = MaterialTheme.typography.bodySmall
         )
         PreferenceSwitch(
             label = stringResource(Res.string.prefs_children_caution),
