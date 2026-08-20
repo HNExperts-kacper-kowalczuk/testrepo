@@ -138,6 +138,7 @@
     <string name="usage_eye">Okolicę oczu</string>
     <string name="result_usage">Oceniono jako %1$s.</string>
     <string name="result_usage_assumed">Nie podano sposobu użycia, więc zastosowano ostrzejszą interpretację leave-on.</string>
+    <string name="result_usage_pick">Sposób użycia został założony — wybierz, jak używasz tego produktu.</string>
     <string name="finding_usage_adjusted">Poziom dostosowany do typu produktu.</string>
 
     <string name="result_rating_a11y">Ocena ogólna: %1$s</string>

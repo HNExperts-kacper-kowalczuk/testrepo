@@ -138,6 +138,7 @@
     <string name="usage_eye">Eye area</string>
     <string name="result_usage">Scored as %1$s.</string>
     <string name="result_usage_assumed">Usage was not given, so the stricter leave-on reading was used.</string>
+    <string name="result_usage_pick">Usage was assumed — pick how you use this.</string>
     <string name="finding_usage_adjusted">Level adjusted for this product type.</string>
 
     <string name="result_rating_a11y">Overall rating: %1$s</string>
