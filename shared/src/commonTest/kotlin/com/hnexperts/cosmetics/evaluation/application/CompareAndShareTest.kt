@@ -129,6 +129,41 @@ class FindLocalAlternativesTest {
         )
         assertTrue(hits.isEmpty())
     }
+
+    @Test
+    fun ocrInciPickingMoisturizerSurfacesCalmerAlternative() {
+        val nightCream = FixtureCatalog.products.first { item -> item.product.id == "night-cream" }.product
+        val ocr = evaluateFormula.evaluate(
+            inciRaw = nightCream.inciRaw,
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        val calmer: Product = Product(
+            id = "calm-moisturizer",
+            name = "Calm Cream",
+            brand = "Fixture Lab",
+            category = "moisturizer",
+            inciRaw = "Aqua, Glycerin, Petrolatum",
+            usage = "LEAVE_ON",
+            source = "curated",
+            verified = true
+        )
+        val candidates: List<Product> = listOf(nightCream, calmer)
+        assertTrue(
+            FindLocalAlternatives.invoke(
+                current = ocr,
+                candidates = candidates,
+                evaluateFormula = evaluateFormula,
+                profile = UserAvoidanceProfile.EMPTY
+            ).isEmpty()
+        )
+        val hits = FindLocalAlternatives.invoke(
+            current = ocr.copy(category = "moisturizer"),
+            candidates = candidates,
+            evaluateFormula = evaluateFormula,
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        assertEquals("calm-moisturizer", hits.first().product.id)
+    }
 }
 
 class ShareResultTextTest {

@@ -7,4 +7,5 @@ interface ProductRepository {
     suspend fun findById(productId: String): Outcome<Product?>
     suspend fun search(query: String): Outcome<List<Product>>
     suspend fun findByCategory(category: String, limit: Int): Outcome<List<Product>>
+    suspend fun frequentCategories(limit: Int): Outcome<List<String>>
 }

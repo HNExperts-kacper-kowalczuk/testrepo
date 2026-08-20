@@ -155,6 +155,10 @@ class ResolveGtinTest {
         override suspend fun findByCategory(category: String, limit: Int): Outcome<List<Product>> {
             return Outcome.Ok(emptyList())
         }
+
+        override suspend fun frequentCategories(limit: Int): Outcome<List<String>> {
+            return Outcome.Ok(emptyList())
+        }
     }
 
     private class MemoryCache : OnlineProductCache {

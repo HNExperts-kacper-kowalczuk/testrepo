@@ -120,6 +120,14 @@ WHERE category = ?
 ORDER BY name
 LIMIT ?;
 
+selectFrequentCategories:
+SELECT category
+FROM product
+WHERE category IS NOT NULL AND category != ''
+GROUP BY category
+ORDER BY COUNT(*) DESC, category ASC
+LIMIT ?;
+
 selectAllProducts:
 SELECT *
 FROM product

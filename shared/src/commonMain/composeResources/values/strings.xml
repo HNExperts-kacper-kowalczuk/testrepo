@@ -67,6 +67,8 @@
     <string name="result_shelf_remove">Remove from shelf</string>
     <string name="result_alternatives">Lower-concern products in this category</string>
     <string name="result_alternatives_source">In this app’s catalog</string>
+    <string name="result_category_pick">Pick a category to look for lower-concern products in this app’s catalog.</string>
+    <string name="result_category_skip">Skip</string>
     <string name="confirm_add_photo">Add another photo</string>
     <string name="level_safe">Generally acceptable</string>
     <string name="level_low">Low concern</string>
