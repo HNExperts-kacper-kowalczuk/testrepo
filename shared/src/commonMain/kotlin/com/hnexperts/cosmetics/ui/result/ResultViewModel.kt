@@ -135,6 +135,52 @@ class ResultViewModel(
         state.value = state.value.copy(navigateToCamera = false)
     }
 
+    fun setUsage(usage: ProductUsage) {
+        if (usage == ProductUsage.UNKNOWN) {
+            return
+        }
+        val current: ProductAssessment = state.value.assessment ?: return
+        extrasJob?.cancel()
+        extrasJob = viewModelScope.launch {
+            applyChosenUsage(current, usage)
+        }
+    }
+
+    private suspend fun applyChosenUsage(current: ProductAssessment, usage: ProductUsage) {
+        val source: String = session.currentSource()
+        val scored: Outcome<ProductAssessment> = evaluateProduct.invoke(
+            inciRaw = current.inciRaw,
+            source = source,
+            productName = current.productName,
+            brand = current.brand,
+            gtin = current.gtin,
+            usage = usage,
+            packVerified = current.packVerified,
+            category = current.category,
+            productId = current.productId
+        )
+        when (scored) {
+            is Outcome.Err -> state.value = state.value.copy(failure = scored.failure)
+            is Outcome.Ok -> {
+                state.value = state.value.copy(assessment = scored.value, failure = null)
+                persistShelfIfStarred(scored.value)
+                loadShelfAndAlternatives(scored.value, state.value.commentLocale)
+            }
+        }
+    }
+
+    private suspend fun persistShelfIfStarred(assessment: ProductAssessment) {
+        if (!state.value.onShelf) {
+            return
+        }
+        shelfMutex.withLock {
+            when (val saved: Outcome<Unit> = shelf.save(toShelfItem(assessment, ShelfKeys.of(assessment)))) {
+                is Outcome.Err -> state.value = state.value.copy(failure = saved.failure)
+                is Outcome.Ok -> Unit
+            }
+        }
+    }
+
     private suspend fun applyShelfToggle(assessment: ProductAssessment) {
         val key: String = ShelfKeys.of(assessment)
         if (state.value.onShelf) {

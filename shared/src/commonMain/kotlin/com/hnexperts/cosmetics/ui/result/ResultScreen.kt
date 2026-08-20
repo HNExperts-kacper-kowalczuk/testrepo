@@ -57,6 +57,7 @@ import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
 import com.hnexperts.cosmetics.resources.result_usage
 import com.hnexperts.cosmetics.resources.result_usage_assumed
+import com.hnexperts.cosmetics.resources.result_usage_pick
 import com.hnexperts.cosmetics.resources.share_scanned_at
 import com.hnexperts.cosmetics.resources.share_scanned_product
 import com.hnexperts.cosmetics.resources.usage_eye
@@ -67,6 +68,7 @@ import com.hnexperts.cosmetics.resources.usage_spray
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
+import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
 import com.hnexperts.cosmetics.ui.theme.RatingColors
 import org.jetbrains.compose.resources.pluralStringResource
@@ -116,6 +118,11 @@ fun ResultScreen(
         ) {
             item {
                 ResultHeader(assessment)
+            }
+            if (assessment.usageAssumed) {
+                item {
+                    ResultUsageConfirm(onSelect = viewModel::setUsage)
+                }
             }
             if (assessment.packVerified) {
                 item {
@@ -328,6 +335,20 @@ private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
                 Text(text = stringResource(Res.string.finding_unmatched))
             }
         }
+    }
+}
+
+@Composable
+private fun ResultUsageConfirm(onSelect: (ProductUsage) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(Res.string.result_usage_pick),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        UsagePicker(selected = ProductUsage.UNKNOWN, onSelect = onSelect)
     }
 }
 

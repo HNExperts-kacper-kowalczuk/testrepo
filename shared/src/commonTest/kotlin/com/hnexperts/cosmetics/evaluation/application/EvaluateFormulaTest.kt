@@ -151,6 +151,28 @@ class EvaluateFormulaTest {
     }
 
     @Test
+    fun alcoholAssumedLeaveOnUntilRinseOffIsPicked() {
+        val profile: UserAvoidanceProfile = UserAvoidanceProfile.EMPTY.copy(alcoholLeaveOn = true)
+        val inciRaw: String = "Aqua, Alcohol Denat., Glycerin"
+        val assumed: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = inciRaw,
+            profile = profile,
+            usage = ProductUsage.UNKNOWN
+        )
+        val rinseOff: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = inciRaw,
+            profile = profile,
+            usage = ProductUsage.RINSE_OFF
+        )
+        assertTrue(assumed.usageAssumed)
+        assertFalse(assumed.suitableForUser)
+        assertFalse(rinseOff.usageAssumed)
+        assertTrue(rinseOff.suitableForUser)
+        assertEquals(DangerLevel.MODERATE, assumed.overall)
+        assertEquals(DangerLevel.MODERATE, rinseOff.overall)
+    }
+
+    @Test
     fun alcoholPresetFlagsLeaveOnMist() {
         val leaveOn: ProductAssessment = evaluateFormula.evaluate(
             inciRaw = "Aqua, Alcohol Denat., Glycerin",
