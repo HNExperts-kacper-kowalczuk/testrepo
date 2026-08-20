@@ -32,6 +32,8 @@ import com.hnexperts.cosmetics.resources.compare_action
 import com.hnexperts.cosmetics.resources.compare_select_hint
 import com.hnexperts.cosmetics.resources.compare_unnamed
 import com.hnexperts.cosmetics.resources.history_empty
+import com.hnexperts.cosmetics.resources.history_insight_hint
+import com.hnexperts.cosmetics.resources.history_insight_title
 import com.hnexperts.cosmetics.resources.history_select_compare
 import com.hnexperts.cosmetics.resources.history_title
 import com.hnexperts.cosmetics.resources.shelf_empty
@@ -98,6 +100,11 @@ private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
                 onCompare = { viewModel.compareSelected(unnamedFormat) }
             )
         }
+        if (uiState.frequentConcerns.isNotEmpty()) {
+            item {
+                HistoryInsight(names = uiState.frequentConcerns)
+            }
+        }
         item {
             Text(
                 text = stringResource(Res.string.shelf_title),
@@ -160,6 +167,24 @@ private fun CompareBar(uiState: HistoryUiState, onCompare: () -> Unit) {
         ) {
             Text(stringResource(Res.string.compare_action))
         }
+    }
+}
+
+@Composable
+private fun HistoryInsight(names: List<String>) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(Res.string.history_insight_title),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+            text = stringResource(Res.string.history_insight_hint),
+            style = MaterialTheme.typography.bodySmall
+        )
+        Text(text = names.joinToString(separator = ", "))
     }
 }
 

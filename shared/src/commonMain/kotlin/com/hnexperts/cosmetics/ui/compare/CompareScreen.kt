@@ -29,9 +29,11 @@ import com.hnexperts.cosmetics.resources.compare_title
 import com.hnexperts.cosmetics.resources.compare_unique_concerns
 import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_suitable
+import com.hnexperts.cosmetics.resources.result_usage
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.common.usageWord
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,6 +108,10 @@ private fun ComparedProductCard(
                 } else {
                     stringResource(Res.string.result_not_suitable)
                 }
+            )
+            Text(
+                text = stringResource(Res.string.result_usage, usageWord(product.assessment.usage)),
+                style = MaterialTheme.typography.bodyMedium
             )
             if (uniqueNames.isNotEmpty()) {
                 Text(

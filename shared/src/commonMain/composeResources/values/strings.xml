@@ -38,6 +38,8 @@
 
     <string name="history_title">Recent scans</string>
     <string name="history_select_compare">Select to compare</string>
+    <string name="history_insight_title">In your recent scans</string>
+    <string name="history_insight_hint">Names that often rate high or prohibited in your recent scans. Informational only — not a diagnosis.</string>
     <string name="history_empty">You have not evaluated a product yet.</string>
     <string name="shelf_title">Shelf</string>
     <string name="shelf_empty">Star a result to keep it here. Shelf stays on this device if the catalog is replaced.</string>
@@ -118,6 +120,12 @@
     <string name="prefs_reports_copy">Copy unsent reports as text</string>
     <string name="prefs_reports_copied">Report list copied.</string>
     <string name="prefs_reports_empty">kind	gtin	payload</string>
+    <string name="prefs_export_avoid">Copy avoid-list</string>
+    <string name="prefs_export_avoid_copied">Avoid-list copied.</string>
+    <string name="prefs_export_avoid_empty">(no avoid-list ingredients)</string>
+    <string name="prefs_export_shelf">Copy shelf</string>
+    <string name="prefs_export_shelf_copied">Shelf copied.</string>
+    <string name="prefs_export_shelf_empty">(no shelf items)</string>
     <string name="prefs_remove_ads">Remove ads</string>
     <string name="prefs_remove_ads_unavailable">In-app purchase to remove ads is not available yet.</string>
     <string name="prefs_ads_removed">Ads are turned off on this device.</string>

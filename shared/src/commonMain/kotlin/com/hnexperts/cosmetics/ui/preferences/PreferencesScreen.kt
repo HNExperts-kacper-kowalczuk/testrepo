@@ -155,6 +155,12 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
         if (uiState.reportsCopied) {
             Text(text = stringResource(Res.string.prefs_reports_copied))
         }
+        PreferencesExportSection(
+            avoidCopied = uiState.avoidCopied,
+            shelfCopied = uiState.shelfCopied,
+            onCopyAvoid = viewModel::copyAvoidList,
+            onCopyShelf = viewModel::copyShelf
+        )
         AdsPurchaseSection(
             adsRemoved = uiState.adsRemoved,
             billingAvailable = uiState.billingAvailable,

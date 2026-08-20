@@ -27,6 +27,7 @@ import com.hnexperts.cosmetics.data.CatalogSeeder
 import com.hnexperts.cosmetics.data.DatabaseDriverFactory
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import com.hnexperts.cosmetics.data.userdb.UserDatabase
+import com.hnexperts.cosmetics.evaluation.application.SummarizeScanHazards
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
 import com.hnexperts.cosmetics.evaluation.application.CompareSession
@@ -102,6 +103,7 @@ val appModule = module {
     single { CompareSession() }
     single<UserShelf> { SqlUserShelf(get(), get()) }
     single { WatchShelfFormulas(get(), get()) }
+    single { SummarizeScanHazards() }
     single { UserDataReset(get(), get(), get(), get(), get()) }
     single { LaunchIntentSession() }
 

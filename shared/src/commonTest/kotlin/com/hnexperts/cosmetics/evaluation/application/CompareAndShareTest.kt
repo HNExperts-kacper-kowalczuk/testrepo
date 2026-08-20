@@ -59,6 +59,30 @@ class CompareFormulasTest {
         )
         assertTrue(summary.sharedPersonalAvoids.contains("Parfum"))
     }
+
+    @Test
+    fun summaryKeepsStoredUsage() {
+        val paste = FixtureCatalog.products.first { item -> item.product.id == "problem-paste" }.product
+        val shampoo = FixtureCatalog.products.first { item -> item.product.id == "strong-shampoo" }.product
+        val summary = CompareFormulas.fromAssessments(
+            listOf(
+                evaluateFormula.evaluate(
+                    inciRaw = paste.inciRaw,
+                    profile = UserAvoidanceProfile.EMPTY,
+                    productName = paste.name,
+                    usage = ProductUsage.LEAVE_ON
+                ),
+                evaluateFormula.evaluate(
+                    inciRaw = shampoo.inciRaw,
+                    profile = UserAvoidanceProfile.EMPTY,
+                    productName = shampoo.name,
+                    usage = ProductUsage.RINSE_OFF
+                )
+            )
+        )
+        assertEquals(ProductUsage.LEAVE_ON, summary.products[0].assessment.usage)
+        assertEquals(ProductUsage.RINSE_OFF, summary.products[1].assessment.usage)
+    }
 }
 
 class FindLocalAlternativesTest {
