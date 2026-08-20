@@ -575,7 +575,7 @@ Each phase should leave the app **installable**. Camera and ads are add-ons on t
 
 ## 19. Further additions (not v1 scope)
 
-Recommended next capabilities — usage type (leave-on vs rinse-off), verify pack vs catalog, structured allergen/children profiles, colour-safe ratings, shelf/compare, encyclopedia — are listed with priority in **[further-additions.md](further-additions.md)**.
+Recommended next capabilities — usage type (leave-on vs rinse-off), verify pack vs catalog, structured allergen/children profiles, colour-safe ratings, shelf/compare, encyclopedia — are listed with priority in **[further-additions.md](further-additions.md)**. Phases 1–5 are shipped; remaining PRs are **[plan-further-improvements.md](plan-further-improvements.md)**.
 
 The next implementation slice (regional CosIng/OBF catalog, ingredients-only OCR with a four-corner crop, Fitatu-inspired scan UI) is specified in **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)**.
 
