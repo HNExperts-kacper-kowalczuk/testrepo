@@ -1,6 +1,6 @@
 # Next phases: catalog, pack trust, profiles, compare, polish
 
-This is the working plan for the rest of the product after scan, OCR crop, Fitatu-style UI, and automatic online GTIN lookup. Each phase leaves the app installable. Phases ship as sequential PRs on `cursor/next-phases-4039` (or follow-up branches stacked on it).
+This is the working plan for phases **1–5** (catalog, pack trust, profiles, compare, polish). Those phases are **shipped**. Remaining work is **[plan-further-improvements.md](plan-further-improvements.md)** (phases 6–15, one PR each).
 
 Related: [plan.md](plan.md), [plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md) (tracks A–D, largely done), [further-additions.md](further-additions.md), [catalog/README.md](../catalog/README.md).
 
