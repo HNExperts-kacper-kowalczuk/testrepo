@@ -1,6 +1,7 @@
 package com.hnexperts.cosmetics.catalog.application
 
 import com.hnexperts.cosmetics.catalog.domain.CatalogMeta
+import com.hnexperts.cosmetics.catalog.pipeline.MaintainedCatalogTags
 import com.hnexperts.cosmetics.evaluation.application.EvaluateFormula
 import com.hnexperts.cosmetics.hazards.domain.HazardPolicy
 import com.hnexperts.cosmetics.hazards.domain.IngredientHazard
@@ -51,6 +52,10 @@ class CatalogIndex(
         const val INGREDIENT_SEARCH_LIMIT: Int = 50
 
         fun assemble(snapshot: CatalogSnapshot): CatalogIndex {
+            return fromTagged(MaintainedCatalogTags.applyTo(snapshot))
+        }
+
+        private fun fromTagged(snapshot: CatalogSnapshot): CatalogIndex {
             val matcher: IngredientMatcher = IngredientMatcher(
                 ingredients = snapshot.ingredients,
                 aliases = snapshot.aliases,

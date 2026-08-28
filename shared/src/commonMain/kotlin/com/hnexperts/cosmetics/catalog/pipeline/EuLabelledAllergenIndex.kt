@@ -4,8 +4,8 @@ import com.hnexperts.cosmetics.ingredients.domain.InciNormalizer
 
 /**
  * Labelled fragrance allergens from Annex III of Regulation (EC) 1223/2009
- * as expanded by Regulation (EU) 2023/1545. Used at CosIng ingest time so
- * the EU-allergens preset stays data-driven.
+ * as expanded by Regulation (EU) 2023/1545. Used at CosIng ingest and when
+ * assembling the in-memory index so the EU-allergens preset stays data-driven.
  */
 object EuLabelledAllergenIndex {
     fun tagsFor(inciName: String): List<String> {
