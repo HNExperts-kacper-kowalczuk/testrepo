@@ -107,4 +107,27 @@ class CosingAssemblerTest {
         assertTrue(record.regulatoryTags.contains("MICROPLASTIC"))
         assertEquals(listOf("ABRASIVE"), record.functionTags)
     }
+
+    @Test
+    fun salicylicAcidGetsSunChildrenAndPregnancyTags() {
+        val record: CosingIngredientRecord? = CosingAssembler().toRecord(
+            metadata("""{"inciName":["SALICYLIC ACID"],"annexNo":["III"],"functionName":["KERATOLYTIC"]}""")
+        )
+        assertNotNull(record)
+        assertEquals("RESTRICTED", record.dangerLevel)
+        assertTrue(record.regulatoryTags.contains("ANNEX_III"))
+        assertTrue(record.regulatoryTags.contains("PHOTOTOXIC"))
+        assertTrue(record.regulatoryTags.contains("CHILDREN"))
+        assertTrue(record.regulatoryTags.contains("PREGNANCY_CAUTION"))
+    }
+
+    @Test
+    fun retinalGetsPregnancyTagWithoutChangingLow() {
+        val record: CosingIngredientRecord? = CosingAssembler().toRecord(
+            metadata("""{"inciName":["RETINAL"],"annexNo":[],"functionName":["SKIN CONDITIONING"]}""")
+        )
+        assertNotNull(record)
+        assertEquals("LOW", record.dangerLevel)
+        assertTrue(record.regulatoryTags.contains("PREGNANCY_CAUTION"))
+    }
 }

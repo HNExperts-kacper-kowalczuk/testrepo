@@ -26,6 +26,18 @@ class MaintainedCatalogTagsTest {
     }
 
     @Test
+    fun salicylicKeepsAnnexAndGainsPresetTags() {
+        val merged: List<String> = MaintainedCatalogTags.merge(
+            inciName = "SALICYLIC ACID",
+            existing = listOf("ANNEX_III")
+        )
+        assertTrue(merged.contains("ANNEX_III"))
+        assertTrue(merged.contains(PhototoxicIndex.TAG))
+        assertTrue(merged.contains(ChildrenCautionIndex.TAG))
+        assertTrue(merged.contains(PregnancyCautionIndex.TAG))
+    }
+
+    @Test
     fun glycerinStaysUntagged() {
         assertEquals(emptyList(), MaintainedCatalogTags.merge("Glycerin", emptyList()))
         assertEquals(listOf("ANNEX_III"), MaintainedCatalogTags.merge("Glycerin", listOf("ANNEX_III")))

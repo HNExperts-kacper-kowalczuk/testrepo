@@ -2,8 +2,11 @@ package com.hnexperts.cosmetics.catalog.pipeline.ingest
 
 import com.hnexperts.cosmetics.catalog.pipeline.CosingCommentRecord
 import com.hnexperts.cosmetics.catalog.pipeline.CosingIngredientRecord
+import com.hnexperts.cosmetics.catalog.pipeline.ChildrenCautionIndex
 import com.hnexperts.cosmetics.catalog.pipeline.EuLabelledAllergenIndex
 import com.hnexperts.cosmetics.catalog.pipeline.MicroplasticIndex
+import com.hnexperts.cosmetics.catalog.pipeline.PhototoxicIndex
+import com.hnexperts.cosmetics.catalog.pipeline.PregnancyCautionIndex
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
 import kotlinx.serialization.json.JsonObject
 
@@ -39,7 +42,10 @@ class CosingAssembler {
             dangerLevel = level.name,
             regulatoryTags = annexTags(annexes) +
                 EuLabelledAllergenIndex.tagsFor(name) +
-                MicroplasticIndex.tagsFor(name),
+                MicroplasticIndex.tagsFor(name) +
+                PhototoxicIndex.tagsFor(name) +
+                ChildrenCautionIndex.tagsFor(name) +
+                PregnancyCautionIndex.tagsFor(name),
             functionTags = functions.map { function -> function.uppercase().replace(' ', '_') },
             comments = templatedComments(level)
         )
