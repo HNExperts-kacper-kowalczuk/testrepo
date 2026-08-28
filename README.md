@@ -27,7 +27,7 @@ Working now:
 - AdMob banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, on no-fill, or when release IDs are missing from `local.properties`; never on Scan, camera, OCR review, or Preferences
 - Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
-The 21–23 slice in [plan-after-twenty.md](docs/plan-after-twenty.md) is shipped.
+The 21–23 slice in [plan-after-twenty.md](docs/plan-after-twenty.md) is shipped. Next: [phase 24](docs/plan-after-twenty-three.md) (ruleset changelog in Settings).
 
 Not in git / not as safety scores (see `docs/plan.md` and `docs/further-additions.md`):
 
@@ -74,6 +74,7 @@ Unknown barcodes are looked up online automatically when the device is connected
 - **[Further improvements 6–15](docs/plan-further-improvements.md)** — trust settings through microplastics chip (shipped)
 - **[After 1–15: phases 16–20](docs/plan-after-fifteen.md)** — CosIng tag overlay, sticky result header, catalog notes, CI, dark surfaces (shipped)
 - **[After 16–20: phases 21–23](docs/plan-after-twenty.md)** — phototoxic/children/pregnancy tags, Settings notes, animal-derived chip (shipped)
+- **[After 21–23: phases 24–26](docs/plan-after-twenty-three.md)** — ruleset changelog, store copy, optional theme override
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**

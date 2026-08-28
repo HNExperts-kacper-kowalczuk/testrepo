@@ -45,6 +45,7 @@ fun PreferencesCatalogSection(
         Text(text = stringResource(Res.string.prefs_catalog_title), style = MaterialTheme.typography.titleMedium)
         CatalogStamp(uiState)
         CatalogNotes()
+        CatalogChangelog(uiState.catalogMeta)
         CatalogFreshnessBlock(uiState = uiState, onApply = onApply)
         if (uiState.catalogApplied) {
             Text(text = stringResource(Res.string.prefs_catalog_applied))

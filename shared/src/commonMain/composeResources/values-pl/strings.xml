@@ -120,6 +120,13 @@
     <string name="prefs_catalog_notes_children">Przełącznik ostrożności u dzieci / nie dla dzieci poniżej 3 lat korzysta z niekompletnej listy w tym katalogu (na przykład kwas salicylowy). Oznacza te składniki jako osobiste unikanie. To nie diagnoza i nie zmienia semafora bezpieczeństwa.</string>
     <string name="prefs_catalog_notes_pregnancy">Przełącznik ostrożności w ciąży / podczas karmienia korzysta z niekompletnej listy w tym katalogu (na przykład niektóre retinoidy). Oznacza te składniki jako osobiste unikanie. To nie diagnoza i nie zmienia semafora bezpieczeństwa.</string>
     <string name="prefs_catalog_notes_tags">Znaczniki alergenów, mikroplastików, ostrzeżenia o słońcu, ostrożności u dzieci, ostrożności w ciąży i pochodzenia zwierzęcego są stosowane przy wczytaniu katalogu, nawet gdy spakowany plik jest starszy niż te listy.</string>
+    <string name="prefs_changelog_title">Co się zmieniło</string>
+    <string name="prefs_changelog_overlay_label">Ta aplikacja</string>
+    <string name="prefs_changelog_animal">%1$s: znaczniki pochodzenia zwierzęcego są stosowane przy wczytaniu katalogu. Lista jest niekompletna i nie jest certyfikatem wegańskim.</string>
+    <string name="prefs_changelog_cautions">%1$s: znaczniki ostrzeżenia o słońcu, ostrożności u dzieci i ostrożności w ciąży są stosowane przy wczytaniu katalogu.</string>
+    <string name="prefs_changelog_allergens">%1$s: znaczniki alergenów UE i mikroplastików są stosowane przy wczytaniu katalogu, nawet gdy spakowany plik jest starszy.</string>
+    <string name="prefs_changelog_packed">%1$s: zbundlowany katalog ze zrzutem załączników UE w tej aplikacji. Nie jest bieżącym źródłem prawnym.</string>
+    <string name="prefs_changelog_disclaimer">To historia reguł katalogu tej aplikacji. To nie bieżący dziennik oficjalnych aktualizacji.</string>
     <string name="prefs_privacy">Opcje prywatności reklam</string>
     <string name="prefs_clear_history">Wyczyść historię skanów</string>
     <string name="prefs_cleared_history">Historia skanów została usunięta z tego urządzenia.</string>

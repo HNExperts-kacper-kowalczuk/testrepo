@@ -120,6 +120,13 @@
     <string name="prefs_catalog_notes_children">[!!The children / not-for-under-3 switch uses an incomplete catalog list (for example salicylic acid). It marks those ingredients as personal avoid. It is not a diagnosis and it does not change the safety traffic light.!!]</string>
     <string name="prefs_catalog_notes_pregnancy">[!!The pregnancy / breastfeeding switch uses an incomplete catalog list (for example some retinoids). It marks those ingredients as personal avoid. It is not a diagnosis and it does not change the safety traffic light.!!]</string>
     <string name="prefs_catalog_notes_tags">[!!Allergen, microplastics, sun-caution, children, pregnancy, and animal-derived tags are applied when the catalog loads, even if the packed file is older than those lists.!!]</string>
+    <string name="prefs_changelog_title">[!!What changed!!]</string>
+    <string name="prefs_changelog_overlay_label">[!!This app!!]</string>
+    <string name="prefs_changelog_animal">[!!%1$s: animal-derived tags are applied when the catalog loads. The list is incomplete and is not a vegan certification.!!]</string>
+    <string name="prefs_changelog_cautions">[!!%1$s: sun-caution, children, and pregnancy tags are applied when the catalog loads.!!]</string>
+    <string name="prefs_changelog_allergens">[!!%1$s: EU-allergen and microplastics tags are applied when the catalog loads, even if the packed file is older.!!]</string>
+    <string name="prefs_changelog_packed">[!!%1$s: bundled catalog with the EU annex snapshot in this app. Not a live legal lookup.!!]</string>
+    <string name="prefs_changelog_disclaimer">[!!This is this app’s catalog-rules history. It is not a live official update feed.!!]</string>
     <string name="prefs_privacy">[!!Ad privacy options!!]</string>
     <string name="prefs_clear_history">[!!Clear scan history!!]</string>
     <string name="prefs_cleared_history">[!!Scan history was deleted on this device.!!]</string>
