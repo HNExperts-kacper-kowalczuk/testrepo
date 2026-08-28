@@ -194,3 +194,32 @@ class ShareResultTextTest {
         assertTrue(text.contains(copy.disclaimer))
     }
 }
+
+class ShareResultImageLayoutTest {
+    @Test
+    fun payloadContainsDisclaimerRatingAndDate() {
+        val assessment = EvaluationFactory.create().evaluate(
+            inciRaw = "Aqua, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY,
+            productName = "Gentle Cream Cleanser"
+        )
+        val copy = ShareCopy(
+            scannedProduct = "Scanned product",
+            suitable = "No personal avoid-list hits.",
+            notSuitable = "Not suitable for your current filters.",
+            disclaimer = "Informational only. This is not a medical device or a substitute for the ingredient list, a dermatologist, or official EU annexes.",
+            overallLabel = "Generally acceptable",
+            scannedAtLabel = "Scanned"
+        )
+        val layout: ShareResultImageLayout = ShareResultText.layout(
+            assessment = assessment,
+            copy = copy,
+            scannedAt = Instant.parse("2026-08-19T12:00:00Z")
+        )
+        val payload: String = layout.payloadText()
+        assertTrue(payload.contains("Gentle Cream Cleanser"))
+        assertTrue(payload.contains("Generally acceptable"))
+        assertTrue(payload.contains("Scanned 2026-08-19"))
+        assertTrue(payload.contains(copy.disclaimer))
+    }
+}

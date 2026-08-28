@@ -22,7 +22,9 @@ import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.i18n.systemAppLocale
+import com.hnexperts.cosmetics.platform.encodeSharePng
 import com.hnexperts.cosmetics.platform.sharePlainText
+import com.hnexperts.cosmetics.platform.sharePngBytes
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
@@ -110,6 +112,21 @@ class ResultViewModel(
             title = assessment.productName ?: assessment.gtin ?: copy.scannedProduct,
             body = ShareResultText.format(assessment, copy)
         )
+    }
+
+    fun shareImage(copy: ShareCopy) {
+        val assessment: ProductAssessment = state.value.assessment ?: return
+        extrasJob?.cancel()
+        extrasJob = viewModelScope.launch {
+            val title: String = assessment.productName ?: assessment.gtin ?: copy.scannedProduct
+            val png: ByteArray = withContext(dispatchers.computation) {
+                encodeSharePng(ShareResultText.layout(assessment, copy))
+            }
+            if (png.isEmpty()) {
+                return@launch
+            }
+            sharePngBytes(title, png)
+        }
     }
 
     fun openAlternative(alternative: CatalogAlternative) {

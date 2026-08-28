@@ -15,19 +15,19 @@ Working now:
 - INCI matching (aliases, `1,2-Hexanediol`, fuzzy OCR typos)
 - Hazard scoring + personal avoid-list (fragrance-free, pregnancy caution, EU allergens, children caution, alcohol in leave-on, essential-oil cluster)
 - Shelf, compare, local catalog alternatives, ingredient encyclopedia
-- Share a plain-text result, gallery barcode, unsent report copy
+- Share a plain-text or image result, gallery barcode, unsent report copy
 - Leave-on vs rinse-off scoring when the catalog or the user provides a product type
 - SQLDelight catalog + user preferences/history, SHA-256 catalog checksum, last-updated stamp
 - CosIng-derived + OBF-style catalog pipeline (`./scripts/build-catalog.sh`) and optional delta apply
 - Compose Multiplatform UI: Scan, Camera, Confirm, Search, History, Preferences, Result
 - Three-page first-launch onboarding + disclaimer; rating marks use shape + word + colour
 - EN/PL string resources (key parity in CI) and localized ingredient comments
-- AdMob test banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, or on no-fill; never on Scan, camera, OCR review, or Preferences
+- AdMob banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, on no-fill, or when release IDs are missing from `local.properties`; never on Scan, camera, OCR review, or Preferences
 - Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
 Not in this slice yet (see `docs/plan.md` and `docs/further-additions.md`):
 
-- Production AdMob unit IDs (debug uses Google sample IDs)
+- Production AdMob unit IDs belong in uncommitted `local.properties` (`admob.app.id`, `admob.banner.id`) / XCConfig; debug uses Google sample IDs
 - A full CosIng + Open Beauty Facts regional dump (pipeline + packer exist; Phase 1 bundles `catalog.sqlite.gz`)
 - Live HTTP catalog hosting (the client applies a bundled delta when one is present)
 

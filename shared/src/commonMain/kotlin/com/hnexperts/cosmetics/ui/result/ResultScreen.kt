@@ -50,7 +50,6 @@ import com.hnexperts.cosmetics.resources.result_missing
 import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_pack_verified
 import com.hnexperts.cosmetics.resources.result_rating_a11y
-import com.hnexperts.cosmetics.resources.result_share
 import com.hnexperts.cosmetics.resources.result_shelf_add
 import com.hnexperts.cosmetics.resources.result_shelf_remove
 import com.hnexperts.cosmetics.resources.result_suitable
@@ -170,12 +169,7 @@ fun ResultScreen(
                     overallLabel = dangerLevelText(assessment.overall),
                     scannedAtLabel = stringResource(Res.string.share_scanned_at)
                 )
-                Button(
-                    onClick = { viewModel.share(shareCopy) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(Res.string.result_share))
-                }
+                ResultShareActions(copy = shareCopy, viewModel = viewModel)
             }
             item {
                 FailureBanner(failure = uiState.failure)

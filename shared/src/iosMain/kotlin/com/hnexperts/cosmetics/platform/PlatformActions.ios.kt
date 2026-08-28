@@ -25,7 +25,8 @@ actual fun sharePlainText(title: String, body: String) {
         activityItems = listOf(body),
         applicationActivities = null
     )
-    val root = UIApplication.sharedApplication.keyWindow?.rootViewController ?: return
+    val root = iosRootViewController() ?: return
+    controller.popoverPresentationController?.sourceView = root.view
     root.presentViewController(controller, animated = true, completion = null)
 }
 

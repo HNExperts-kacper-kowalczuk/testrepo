@@ -4,12 +4,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.hnexperts.cosmetics.platform.iosRootViewController
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.camera_gallery
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.ios.IosStillBarcodeDecoder
 import org.jetbrains.compose.resources.stringResource
-import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
 import platform.UIKit.UIImagePickerController
 import platform.UIKit.UIImagePickerControllerDelegateProtocol
@@ -42,7 +42,7 @@ private fun presentPicker(
     onEmpty: () -> Unit,
     onCancel: () -> Unit
 ) {
-    val root = keyWindowRootController() ?: run {
+    val root = iosRootViewController() ?: run {
         onCancel()
         return
     }
@@ -53,9 +53,6 @@ private fun presentPicker(
     picker.delegate = delegate
     root.presentViewController(picker, animated = true, completion = null)
 }
-
-private fun keyWindowRootController() =
-    UIApplication.sharedApplication.keyWindow?.rootViewController
 
 private class GalleryPickerDelegate(
     private val onBarcode: (BarcodePayload) -> Unit,
