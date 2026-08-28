@@ -38,6 +38,7 @@ import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
 import com.hnexperts.cosmetics.resources.finding_early_list
 import com.hnexperts.cosmetics.resources.finding_rating_a11y
+import com.hnexperts.cosmetics.resources.finding_sun_caution
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
 import com.hnexperts.cosmetics.resources.result_a11y_summary
@@ -320,6 +321,12 @@ private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
             val comment = viewModel.commentFor(finding.comments)
             if (comment != null) {
                 Text(text = comment.summary, style = MaterialTheme.typography.bodyLarge)
+            }
+            if (finding.sunCaution()) {
+                Text(
+                    text = stringResource(Res.string.finding_sun_caution),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
             if (finding.earlyListConcern()) {
                 Text(
