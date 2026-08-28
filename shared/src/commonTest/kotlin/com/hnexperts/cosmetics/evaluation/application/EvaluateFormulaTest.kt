@@ -237,4 +237,24 @@ class EvaluateFormulaTest {
         assertEquals(DangerLevel.RESTRICTED, assessment.overall)
         assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "aqua" }.sunCaution())
     }
+
+    @Test
+    fun microplasticTagIsAChipNotASafetyScore() {
+        val product = FixtureCatalog.products.first { item -> item.product.id == "bead-scrub" }.product
+        val assessment: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = product.inciRaw,
+            profile = UserAvoidanceProfile.EMPTY,
+            usage = ProductUsage.parse(product.usage)
+        )
+        assertEquals(DangerLevel.SAFE, assessment.overall)
+        assertTrue(assessment.hasMicroplastics())
+        assertTrue(assessment.findings.first { finding -> finding.ingredient.id == "polyethylene" }.microplastic())
+        assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "aqua" }.microplastic())
+        val withoutBeads: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = "Aqua, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        assertEquals(DangerLevel.SAFE, withoutBeads.overall)
+        assertFalse(withoutBeads.hasMicroplastics())
+    }
 }

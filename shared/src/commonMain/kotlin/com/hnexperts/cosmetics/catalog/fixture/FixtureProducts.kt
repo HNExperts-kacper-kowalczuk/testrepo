@@ -107,6 +107,19 @@ internal object FixtureProducts {
                 verified = true
             ),
             gtins = listOf("5901234123525")
+        ),
+        FixtureProduct(
+            product = Product(
+                id = "bead-scrub",
+                name = "Bead Face Scrub",
+                brand = "Fixture Care",
+                category = "scrub",
+                inciRaw = "Aqua, Glycerin, Polyethylene",
+                usage = "RINSE_OFF",
+                source = "curated",
+                verified = true
+            ),
+            gtins = listOf("5901234123532")
         )
     )
 }

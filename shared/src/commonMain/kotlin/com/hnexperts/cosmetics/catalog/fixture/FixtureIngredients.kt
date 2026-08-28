@@ -336,6 +336,15 @@ internal object FixtureIngredients {
             tags = listOf("ANNEX_II", "CMR"),
             en = "Listed as prohibited in EU cosmetics (Annex II).",
             pl = "Wykazany jako substancja zakazana w kosmetykach UE (załącznik II)."
+        ),
+        ing(
+            id = "polyethylene",
+            name = "Polyethylene",
+            aliases = listOf("PE"),
+            level = DangerLevel.SAFE,
+            tags = listOf("ABRASIVE", "MICROPLASTIC"),
+            en = "Solid polyethylene used as a film former or microbead. Tagged as a possible microplastic in this catalog; the list is incomplete.",
+            pl = "Stały polietylen stosowany jako filmotwórczy lub mikrokuleczka. W tym katalogu oznaczony jako możliwy mikroplastik; lista jest niepełna."
         )
     )
 
@@ -354,11 +363,12 @@ internal object FixtureIngredients {
             tag != "ANNEX_II" && tag != "ANNEX_III" && tag != "ANNEX_IV" &&
                 tag != "ANNEX_V" && tag != "ANNEX_VI" && tag != "ALLERGEN_26" &&
                 tag != "CMR" && tag != "PREGNANCY_CAUTION" && tag != "CHILDREN" &&
-                tag != "PHOTOTOXIC"
+                tag != "PHOTOTOXIC" && tag != "MICROPLASTIC"
         }
         val regulatoryTags: List<String> = tags.filter { tag ->
             tag.startsWith("ANNEX_") || tag == "ALLERGEN_26" || tag == "CMR" ||
-                tag == "PREGNANCY_CAUTION" || tag == "CHILDREN" || tag == "PHOTOTOXIC"
+                tag == "PREGNANCY_CAUTION" || tag == "CHILDREN" || tag == "PHOTOTOXIC" ||
+                tag == "MICROPLASTIC"
         }
         return FixtureIngredient(
             ingredient = Ingredient(
