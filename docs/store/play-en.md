@@ -12,7 +12,8 @@ INCI Scan helps you decide whether a cosmetic is suitable for you — at the she
 - Ratings come from a local ingredient knowledge base (EU annex-inspired levels plus short shopper comments), not from the cloud.
 - Set personal filters: fragrance-free, pregnancy caution, EU-labelled allergens, children caution, alcohol in leave-on, essential-oil cluster, and ingredients you want to avoid.
 - Leave-on vs rinse-off changes some scores (for example MIT in a cream vs a shampoo). If the catalog does not know the product type, you can pick it on the result screen.
-- Save products to a shelf, compare scans, and see lower-concern options in this app’s catalog. A microplastics tag, when present, is a separate chip — not part of the safety traffic light.
+- Save products to a shelf, compare scans, and see lower-concern options in this app’s catalog.
+- Microplastics and animal-derived tags, when present, are separate chips — not part of the safety traffic light. Sun-caution, children, and pregnancy notes are incomplete catalog lists, not diagnoses, and do not change that rating.
 - Share a result as text or a simple image. Wipe history, shelf, or all personal data on this device from Preferences. There is no account.
 - Ads are optional banners on browse screens only. They never appear on the camera or the confirm-ingredients step.
 

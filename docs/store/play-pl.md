@@ -12,7 +12,8 @@ INCI Scan pomaga ocenić, czy kosmetyk jest dla Ciebie odpowiedni — przy pół
 - Oceny pochodzą z lokalnej bazy składników (poziomy inspirowane załącznikami UE i krótkie komentarze), nie z chmury.
 - Ustaw filtry: bez zapachu, ostrożność w ciąży, alergeny oznaczane w UE, ostrożność u dzieci, alkohol w produktach leave-on, oleje eteryczne oraz składniki do unikania.
 - Leave-on i produkty spłukiwane mogą dostać inną ocenę (np. MIT w kremie i w szamponie). Jeśli katalog nie zna typu produktu, możesz go wybrać na ekranie wyniku.
-- Zapisuj produkty na półce, porównuj skany i oglądaj spokojniejsze opcje w katalogu tej aplikacji. Oznaczenie mikroplastiku, jeśli jest, to osobny znacznik — nie część semafora bezpieczeństwa.
+- Zapisuj produkty na półce, porównuj skany i oglądaj spokojniejsze opcje w katalogu tej aplikacji.
+- Oznaczenia mikroplastiku i pochodzenia zwierzęcego, jeśli są, to osobne znaczniki — nie część semafora bezpieczeństwa. Ostrzeżenie o słońcu oraz ostrożność u dzieci i w ciąży to niekompletne listy w katalogu, nie diagnozy, i nie zmieniają tej oceny.
 - Udostępnij wynik jako tekst albo prosty obraz. W Preferencjach możesz usunąć historię, półkę albo wszystkie dane osobiste na tym urządzeniu. Nie ma konta.
 - Reklamy to opcjonalne bannery tylko na ekranach przeglądania. Nie ma ich na aparacie ani przy potwierdzaniu składu.
 
