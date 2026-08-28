@@ -12,7 +12,9 @@ INCI Scan to offline’owy skaner składników kosmetyków.
 
 Zeskanuj kod kreskowy albo zrób zdjęcie bloku INCI / składu, gdy produktu nie ma w katalogu. Potwierdź nazwy z OCR, a potem zobacz ocenę, która nie opiera się tylko na kolorze: każdy poziom ma kształt, słowo i barwę.
 
-Filtry osobiste (bez zapachu, ostrożność w ciąży, lista unikania) mogą oznaczyć produkt jako nieodpowiedni nawet przy umiarkowanej ocenie ogólnej.
+Filtry osobiste (bez zapachu, ostrożność w ciąży, alergeny oznaczane w UE, ostrożność u dzieci, alkohol w leave-on, oleje eteryczne, lista unikania) mogą oznaczyć produkt jako nieodpowiedni nawet przy umiarkowanej ocenie ogólnej. Jeśli użycie jest nieznane, wybierz leave-on albo spłukiwanie na ekranie wyniku.
+
+Zapisuj produkty na półce, porównuj skany i udostępniaj wynik jako tekst albo prosty obraz. Oznaczenie mikroplastiku, jeśli jest w katalogu, to osobny znacznik — nie szósta barwa semafora. Dane osobiste na tym urządzeniu możesz usunąć w ustawieniach. Nie ma konta.
 
 Bannery reklamowe nie zasłaniają aparatu ani przycisku oceny. Zgoda (ATT) jest wymagana przed reklamami spersonalizowanymi.
 
