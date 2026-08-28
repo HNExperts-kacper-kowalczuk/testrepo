@@ -112,6 +112,12 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
                 label = { Text(stringResource(Res.string.prefs_language_pl)) }
             )
         }
+        PreferencesThemeSection(
+            preference = stored.themePreference,
+            onFollowSystem = viewModel::setFollowSystemTheme,
+            onLight = viewModel::setLightTheme,
+            onDark = viewModel::setDarkTheme
+        )
         Text(text = stringResource(Res.string.prefs_avoid_title), style = MaterialTheme.typography.titleMedium)
         OutlinedTextField(
             value = uiState.avoidQuery,

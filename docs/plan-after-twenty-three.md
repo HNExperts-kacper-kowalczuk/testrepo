@@ -1,6 +1,6 @@
 # After phases 21–23: next work
 
-Phases **21–23** in [plan-after-twenty.md](plan-after-twenty.md) are **shipped** on `main` (PRs **#32–#34**). This document is the next slice.
+Phases **21–23** in [plan-after-twenty.md](plan-after-twenty.md) are **shipped** on `main` (PRs **#32–#34**). This document is the next slice: **24–25 shipped** (#35–#36); **26 is this PR**.
 
 **Each phase is one PR.** Stack on `main` after the previous phase merges. Suggested branches: `cursor/phase-24-ruleset-changelog-4039` … `cursor/phase-26-theme-override-4039`. Do not combine two phases in one PR.
 
@@ -17,7 +17,7 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 | Settings catalog | Stamp + “what this includes” notes. No version-stamped **history** |
 | Changelog | Called out in [further-additions.md](further-additions.md) §6; explicitly **out** of phases 18 and 22 (no SQLite table, no live CosIng feed) |
 | Store listings | Play/App Store copy still described only the microplastics chip before **phase 25** |
-| Theme | Follows the system; `RatingColors` fixed. No in-app light/dark override |
+| Theme | System / light / dark in Preferences (this PR). `RatingColors` stay fixed |
 
 ---
 
@@ -49,6 +49,7 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 
 **PR:** `cursor/phase-25-store-copy-4039`  
 **Depends on:** 24 (shipped as **#35**; optional for this copy).  
+**PR:** **#36** (shipped).  
 **Outcome:** Play/App Store docs mention sun-caution / children / pregnancy notes and the animal-derived chip, not only microplastics. EN/PL. No traffic-light change.
 
 In-app Settings notes and result chips already cover those tags (phases 22–23). This PR updates store listings and related sideload/catalog docs.
@@ -62,10 +63,27 @@ In-app Settings notes and result chips already cover those tags (phases 22–23)
 
 ---
 
-## Phase 26 — In-app theme override (optional, last)
+## Phase 26 — In-app theme override
 
-**PR:** `cursor/phase-26-theme-override-4039`  
-Light / dark / system in Preferences. `RatingColors` stay fixed. No dynamic colour on ratings.
+**PR:** `cursor/phase-26-theme-override-4039` (this PR)  
+**Depends on:** 25 (shipped as **#36**).  
+**Outcome:** Light / dark / system in Preferences. `RatingColors` stay fixed. No dynamic colour on ratings.
+
+### 26.1 Behaviour
+
+- `ThemePreference` (`system` / `light` / `dark`) on `user_profile`, migrated for existing installs.
+- `ThemeSession` publishes the live choice; `CosmeticsTheme` resolves dark surfaces from that plus the system setting.
+- Device reset keeps appearance the same way it keeps locale.
+- EN/PL keys. Filter chips in Settings, extracted from `PreferencesScreen`.
+
+### 26.2 Done when
+
+- Preferences can pin light, pin dark, or follow the system; the choice persists locally.
+- Rating badges still use `RatingColors` (green/red do not follow the scheme).
+- Device reset does not revert a pinned dark/light theme.
+- `:shared:jvmTest` and quality script green.
+
+**Out of this PR:** Material You dynamic colour on ratings; per-screen themes; foldables.
 
 ---
 
@@ -87,8 +105,8 @@ Light / dark / system in Preferences. `RatingColors` stay fixed. No dynamic colo
 
 ```
 24 ruleset changelog in Settings   ← shipped #35
-25 store listing copy pass         ← this PR
-26 in-app theme override (optional last)
+25 store listing copy pass         ← shipped #36
+26 in-app theme override           ← this PR
 ```
 
 ---

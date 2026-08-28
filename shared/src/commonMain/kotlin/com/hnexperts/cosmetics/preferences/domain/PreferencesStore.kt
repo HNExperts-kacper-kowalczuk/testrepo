@@ -8,7 +8,8 @@ data class StoredPreferences(
     val profile: UserAvoidanceProfile,
     val localePreference: LocalePreference,
     val pinnedLocale: AppLocale?,
-    val adsRemoved: Boolean = false
+    val adsRemoved: Boolean = false,
+    val themePreference: ThemePreference = ThemePreference.FOLLOW_SYSTEM
 )
 
 interface PreferencesStore {

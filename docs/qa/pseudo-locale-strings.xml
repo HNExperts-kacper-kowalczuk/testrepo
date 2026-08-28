@@ -101,6 +101,10 @@
     <string name="prefs_language_system">[!!Follow system!!]</string>
     <string name="prefs_language_en">[!!English!!]</string>
     <string name="prefs_language_pl">[!!Polish!!]</string>
+    <string name="prefs_theme">[!!Appearance!!]</string>
+    <string name="prefs_theme_system">[!!Follow system!!]</string>
+    <string name="prefs_theme_light">[!!Light!!]</string>
+    <string name="prefs_theme_dark">[!!Dark!!]</string>
     <string name="prefs_avoid_title">[!!Avoid specific ingredients!!]</string>
     <string name="prefs_catalog_title">[!!Offline catalog!!]</string>
     <string name="prefs_catalog_stamp">[!!Version %1$s · built %2$s · %3$s!!]</string>

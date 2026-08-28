@@ -8,6 +8,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
+import com.hnexperts.cosmetics.preferences.domain.ThemePreference
 
 /**
  * Rating semantics are fixed brand colours. They must not follow
@@ -86,9 +87,20 @@ internal fun cosmeticsColorScheme(dark: Boolean): ColorScheme {
     return if (dark) DarkColors else LightColors
 }
 
+fun resolveDarkTheme(preference: ThemePreference, systemDark: Boolean): Boolean {
+    return when (preference) {
+        ThemePreference.FOLLOW_SYSTEM -> systemDark
+        ThemePreference.LIGHT -> false
+        ThemePreference.DARK -> true
+    }
+}
+
 @Composable
-fun CosmeticsTheme(content: @Composable () -> Unit) {
-    val dark: Boolean = isSystemInDarkTheme()
+fun CosmeticsTheme(
+    preference: ThemePreference = ThemePreference.FOLLOW_SYSTEM,
+    content: @Composable () -> Unit
+) {
+    val dark: Boolean = resolveDarkTheme(preference, isSystemInDarkTheme())
     MaterialTheme(
         colorScheme = cosmeticsColorScheme(dark),
         content = content
