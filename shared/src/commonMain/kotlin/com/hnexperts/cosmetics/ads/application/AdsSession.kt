@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.ads.application
 
+import com.hnexperts.cosmetics.ads.AdMobConfig
 import com.hnexperts.cosmetics.ads.AdPolicy
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.ads.domain.AdsInitializer
@@ -65,7 +66,7 @@ class AdsSession(
                 ConsentSnapshot(canRequestAds = false, privacyOptionsRequired = false)
             }
             var sdkReady: Boolean = false
-            if (snapshot.canRequestAds && online) {
+            if (AdMobConfig.isConfigured && snapshot.canRequestAds && online) {
                 sdkReady = try {
                     adsInitializer.initialize()
                 } catch (cancelled: CancellationException) {
@@ -75,7 +76,7 @@ class AdsSession(
                     false
                 }
             }
-            val adsRemoved: Boolean = adsRemovedFlag()
+            val adsRemoved: Boolean = adsRemovedFlag() || !AdMobConfig.isConfigured
             state.update { current ->
                 current.copy(
                     consentGranted = snapshot.canRequestAds,

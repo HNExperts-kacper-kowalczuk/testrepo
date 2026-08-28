@@ -61,6 +61,7 @@
     <string name="result_check_label">Check the label</string>
     <string name="result_pack_verified">The photographed list matches the catalog.</string>
     <string name="result_share">Share result</string>
+    <string name="result_share_image">Share as image</string>
     <string name="share_scanned_product">Scanned product</string>
     <string name="share_scanned_at">Scanned</string>
     <string name="result_shelf_add">Save to shelf</string>

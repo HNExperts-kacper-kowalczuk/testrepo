@@ -9,8 +9,9 @@ Scan history, the personal avoid-list, shelf stars, unsent reports, and cached o
 
 ## iOS
 
-- The user database is in the app sandbox. If you later enable iCloud Documents or iCloud Backup of the container, include `user.db` in the privacy nutrition labels as “Scan History” / “User Content”.
-- This release does not add a custom iCloud entitlement.
+- `user.db` is in the app sandbox (SQLDelight default location) and is included in **standard iCloud / computer backup of the app container**. This is not an iCloud Documents entitlement and not a custom CloudKit container.
+- Spotlight / Siri can offer “Scan barcode” via `NSUserActivity` type `com.hnexperts.cosmetics.scanner.scan` (iOS 15.3, no App Intents). That opens the in-app barcode camera through the same launch-intent path as the Android home-screen shortcut.
+- Privacy nutrition: `PrivacyInfo.xcprivacy` records scan history / avoid-list as on-device User Content for app functionality, not linked and not used for tracking.
 
 ## What is not backed up
 

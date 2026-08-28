@@ -61,6 +61,7 @@
     <string name="result_check_label">Sprawdź etykietę</string>
     <string name="result_pack_verified">Zeskanowana lista zgadza się z katalogiem.</string>
     <string name="result_share">Udostępnij wynik</string>
+    <string name="result_share_image">Udostępnij jako obraz</string>
     <string name="share_scanned_product">Zeskanowany produkt</string>
     <string name="share_scanned_at">Zeskanowano</string>
     <string name="result_shelf_add">Zapisz na półkę</string>
