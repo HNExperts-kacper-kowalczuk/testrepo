@@ -136,7 +136,7 @@ Wrong name, wrong INCI, missing product: saved on device, flushed when sync exis
 ## 6. Knowledge, not only a score (P2)
 
 - **Ingredient encyclopedia:** search the knowledge base without scanning (name, alias, CAS). Reuses the same comment rows.
-- **Ruleset changelog:** “Catalog 2026-08: 40 comments updated.” Shown in Settings. Makes offline data feel alive.
+- **Ruleset changelog:** “Catalog 2026-08: …” in Settings ([plan-after-twenty-three.md](plan-after-twenty-three.md) phase 24). Makes offline data feel alive. Not a live CosIng feed.
 - **Watch saved products** after sync: if a starred GTIN’s INCI hash changes, badge it. (Needs sync; design the hash in v1.)
 
 Educational copy must stay factual (annex, function). No “causes cancer” headlines.
@@ -201,7 +201,7 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–23 in **[plan-after-twenty.md](plan-after-twenty.md)** (phototoxic/children/pregnancy tags, Settings notes, animal-derived chip) complete this slice.
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–23 in **[plan-after-twenty.md](plan-after-twenty.md)** are shipped. Next: **[plan-after-twenty-three.md](plan-after-twenty-three.md)** (ruleset changelog in Settings, store copy, optional theme override).
 
 Still out of git: real Remove-ads IAP, production AdMob / sync URLs, vegan/cruelty as safety scores, foldables, CJK OCR.
 

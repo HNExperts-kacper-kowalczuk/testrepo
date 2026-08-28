@@ -113,7 +113,7 @@ Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unch
 ```
 21 phototoxic / children / pregnancy indexes   ← shipped #32
 22 settings notes for those tags               ← shipped #33
-23 animal-derived chip (optional last)         ← this PR
+23 animal-derived chip (optional last)         ← shipped #34
 ```
 
 ---
