@@ -54,5 +54,11 @@
         <meta-data
             android:name="com.hnexperts.cosmetics.ads.BANNER_UNIT_ID"
             android:value="${admobBannerId}" />
+        <meta-data
+            android:name="com.hnexperts.cosmetics.sync.CATALOG_BASE_URL"
+            android:value="${catalogBaseUrl}" />
+        <meta-data
+            android:name="com.hnexperts.cosmetics.sync.REPORTS_URL"
+            android:value="${reportsUrl}" />
     </application>
 </manifest>

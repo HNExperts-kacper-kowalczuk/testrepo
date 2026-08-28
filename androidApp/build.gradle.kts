@@ -40,6 +40,8 @@ android {
         versionName = "1.0"
         manifestPlaceholders["admobAppId"] = sampleAdmobAppId
         manifestPlaceholders["admobBannerId"] = sampleAdmobBannerId
+        manifestPlaceholders["catalogBaseUrl"] = localProperty("catalog.sync.url")
+        manifestPlaceholders["reportsUrl"] = localProperty("reports.flush.url")
     }
     packaging {
         resources {
@@ -50,6 +52,8 @@ android {
         getByName("debug") {
             manifestPlaceholders["admobAppId"] = sampleAdmobAppId
             manifestPlaceholders["admobBannerId"] = sampleAdmobBannerId
+            manifestPlaceholders["catalogBaseUrl"] = localProperty("catalog.sync.url")
+            manifestPlaceholders["reportsUrl"] = localProperty("reports.flush.url")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -58,6 +62,8 @@ android {
             manifestPlaceholders["admobAppId"] =
                 releaseAppId.ifEmpty { "ca-app-pub-0000000000000000~0000000000" }
             manifestPlaceholders["admobBannerId"] = releaseBannerId
+            manifestPlaceholders["catalogBaseUrl"] = localProperty("catalog.sync.url")
+            manifestPlaceholders["reportsUrl"] = localProperty("reports.flush.url")
         }
     }
     compileOptions {

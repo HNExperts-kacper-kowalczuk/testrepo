@@ -25,8 +25,8 @@ object CatalogBuilder {
         if (commentErrors.isNotEmpty()) {
             throw IllegalStateException(commentErrors.joinToString(separator = "; "))
         }
-        val ingredients: List<FixtureIngredient> = ingredientsDump.ingredients.map(::toFixture)
-        val products: List<FixtureProduct> = productsDump.products.map(::toFixture)
+        val ingredients: List<FixtureIngredient> = ingredientsDump.ingredients.map(::ingredientFrom)
+        val products: List<FixtureProduct> = productsDump.products.map(::productFrom)
         val checksum: String = CatalogIntegrity.fingerprint(
             catalogVersion = ingredientsDump.catalogVersion,
             rulesetVersion = ingredientsDump.rulesetVersion,
@@ -60,7 +60,7 @@ object CatalogBuilder {
         )
     }
 
-    private fun toFixture(record: CosingIngredientRecord): FixtureIngredient {
+    fun ingredientFrom(record: CosingIngredientRecord): FixtureIngredient {
         return FixtureIngredient(
             ingredient = Ingredient(
                 id = record.id,
@@ -82,7 +82,7 @@ object CatalogBuilder {
         )
     }
 
-    private fun toFixture(record: ObfProductRecord): FixtureProduct {
+    fun productFrom(record: ObfProductRecord): FixtureProduct {
         return FixtureProduct(
             product = Product(
                 id = record.id,

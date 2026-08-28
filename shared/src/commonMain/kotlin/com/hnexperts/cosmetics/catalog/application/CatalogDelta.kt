@@ -25,11 +25,11 @@ interface CatalogMutationStore {
 }
 
 interface CatalogDeltaSource {
-    suspend fun deltaFor(fromVersion: String, toVersion: String): CatalogDelta?
+    suspend fun deltaFor(fromVersion: String, published: CatalogManifest): CatalogDelta?
 }
 
 class BundledCatalogDeltaSource : CatalogDeltaSource {
-    override suspend fun deltaFor(fromVersion: String, toVersion: String): CatalogDelta? {
+    override suspend fun deltaFor(fromVersion: String, published: CatalogManifest): CatalogDelta? {
         return null
     }
 }

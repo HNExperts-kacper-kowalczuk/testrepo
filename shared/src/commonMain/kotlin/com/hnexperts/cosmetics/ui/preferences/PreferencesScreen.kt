@@ -51,10 +51,6 @@ import com.hnexperts.cosmetics.resources.prefs_pregnancy
 import com.hnexperts.cosmetics.resources.prefs_privacy
 import com.hnexperts.cosmetics.resources.prefs_remove_ads
 import com.hnexperts.cosmetics.resources.prefs_remove_ads_unavailable
-import com.hnexperts.cosmetics.resources.prefs_reports_copy
-import com.hnexperts.cosmetics.resources.prefs_reports_copied
-import com.hnexperts.cosmetics.resources.prefs_reports_count
-import com.hnexperts.cosmetics.resources.prefs_reports_empty
 import com.hnexperts.cosmetics.resources.prefs_ads_removed
 import com.hnexperts.cosmetics.resources.prefs_title
 import com.hnexperts.cosmetics.ui.common.FailureBanner
@@ -146,20 +142,14 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             onCheck = viewModel::reload,
             onApply = viewModel::applyCatalogUpdate
         )
-        Text(
-            text = stringResource(Res.string.prefs_reports_count, uiState.openReportCount.toString()),
-            style = MaterialTheme.typography.bodyLarge
+        PreferencesReportsSection(
+            openReportCount = uiState.openReportCount,
+            reportsCopied = uiState.reportsCopied,
+            reportsSent = uiState.reportsSent,
+            reportsSendAvailable = uiState.reportsSendAvailable,
+            onCopyReports = viewModel::copyReports,
+            onSendReports = viewModel::sendReports
         )
-        val emptyReports: String = stringResource(Res.string.prefs_reports_empty)
-        Button(
-            onClick = { viewModel.copyReports(emptyReports) },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(Res.string.prefs_reports_copy))
-        }
-        if (uiState.reportsCopied) {
-            Text(text = stringResource(Res.string.prefs_reports_copied))
-        }
         PreferencesExportSection(
             avoidCopied = uiState.avoidCopied,
             shelfCopied = uiState.shelfCopied,
