@@ -1,6 +1,6 @@
 # After phases 1–15: next work
 
-Phases **1–5** ([plan-next-phases.md](plan-next-phases.md)) and **6–15** ([plan-further-improvements.md](plan-further-improvements.md)) are **shipped** on `main` (through PR **#24**). This document is the next slice.
+**Status: shipped** (PRs **#25–#30**). Phases **1–5** in [plan-next-phases.md](plan-next-phases.md) and **6–15** in [plan-further-improvements.md](plan-further-improvements.md) were already shipped. This document is the completed 16–20 slice. Further work: [plan-after-twenty.md](plan-after-twenty.md).
 
 **Each phase is one PR.** Stack on `main` after the previous phase merges. Suggested branches: `cursor/phase-16-catalog-tags-4039` … `cursor/phase-20-dark-scheme-4039`. Do not combine two phases in one PR. If a phase grows past a focused review, split it *before* opening the PR, and update this file.
 
