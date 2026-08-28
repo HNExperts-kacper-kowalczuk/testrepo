@@ -1,0 +1,3 @@
+  1) AAAABBBBCCCCDDDDEEEEFFFF0000111122223333 "Apple Distribution: Acme Inc (FFFF000011)"
+  2) 1111222233334444555566667777888899990000 "Developer ID Application: Acme Inc (ZYXW987654)"
+     2 valid identities found

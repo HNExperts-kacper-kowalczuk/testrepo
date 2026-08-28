@@ -53,6 +53,10 @@ else
   echo "OK: no catch (Throwable)"
 fi
 
+if ! ./scripts/test-ios-codesign-identities.sh; then
+  FAILED=1
+fi
+
 extract_keys() {
   grep -oE 'name="[^"]+"' "$1" | sed 's/name="//;s/"$//' | sort
 }
