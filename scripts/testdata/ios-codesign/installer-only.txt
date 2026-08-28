@@ -1,0 +1,2 @@
+  1) AAAABBBBCCCCDDDDEEEEFFFF0000111122223333 "Developer ID Installer: Acme Inc (ZYXW987654)"
+     1 valid identities found

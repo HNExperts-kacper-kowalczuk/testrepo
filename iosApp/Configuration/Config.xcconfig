@@ -1,3 +1,5 @@
+// TEAM_ID is filled by scripts/sync-ios-signing.sh from Apple Development
+// and Developer ID certs in the login keychain (Config.local.xcconfig).
 TEAM_ID=
 BUNDLE_ID=com.hnexperts.cosmetics.scanner
 APP_NAME=INCI Scan
@@ -5,4 +7,7 @@ ADMOB_APP_ID=
 ADMOB_BANNER_ID=
 CATALOG_SYNC_URL=
 REPORTS_FLUSH_URL=
+
+#include? "Config.local.xcconfig"
+
 

@@ -48,7 +48,15 @@ export ANDROID_HOME=/path/to/android-sdk
 
 Pull requests and `main` run `./scripts/check-quality.sh` and `:shared:jvmTest` (see `.github/workflows/quality.yml`). That job does not assemble the APK or call live CosIng/OBF.
 
-iOS: open `iosApp/iosApp.xcodeproj` on macOS after a Gradle sync.
+iOS (macOS, Xcode, JDK 21):
+
+```bash
+./scripts/open-ios-xcode.sh
+```
+
+That reads **Apple Development** and **Developer ID** certificates from the **login** keychain, writes `iosApp/Configuration/Config.local.xcconfig` (`TEAM_ID` for Automatic signing), and opens `iosApp/iosApp.xcodeproj`. Pick a simulator or device and Run. The Xcode scheme and a build phase re-sync signing on each Run.
+
+`Config.local.xcconfig` is gitignored. AdMob / catalog / report URLs still go in `iosApp/Configuration/Config.xcconfig`. Simulator Run works if the login keychain has no matching certs; a physical device needs an Apple Development identity in login.
 
 ### Fixture barcodes
 
