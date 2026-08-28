@@ -2,15 +2,15 @@ package com.hnexperts.cosmetics.ui.result
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,8 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
@@ -32,7 +30,6 @@ import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
-import com.hnexperts.cosmetics.evaluation.domain.ResultA11yCounts
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
@@ -41,7 +38,6 @@ import com.hnexperts.cosmetics.resources.finding_rating_a11y
 import com.hnexperts.cosmetics.resources.finding_sun_caution
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
-import com.hnexperts.cosmetics.resources.result_a11y_summary
 import com.hnexperts.cosmetics.resources.result_alternatives
 import com.hnexperts.cosmetics.resources.result_alternatives_source
 import com.hnexperts.cosmetics.resources.result_check_label
@@ -49,28 +45,19 @@ import com.hnexperts.cosmetics.resources.result_disclaimer
 import com.hnexperts.cosmetics.resources.result_missing
 import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_pack_verified
-import com.hnexperts.cosmetics.resources.result_rating_a11y
 import com.hnexperts.cosmetics.resources.result_shelf_add
 import com.hnexperts.cosmetics.resources.result_shelf_remove
 import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
-import com.hnexperts.cosmetics.resources.result_usage
-import com.hnexperts.cosmetics.resources.result_usage_assumed
 import com.hnexperts.cosmetics.resources.result_usage_pick
 import com.hnexperts.cosmetics.resources.share_scanned_at
 import com.hnexperts.cosmetics.resources.share_scanned_product
-import com.hnexperts.cosmetics.resources.usage_eye
-import com.hnexperts.cosmetics.resources.usage_leave_on
-import com.hnexperts.cosmetics.resources.usage_lip
-import com.hnexperts.cosmetics.resources.usage_rinse_off
-import com.hnexperts.cosmetics.resources.usage_spray
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
-import com.hnexperts.cosmetics.ui.theme.RatingColors
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -111,194 +98,165 @@ fun ResultScreen(
             }
             return@Scaffold
         }
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                ResultHeader(assessment)
-            }
-            if (assessment.hasMicroplastics()) {
-                item {
-                    ResultMicroplasticChip()
-                }
-            }
-            if (assessment.usageAssumed) {
-                item {
-                    ResultUsageConfirm(onSelect = viewModel::setUsage)
-                }
-            }
-            if (showCategoryPicker(assessment, uiState)) {
-                item {
-                    ResultCategoryPicker(
-                        choices = uiState.categoryChoices,
-                        onPick = viewModel::setCategory,
-                        onSkip = viewModel::skipCategory
-                    )
-                }
-            }
-            if (assessment.packVerified) {
-                item {
-                    Text(text = stringResource(Res.string.result_pack_verified))
-                }
-            }
-            item {
-                Button(
-                    onClick = viewModel::checkTheLabel,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(Res.string.result_check_label))
-                }
-            }
-            item {
-                Button(
-                    onClick = viewModel::toggleShelf,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (uiState.onShelf) {
-                            stringResource(Res.string.result_shelf_remove)
-                        } else {
-                            stringResource(Res.string.result_shelf_add)
-                        }
-                    )
-                }
-            }
-            item {
-                val shareCopy: ShareCopy = ShareCopy(
-                    scannedProduct = stringResource(Res.string.share_scanned_product),
-                    suitable = stringResource(Res.string.result_suitable),
-                    notSuitable = stringResource(Res.string.result_not_suitable),
-                    disclaimer = stringResource(Res.string.result_disclaimer),
-                    overallLabel = dangerLevelText(assessment.overall),
-                    scannedAtLabel = stringResource(Res.string.share_scanned_at)
-                )
-                ResultShareActions(copy = shareCopy, viewModel = viewModel)
-            }
-            item {
-                FailureBanner(failure = uiState.failure)
-            }
-            if (assessment.unknownCount > 0) {
-                item {
-                    Text(
-                        text = pluralStringResource(
-                            Res.plurals.result_unknown_count,
-                            assessment.unknownCount,
-                            assessment.unknownCount
-                        )
-                    )
-                }
-            }
-            if (uiState.alternatives.isNotEmpty()) {
-                item {
-                    Text(
-                        text = stringResource(Res.string.result_alternatives),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-                item {
-                    Text(
-                        text = stringResource(Res.string.result_alternatives_source),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                items(uiState.alternatives, key = { alternative -> alternative.product.id }) { alternative ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { viewModel.openAlternative(alternative) }
-                    ) {
-                        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                            Text(text = alternative.product.name, style = MaterialTheme.typography.titleMedium)
-                            Text(text = dangerLevelText(alternative.assessment.overall))
-                        }
-                    }
-                }
-            }
-            items(assessment.findings) { finding ->
-                FindingRow(finding, viewModel)
-            }
-            item {
-                Text(
-                    text = stringResource(Res.string.result_disclaimer),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ResultHeader(assessment: ProductAssessment) {
-    val headerColor = RatingColors.of(assessment.overall)
-    val onHeader = RatingColors.onColor(assessment.overall)
-    val counts: ResultA11yCounts = ResultA11yCounts.of(assessment)
-    val headerSummary: String = stringResource(
-        Res.string.result_a11y_summary,
-        dangerLevelText(assessment.overall),
-        counts.prohibited,
-        counts.high,
-        counts.unknown
-    )
-    Card(
-        modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {
-            contentDescription = headerSummary
-        },
-        colors = CardDefaults.cardColors(containerColor = headerColor, contentColor = onHeader)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            val title: String = assessment.productName ?: assessment.gtin ?: ""
-            if (title.isNotEmpty()) {
-                Text(text = title, style = MaterialTheme.typography.headlineMedium)
-            }
-            assessment.brand?.let { brand ->
-                Text(text = brand, style = MaterialTheme.typography.titleMedium)
-            }
-            RatingChip(assessment)
-            Text(
-                text = if (assessment.suitableForUser) {
-                    stringResource(Res.string.result_suitable)
-                } else {
-                    stringResource(Res.string.result_not_suitable)
-                },
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = stringResource(Res.string.result_usage, usageLabel(assessment.usage)),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            if (assessment.usageAssumed) {
-                Text(
-                    text = stringResource(Res.string.result_usage_assumed),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-/**
- * The shape+word rating mark sits on a white chip so its colour-independent
- * shape stays visible on the tinted header.
- */
-@Composable
-private fun RatingChip(assessment: ProductAssessment) {
-    val overallLabel: String = dangerLevelText(assessment.overall)
-    val overallDescription: String = stringResource(Res.string.result_rating_a11y, overallLabel)
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surface
-    ) {
-        RatingBadge(
-            level = assessment.overall,
-            label = overallLabel,
-            contentDescription = overallDescription,
-            large = true,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+        ResultAssessmentBody(
+            assessment = assessment,
+            uiState = uiState,
+            viewModel = viewModel,
+            padding = padding
         )
+    }
+}
+
+@Composable
+private fun ResultAssessmentBody(
+    assessment: ProductAssessment,
+    uiState: ResultUiState,
+    viewModel: ResultViewModel,
+    padding: PaddingValues
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(padding),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        stickyHeader(key = "result-rating") {
+            Surface(
+                color = MaterialTheme.colorScheme.background,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ResultStickyRating(assessment)
+            }
+        }
+        resultActions(assessment, uiState, viewModel)
+        resultDetails(assessment, uiState, viewModel)
+    }
+}
+
+private fun LazyListScope.resultActions(
+    assessment: ProductAssessment,
+    uiState: ResultUiState,
+    viewModel: ResultViewModel
+) {
+    if (assessment.usageAssumed) {
+        item {
+            ResultUsageConfirm(onSelect = viewModel::setUsage)
+        }
+    }
+    if (showCategoryPicker(assessment, uiState)) {
+        item {
+            ResultCategoryPicker(
+                choices = uiState.categoryChoices,
+                onPick = viewModel::setCategory,
+                onSkip = viewModel::skipCategory
+            )
+        }
+    }
+    if (assessment.packVerified) {
+        item {
+            Text(text = stringResource(Res.string.result_pack_verified))
+        }
+    }
+    item {
+        Button(
+            onClick = viewModel::checkTheLabel,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(Res.string.result_check_label))
+        }
+    }
+    item {
+        Button(
+            onClick = viewModel::toggleShelf,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = if (uiState.onShelf) {
+                    stringResource(Res.string.result_shelf_remove)
+                } else {
+                    stringResource(Res.string.result_shelf_add)
+                }
+            )
+        }
+    }
+    item {
+        ResultShareActions(
+            copy = shareCopyFor(assessment),
+            viewModel = viewModel
+        )
+    }
+}
+
+@Composable
+private fun shareCopyFor(assessment: ProductAssessment): ShareCopy {
+    return ShareCopy(
+        scannedProduct = stringResource(Res.string.share_scanned_product),
+        suitable = stringResource(Res.string.result_suitable),
+        notSuitable = stringResource(Res.string.result_not_suitable),
+        disclaimer = stringResource(Res.string.result_disclaimer),
+        overallLabel = dangerLevelText(assessment.overall),
+        scannedAtLabel = stringResource(Res.string.share_scanned_at)
+    )
+}
+
+private fun LazyListScope.resultDetails(
+    assessment: ProductAssessment,
+    uiState: ResultUiState,
+    viewModel: ResultViewModel
+) {
+    item {
+        FailureBanner(failure = uiState.failure)
+    }
+    if (assessment.unknownCount > 0) {
+        item {
+            Text(
+                text = pluralStringResource(
+                    Res.plurals.result_unknown_count,
+                    assessment.unknownCount,
+                    assessment.unknownCount
+                )
+            )
+        }
+    }
+    if (uiState.alternatives.isNotEmpty()) {
+        resultAlternatives(uiState, viewModel)
+    }
+    items(assessment.findings) { finding ->
+        FindingRow(finding, viewModel)
+    }
+    item {
+        Text(
+            text = stringResource(Res.string.result_disclaimer),
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+private fun LazyListScope.resultAlternatives(
+    uiState: ResultUiState,
+    viewModel: ResultViewModel
+) {
+    item {
+        Text(
+            text = stringResource(Res.string.result_alternatives),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+    item {
+        Text(
+            text = stringResource(Res.string.result_alternatives_source),
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+    items(uiState.alternatives, key = { alternative -> alternative.product.id }) { alternative ->
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { viewModel.openAlternative(alternative) }
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Text(text = alternative.product.name, style = MaterialTheme.typography.titleMedium)
+                Text(text = dangerLevelText(alternative.assessment.overall))
+            }
+        }
     }
 }
 
@@ -375,15 +333,4 @@ private fun showCategoryPicker(assessment: ProductAssessment, uiState: ResultUiS
         return false
     }
     return uiState.categoryChoices.isNotEmpty()
-}
-
-@Composable
-private fun usageLabel(usage: ProductUsage): String {
-    return when (usage) {
-        ProductUsage.LEAVE_ON, ProductUsage.UNKNOWN -> stringResource(Res.string.usage_leave_on)
-        ProductUsage.RINSE_OFF -> stringResource(Res.string.usage_rinse_off)
-        ProductUsage.SPRAY -> stringResource(Res.string.usage_spray)
-        ProductUsage.LIP -> stringResource(Res.string.usage_lip)
-        ProductUsage.EYE -> stringResource(Res.string.usage_eye)
-    }
 }
