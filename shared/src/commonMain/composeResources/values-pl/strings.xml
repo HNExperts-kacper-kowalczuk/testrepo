@@ -109,6 +109,11 @@
     <string name="prefs_catalog_applied">Zbundlowana aktualizacja katalogu została wczytana.</string>
     <string name="prefs_catalog_offline">Offline — pokazujemy katalog z aplikacji. Aktualizacje poczekają na sieć.</string>
     <string name="prefs_catalog_check_action">Sprawdź aktualizacje katalogu</string>
+    <string name="prefs_catalog_notes_title">Co zawiera ten katalog</string>
+    <string name="prefs_catalog_notes_allergens">Przełącznik alergenów UE korzysta z oznaczanych alergenów zapachowych w tym katalogu (pierwotne 26 nazw i rozszerzenie z 2023 r.). Oznacza te składniki jako osobiste unikanie. Nie zmienia semafora bezpieczeństwa.</string>
+    <string name="prefs_catalog_notes_microplastics">Chip mikroplastików to niekompletny znacznik katalogu, nie ocena bezpieczeństwa.</string>
+    <string name="prefs_catalog_notes_annex">Poziomy zagrożenia pochodzą ze zrzutu załączników UE w tym katalogu, nie z bieżącego źródła prawnego.</string>
+    <string name="prefs_catalog_notes_tags">Znaczniki alergenów i mikroplastików są stosowane przy wczytaniu katalogu, nawet gdy spakowany plik jest starszy niż te listy.</string>
     <string name="prefs_privacy">Opcje prywatności reklam</string>
     <string name="prefs_clear_history">Wyczyść historię skanów</string>
     <string name="prefs_cleared_history">Historia skanów została usunięta z tego urządzenia.</string>
