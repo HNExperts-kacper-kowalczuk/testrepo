@@ -119,6 +119,11 @@ fun ResultScreen(
             item {
                 ResultHeader(assessment)
             }
+            if (assessment.hasMicroplastics()) {
+                item {
+                    ResultMicroplasticChip()
+                }
+            }
             if (assessment.usageAssumed) {
                 item {
                     ResultUsageConfirm(onSelect = viewModel::setUsage)

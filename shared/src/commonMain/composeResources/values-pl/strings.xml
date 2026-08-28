@@ -81,6 +81,8 @@
     <string name="finding_personal_avoid">Na Twojej liście unikania</string>
     <string name="finding_early_list">Blisko początku listy INCI (często wyższa zawartość).</string>
     <string name="finding_sun_caution">Ostrzeżenie o słońcu w tym katalogu — to nie diagnoza.</string>
+    <string name="result_microplastics_chip">Oznaczono mikroplastik</string>
+    <string name="result_microplastics_a11y">W tym katalogu oznaczono mikroplastik. Ta lista jest niepełna i nie jest oceną bezpieczeństwa.</string>
     <string name="finding_unmatched">Brak w bazie wiedzy</string>
     <string name="back">Wstecz</string>
 

@@ -96,4 +96,15 @@ class CosingAssemblerTest {
         assertEquals("LOW", record.dangerLevel)
         assertEquals(listOf("ALLERGEN_80"), record.regulatoryTags)
     }
+
+    @Test
+    fun polyethyleneGetsMicroplasticTagWithoutChangingDanger() {
+        val record: CosingIngredientRecord? = CosingAssembler().toRecord(
+            metadata("""{"inciName":["POLYETHYLENE"],"annexNo":[],"functionName":["ABRASIVE"]}""")
+        )
+        assertNotNull(record)
+        assertEquals("LOW", record.dangerLevel)
+        assertTrue(record.regulatoryTags.contains("MICROPLASTIC"))
+        assertEquals(listOf("ABRASIVE"), record.functionTags)
+    }
 }
