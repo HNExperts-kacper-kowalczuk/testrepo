@@ -120,6 +120,19 @@ internal object FixtureProducts {
                 verified = true
             ),
             gtins = listOf("5901234123532")
+        ),
+        FixtureProduct(
+            product = Product(
+                id = "carmine-tint",
+                name = "Carmine Lip Tint",
+                brand = "Fixture Care",
+                category = "lip",
+                inciRaw = "Aqua, Glycerin, Carmine",
+                usage = "LIP",
+                source = "curated",
+                verified = true
+            ),
+            gtins = listOf("5901234123549")
         )
     )
 }

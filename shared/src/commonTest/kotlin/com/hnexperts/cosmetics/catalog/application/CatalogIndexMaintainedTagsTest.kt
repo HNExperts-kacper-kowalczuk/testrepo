@@ -28,6 +28,20 @@ class CatalogIndexMaintainedTagsTest {
     }
 
     @Test
+    fun carmineChipDoesNotChangeOverall() {
+        val assessment: ProductAssessment = index.evaluateFormula.evaluate(
+            inciRaw = "Aqua, CARMINE",
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        val finding = assessment.findings.first { row -> row.ingredient.id == "carmine-cosing" }
+        assertTrue(finding.animalDerived())
+        assertTrue(assessment.hasAnimalDerived())
+        assertEquals(DangerLevel.LOW, assessment.overall)
+        assertEquals(DangerLevel.LOW, finding.level)
+        assertFalse(assessment.hasMicroplastics())
+    }
+
+    @Test
     fun euAllergensPresetUsesAssembledTags() {
         val withPreset: UserAvoidanceProfile = UserAvoidanceProfile.EMPTY.copy(euAllergens = true)
         val geraniolOn: ProductAssessment = index.evaluateFormula.evaluate(
@@ -57,6 +71,7 @@ class CatalogIndexMaintainedTagsTest {
             ingredients = listOf(
                 named("aqua", "Aqua"),
                 named("polyethylene-cosing", "POLYETHYLENE"),
+                named("carmine-cosing", "CARMINE"),
                 named("geraniol-cosing", "GERANIOL"),
                 named("acetyl-cedrene-cosing", "ACETYL CEDRENE")
             ),
@@ -65,6 +80,7 @@ class CatalogIndexMaintainedTagsTest {
             hazards = mapOf(
                 "aqua" to lowHazard("aqua"),
                 "polyethylene-cosing" to lowHazard("polyethylene-cosing"),
+                "carmine-cosing" to lowHazard("carmine-cosing"),
                 "geraniol-cosing" to lowHazard("geraniol-cosing"),
                 "acetyl-cedrene-cosing" to lowHazard("acetyl-cedrene-cosing")
             ),

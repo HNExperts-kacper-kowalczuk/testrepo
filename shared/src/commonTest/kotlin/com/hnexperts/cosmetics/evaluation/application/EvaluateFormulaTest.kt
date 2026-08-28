@@ -257,4 +257,24 @@ class EvaluateFormulaTest {
         assertEquals(DangerLevel.SAFE, withoutBeads.overall)
         assertFalse(withoutBeads.hasMicroplastics())
     }
+
+    @Test
+    fun animalDerivedTagIsAChipNotASafetyScore() {
+        val product = FixtureCatalog.products.first { item -> item.product.id == "carmine-tint" }.product
+        val assessment: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = product.inciRaw,
+            profile = UserAvoidanceProfile.EMPTY,
+            usage = ProductUsage.parse(product.usage)
+        )
+        assertEquals(DangerLevel.SAFE, assessment.overall)
+        assertTrue(assessment.hasAnimalDerived())
+        assertTrue(assessment.findings.first { finding -> finding.ingredient.id == "carmine" }.animalDerived())
+        assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "aqua" }.animalDerived())
+        val withoutCarmine: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = "Aqua, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        assertEquals(DangerLevel.SAFE, withoutCarmine.overall)
+        assertFalse(withoutCarmine.hasAnimalDerived())
+    }
 }

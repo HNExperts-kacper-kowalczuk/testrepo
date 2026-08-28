@@ -16,6 +16,7 @@ import com.hnexperts.cosmetics.resources.prefs_catalog_applied
 import com.hnexperts.cosmetics.resources.prefs_catalog_check_action
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_allergens
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_annex
+import com.hnexperts.cosmetics.resources.prefs_catalog_notes_animal_derived
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_children
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_microplastics
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_pregnancy
@@ -72,6 +73,7 @@ private fun CatalogNotes() {
     )
     CatalogNote(Res.string.prefs_catalog_notes_allergens)
     CatalogNote(Res.string.prefs_catalog_notes_microplastics)
+    CatalogNote(Res.string.prefs_catalog_notes_animal_derived)
     CatalogNote(Res.string.prefs_catalog_notes_annex)
     CatalogNote(Res.string.prefs_catalog_notes_sun_caution)
     CatalogNote(Res.string.prefs_catalog_notes_children)

@@ -2,6 +2,7 @@ package com.hnexperts.cosmetics.catalog.pipeline.ingest
 
 import com.hnexperts.cosmetics.catalog.pipeline.CosingCommentRecord
 import com.hnexperts.cosmetics.catalog.pipeline.CosingIngredientRecord
+import com.hnexperts.cosmetics.catalog.pipeline.AnimalDerivedIndex
 import com.hnexperts.cosmetics.catalog.pipeline.ChildrenCautionIndex
 import com.hnexperts.cosmetics.catalog.pipeline.EuLabelledAllergenIndex
 import com.hnexperts.cosmetics.catalog.pipeline.MicroplasticIndex
@@ -45,7 +46,8 @@ class CosingAssembler {
                 MicroplasticIndex.tagsFor(name) +
                 PhototoxicIndex.tagsFor(name) +
                 ChildrenCautionIndex.tagsFor(name) +
-                PregnancyCautionIndex.tagsFor(name),
+                PregnancyCautionIndex.tagsFor(name) +
+                AnimalDerivedIndex.tagsFor(name),
             functionTags = functions.map { function -> function.uppercase().replace(' ', '_') },
             comments = templatedComments(level)
         )
