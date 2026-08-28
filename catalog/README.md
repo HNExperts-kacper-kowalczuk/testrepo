@@ -22,4 +22,4 @@ The app unpacks `shared/src/commonMain/composeResources/files/catalog.sqlite.gz`
 
 `./gradlew :shared:packShippedCatalog` writes that gzip from **`catalog/ingest/`** when present (fixtures win on id/GTIN conflict), otherwise from `catalog/sources/` (fixture-sized). Do not run it without ingest dumps or you will replace the shipped catalog with eight SKUs.
 
-Allergen and microplastic **tag indexes** are written at CosIng ingest (`CosingAssembler`) and applied when `CatalogIndex` is assembled (phase 16). Phototoxic, children, and pregnancy caution lists follow the same pattern in [plan-after-twenty.md](../docs/plan-after-twenty.md). Do not run `packShippedCatalog` without ingest dumps or you will replace the shipped catalog with eight SKUs.
+Allergen, microplastic, phototoxic, children, pregnancy, and animal-derived **tag indexes** are written at CosIng ingest (`CosingAssembler`) and applied when `CatalogIndex` is assembled. Do not run `packShippedCatalog` without ingest dumps or you will replace the shipped catalog with eight SKUs.

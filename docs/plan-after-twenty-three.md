@@ -16,7 +16,7 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 | --- | --- |
 | Settings catalog | Stamp + “what this includes” notes. No version-stamped **history** |
 | Changelog | Called out in [further-additions.md](further-additions.md) §6; explicitly **out** of phases 18 and 22 (no SQLite table, no live CosIng feed) |
-| Store listings | `docs/store/play-en.md` still mentions only the microplastics chip |
+| Store listings | Play/App Store copy still described only the microplastics chip before **phase 25** |
 | Theme | Follows the system; `RatingColors` fixed. No in-app light/dark override |
 
 ---
@@ -45,11 +45,20 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 
 ---
 
-## Phase 25 — Store listing + in-app copy pass (later)
+## Phase 25 — Store listing + in-app copy pass
 
 **PR:** `cursor/phase-25-store-copy-4039`  
-**Depends on:** 24 optional.  
-Play/App Store docs and any in-app lines that still describe only the microplastics chip should mention sun-caution / children / pregnancy notes and the animal-derived chip. EN/PL. No traffic-light change.
+**Depends on:** 24 (shipped as **#35**; optional for this copy).  
+**Outcome:** Play/App Store docs mention sun-caution / children / pregnancy notes and the animal-derived chip, not only microplastics. EN/PL. No traffic-light change.
+
+In-app Settings notes and result chips already cover those tags (phases 22–23). This PR updates store listings and related sideload/catalog docs.
+
+### 25.1 Done when
+
+- `docs/store/play-en.md`, `play-pl.md`, `app-store-en.md`, and `app-store-pl.md` mention both extra chips and that sun/children/pregnancy notes are incomplete, not diagnoses, and not the traffic light.
+- Quality script green.
+
+**Out of this PR:** theme override (26); changing `DangerLevel`.
 
 ---
 
@@ -77,8 +86,8 @@ Light / dark / system in Preferences. `RatingColors` stay fixed. No dynamic colo
 ## Implementation order (one PR each)
 
 ```
-24 ruleset changelog in Settings   ← leftover from 18/22; do this first
-25 store listing copy pass
+24 ruleset changelog in Settings   ← shipped #35
+25 store listing copy pass         ← this PR
 26 in-app theme override (optional last)
 ```
 
