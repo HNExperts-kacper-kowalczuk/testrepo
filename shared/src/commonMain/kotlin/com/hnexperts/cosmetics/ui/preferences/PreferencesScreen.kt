@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hnexperts.cosmetics.catalog.application.CatalogFreshness
 import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
@@ -30,15 +29,6 @@ import com.hnexperts.cosmetics.resources.prefs_alcohol_leave_on
 import com.hnexperts.cosmetics.resources.prefs_avoid_search
 import com.hnexperts.cosmetics.resources.prefs_avoid_title
 import com.hnexperts.cosmetics.resources.prefs_children_caution
-import com.hnexperts.cosmetics.resources.prefs_catalog_apply
-import com.hnexperts.cosmetics.resources.prefs_catalog_applied
-import com.hnexperts.cosmetics.resources.prefs_catalog_check_action
-import com.hnexperts.cosmetics.resources.prefs_catalog_offline
-import com.hnexperts.cosmetics.resources.prefs_catalog_stamp
-import com.hnexperts.cosmetics.resources.prefs_catalog_title
-import com.hnexperts.cosmetics.resources.prefs_catalog_unknown
-import com.hnexperts.cosmetics.resources.prefs_catalog_update
-import com.hnexperts.cosmetics.resources.prefs_catalog_uptodate
 import com.hnexperts.cosmetics.resources.prefs_essential_oil
 import com.hnexperts.cosmetics.resources.prefs_eu_allergens
 import com.hnexperts.cosmetics.resources.prefs_eu_allergens_hint
@@ -137,7 +127,7 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
                 onCheckedChange = { viewModel.toggleAvoid(ingredient.id) }
             )
         }
-        CatalogSection(
+        PreferencesCatalogSection(
             uiState = uiState,
             onCheck = viewModel::reload,
             onApply = viewModel::applyCatalogUpdate
@@ -193,38 +183,6 @@ private fun AdsPurchaseSection(
         return
     }
     Text(text = stringResource(Res.string.prefs_remove_ads_unavailable))
-}
-
-@Composable
-private fun CatalogSection(
-    uiState: PreferencesUiState,
-    onCheck: () -> Unit,
-    onApply: () -> Unit
-) {
-    Text(text = stringResource(Res.string.prefs_catalog_title), style = MaterialTheme.typography.titleMedium)
-    val meta = uiState.catalogMeta
-    if (meta == null) {
-        Text(text = stringResource(Res.string.prefs_catalog_unknown))
-    } else {
-        Text(text = stringResource(Res.string.prefs_catalog_stamp, meta.catalogVersion, meta.builtAt, meta.region))
-    }
-    when (val freshness: CatalogFreshness? = uiState.freshness) {
-        is CatalogFreshness.UpToDate -> Text(text = stringResource(Res.string.prefs_catalog_uptodate))
-        is CatalogFreshness.UpdateAvailable -> {
-            Text(text = stringResource(Res.string.prefs_catalog_update, freshness.published.catalogVersion))
-            Button(onClick = onApply, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(Res.string.prefs_catalog_apply))
-            }
-        }
-        CatalogFreshness.Offline -> Text(text = stringResource(Res.string.prefs_catalog_offline))
-        null -> Unit
-    }
-    if (uiState.catalogApplied) {
-        Text(text = stringResource(Res.string.prefs_catalog_applied))
-    }
-    Button(onClick = onCheck, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(Res.string.prefs_catalog_check_action))
-    }
 }
 
 @Composable
