@@ -27,7 +27,9 @@ Working now:
 - AdMob banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, on no-fill, or when release IDs are missing from `local.properties`; never on Scan, camera, OCR review, or Preferences
 - Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
-Not in this slice yet (see `docs/plan.md` and `docs/further-additions.md`):
+Next code slice: [phases 16–20](docs/plan-after-fifteen.md) (maintained CosIng tags, sticky result header, catalog notes, CI, dark surfaces).
+
+Not in git / not as safety scores (see `docs/plan.md` and `docs/further-additions.md`):
 
 - Production AdMob unit IDs belong in uncommitted `local.properties` (`admob.app.id`, `admob.banner.id`) / XCConfig; debug uses Google sample IDs
 - Hosted catalog and report-flush URLs (`catalog.sync.url`, `reports.flush.url`) stay empty unless you set them locally
@@ -67,6 +69,7 @@ Unknown barcodes are looked up online automatically when the device is connected
 - **[Product and architecture plan](docs/plan.md)**
 - **[Next phases 1–5](docs/plan-next-phases.md)** — bundled catalog, pack verify, personal presets, compare, polish (shipped)
 - **[Further improvements 6–15](docs/plan-further-improvements.md)** — trust settings through microplastics chip (shipped)
+- **[After 1–15: phases 16–20](docs/plan-after-fifteen.md)** — CosIng tag overlay, sticky result header, catalog notes, CI, dark surfaces
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**

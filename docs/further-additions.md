@@ -201,7 +201,9 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** are **shipped**. What remains is P3 / out-of-scope work in this file (real Remove-ads IAP, vegan/cruelty as safety scores, foldables, CJK OCR).
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** are **shipped**. The next implementation slice is **[plan-after-fifteen.md](plan-after-fifteen.md)** (phases 16–20): apply allergen/microplastic tag indexes to the packed CosIng catalog at assemble time, keep the result header on screen, explain the ruleset in Settings, add CI, and finish the dark surface palette.
+
+Still out of that slice (and of git): real Remove-ads IAP, production AdMob / sync URLs, vegan/cruelty as safety scores, foldables, CJK OCR.
 
 ---
 
