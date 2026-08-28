@@ -161,6 +161,11 @@ WHERE flushed = 0
 ORDER BY created_at DESC
 LIMIT 200;
 
+markOpenReportsFlushed:
+UPDATE report_queue
+SET flushed = 1
+WHERE flushed = 0;
+
 selectShelf:
 SELECT *
 FROM user_shelf

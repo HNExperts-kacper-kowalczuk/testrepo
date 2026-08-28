@@ -20,7 +20,7 @@ class ApplyCatalogDelta(
         val applied: Outcome<Unit> = FailureCatcher.catalog("catalog.sync.apply") {
             val delta: CatalogDelta = deltas.deltaFor(
                 fromVersion = local.meta.catalogVersion,
-                toVersion = published.catalogVersion
+                published = published
             ) ?: throw NoCatalogDeltaException(published.catalogVersion)
             withContext(dispatchers.catalogDatabase) {
                 mutations.applyDelta(delta)

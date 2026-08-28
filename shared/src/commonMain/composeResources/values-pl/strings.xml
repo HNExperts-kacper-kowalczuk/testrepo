@@ -125,6 +125,9 @@
     <string name="prefs_reports_copy">Kopiuj niewysłane zgłoszenia jako tekst</string>
     <string name="prefs_reports_copied">Lista zgłoszeń skopiowana.</string>
     <string name="prefs_reports_empty">rodzaj	gtin	treść</string>
+    <string name="prefs_reports_send">Wyślij niewysłane zgłoszenia</string>
+    <string name="prefs_reports_sent">Niewysłane zgłoszenia zostały wysłane.</string>
+    <string name="prefs_reports_send_unavailable">Wysyłanie zgłoszeń nie jest skonfigurowane w tej kompilacji.</string>
     <string name="prefs_export_avoid">Kopiuj listę unikania</string>
     <string name="prefs_export_avoid_copied">Lista unikania skopiowana.</string>
     <string name="prefs_export_avoid_empty">(brak składników na liście unikania)</string>

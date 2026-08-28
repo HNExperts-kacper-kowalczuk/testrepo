@@ -125,6 +125,9 @@
     <string name="prefs_reports_copy">Copy unsent reports as text</string>
     <string name="prefs_reports_copied">Report list copied.</string>
     <string name="prefs_reports_empty">kind	gtin	payload</string>
+    <string name="prefs_reports_send">Send unsent reports</string>
+    <string name="prefs_reports_sent">Unsent reports were sent.</string>
+    <string name="prefs_reports_send_unavailable">Sending reports is not configured on this build.</string>
     <string name="prefs_export_avoid">Copy avoid-list</string>
     <string name="prefs_export_avoid_copied">Avoid-list copied.</string>
     <string name="prefs_export_avoid_empty">(no avoid-list ingredients)</string>

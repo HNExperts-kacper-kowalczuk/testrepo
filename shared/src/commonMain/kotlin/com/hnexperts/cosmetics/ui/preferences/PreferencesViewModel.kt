@@ -22,6 +22,7 @@ import com.hnexperts.cosmetics.preferences.application.UserDataReset
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
+import com.hnexperts.cosmetics.scanning.application.FlushReports
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.runUiAction
@@ -56,6 +57,8 @@ data class PreferencesUiState(
     val avoidQuery: String = "",
     val openReportCount: Long = 0,
     val reportsCopied: Boolean = false,
+    val reportsSent: Boolean = false,
+    val reportsSendAvailable: Boolean = false,
     val adsRemoved: Boolean = false,
     val billingAvailable: Boolean = false,
     val pendingReset: DataResetKind? = null,
@@ -71,6 +74,7 @@ class PreferencesViewModel(
     private val applyCatalogDelta: ApplyCatalogDelta,
     private val adsSession: AdsSession,
     private val reports: ReportQueue,
+    private val flushReports: FlushReports,
     private val billing: BillingPort,
     private val userDataReset: UserDataReset,
     private val shelf: UserShelf
@@ -82,7 +86,10 @@ class PreferencesViewModel(
     private var ingredientsById: Map<String, Ingredient> = emptyMap()
 
     init {
-        state.value = state.value.copy(billingAvailable = billing.isAvailable())
+        state.value = state.value.copy(
+            billingAvailable = billing.isAvailable(),
+            reportsSendAvailable = flushReports.isConfigured()
+        )
         reload()
         viewModelScope.launch {
             adsSession.gate.collect { gate ->
@@ -222,6 +229,17 @@ class PreferencesViewModel(
             }
             copyPlainText(text.ifBlank { emptyText })
             state.value = state.value.copy(reportsCopied = true, failure = null)
+        }
+    }
+
+    fun sendReports() {
+        if (!flushReports.isConfigured()) {
+            return
+        }
+        viewModelScope.launch {
+            runUiAction(::showFailure) { flushReports.invoke() } ?: return@launch
+            state.value = state.value.copy(reportsSent = true, failure = null)
+            reload()
         }
     }
 

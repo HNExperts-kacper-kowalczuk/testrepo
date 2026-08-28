@@ -232,6 +232,11 @@ class UserDataResetTest {
             return Outcome.Ok(items.toList())
         }
 
+        override suspend fun markAllOpenFlushed(): Outcome<Unit> {
+            items.clear()
+            return Outcome.Ok(Unit)
+        }
+
         override suspend fun clear(): Outcome<Unit> {
             items.clear()
             return Outcome.Ok(Unit)

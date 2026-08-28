@@ -67,6 +67,14 @@ class SqlReportQueue(
         }
     }
 
+    override suspend fun markAllOpenFlushed(): Outcome<Unit> {
+        return FailureCatcher.database("report.flush") {
+            withContext(dispatchers.userDatabase) {
+                database.userDatabaseQueries.markOpenReportsFlushed()
+            }
+        }
+    }
+
     override suspend fun clear(): Outcome<Unit> {
         return FailureCatcher.database("report.clear") {
             withContext(dispatchers.userDatabase) {

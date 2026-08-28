@@ -53,3 +53,16 @@ data class ObfProductDump(
     val region: String,
     val products: List<ObfProductRecord>
 )
+
+@Serializable
+data class CatalogDeltaDump(
+    val fromCatalogVersion: String,
+    val catalogVersion: String,
+    val rulesetVersion: String,
+    val builtAt: String,
+    val region: String,
+    val checksum: String,
+    val supportedCommentLocales: List<String> = listOf("en", "pl"),
+    val ingredients: List<CosingIngredientRecord> = emptyList(),
+    val products: List<ObfProductRecord> = emptyList()
+)
