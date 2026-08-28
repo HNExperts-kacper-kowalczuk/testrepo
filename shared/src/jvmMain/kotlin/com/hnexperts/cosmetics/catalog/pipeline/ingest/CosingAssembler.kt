@@ -2,6 +2,7 @@ package com.hnexperts.cosmetics.catalog.pipeline.ingest
 
 import com.hnexperts.cosmetics.catalog.pipeline.CosingCommentRecord
 import com.hnexperts.cosmetics.catalog.pipeline.CosingIngredientRecord
+import com.hnexperts.cosmetics.catalog.pipeline.EuLabelledAllergenIndex
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
 import kotlinx.serialization.json.JsonObject
 
@@ -35,10 +36,14 @@ class CosingAssembler {
             aliases = aliases(metadata, name),
             commaException = COMMA_IN_NAME.containsMatchIn(name),
             dangerLevel = level.name,
-            regulatoryTags = annexes.map { annex -> "ANNEX_$annex" },
+            regulatoryTags = annexTags(annexes) + EuLabelledAllergenIndex.tagsFor(name),
             functionTags = functions.map { function -> function.uppercase().replace(' ', '_') },
             comments = templatedComments(level)
         )
+    }
+
+    private fun annexTags(annexes: List<String>): List<String> {
+        return annexes.map { annex -> "ANNEX_$annex" }
     }
 
     private fun dangerLevel(annexes: List<String>, functions: List<String>): DangerLevel {

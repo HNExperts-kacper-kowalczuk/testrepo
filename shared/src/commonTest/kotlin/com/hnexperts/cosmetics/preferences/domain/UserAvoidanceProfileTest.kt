@@ -28,4 +28,23 @@ class UserAvoidanceProfileTest {
             )
         )
     }
+
+    @Test
+    fun euAllergensPresetMatchesAllergen80Tag() {
+        val profile: UserAvoidanceProfile = UserAvoidanceProfile.EMPTY.copy(euAllergens = true)
+        assertTrue(
+            profile.avoids(
+                ingredientId = "vanillin",
+                functionTags = emptyList(),
+                regulatoryTags = listOf(UserAvoidanceProfile.TAG_ALLERGEN_80)
+            )
+        )
+        assertFalse(
+            UserAvoidanceProfile.EMPTY.avoids(
+                ingredientId = "vanillin",
+                functionTags = emptyList(),
+                regulatoryTags = listOf(UserAvoidanceProfile.TAG_ALLERGEN_80)
+            )
+        )
+    }
 }
