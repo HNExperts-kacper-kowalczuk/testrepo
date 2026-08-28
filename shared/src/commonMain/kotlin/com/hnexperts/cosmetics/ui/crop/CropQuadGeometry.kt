@@ -12,6 +12,7 @@ data class FittedImageRect(
 }
 
 object CropQuadGeometry {
+    const val NUDGE_STEP: Float = 0.02f
     fun fittedRect(containerWidth: Float, containerHeight: Float, imageWidth: Int, imageHeight: Int): FittedImageRect {
         if (containerWidth <= 0f || containerHeight <= 0f || imageWidth <= 0 || imageHeight <= 0) {
             return FittedImageRect(0f, 0f, 0f, 0f)
@@ -44,6 +45,13 @@ object CropQuadGeometry {
         return Pair(
             rect.left + normalizedX * rect.width,
             rect.top + normalizedY * rect.height
+        )
+    }
+
+    fun nudgedNormalized(x: Float, y: Float, deltaX: Float, deltaY: Float): Pair<Float, Float> {
+        return Pair(
+            (x + deltaX).coerceIn(0f, 1f),
+            (y + deltaY).coerceIn(0f, 1f)
         )
     }
 }

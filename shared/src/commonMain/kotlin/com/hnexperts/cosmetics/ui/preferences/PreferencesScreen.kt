@@ -1,28 +1,15 @@
 package com.hnexperts.cosmetics.ui.preferences
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.hnexperts.cosmetics.i18n.AppLocale
-import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.prefs_alcohol_leave_on
@@ -33,44 +20,40 @@ import com.hnexperts.cosmetics.resources.prefs_essential_oil
 import com.hnexperts.cosmetics.resources.prefs_eu_allergens
 import com.hnexperts.cosmetics.resources.prefs_eu_allergens_hint
 import com.hnexperts.cosmetics.resources.prefs_fragrance_free
-import com.hnexperts.cosmetics.resources.prefs_language
-import com.hnexperts.cosmetics.resources.prefs_language_en
-import com.hnexperts.cosmetics.resources.prefs_language_pl
-import com.hnexperts.cosmetics.resources.prefs_language_system
 import com.hnexperts.cosmetics.resources.prefs_pregnancy
 import com.hnexperts.cosmetics.resources.prefs_privacy
 import com.hnexperts.cosmetics.resources.prefs_remove_ads
 import com.hnexperts.cosmetics.resources.prefs_remove_ads_unavailable
 import com.hnexperts.cosmetics.resources.prefs_ads_removed
 import com.hnexperts.cosmetics.resources.prefs_title
+import com.hnexperts.cosmetics.ui.a11y.screenHeading
 import com.hnexperts.cosmetics.ui.common.FailureBanner
+import com.hnexperts.cosmetics.ui.common.PreferenceToggleRow
+import com.hnexperts.cosmetics.ui.layout.AppScrollPane
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PreferencesScreen(viewModel: PreferencesViewModel) {
     val uiState: PreferencesUiState by viewModel.uiState.collectAsState()
     val stored: StoredPreferences = uiState.stored
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(text = stringResource(Res.string.prefs_title), style = MaterialTheme.typography.headlineSmall)
+    AppScrollPane(modifier = Modifier.statusBarsPadding()) {
+        Text(
+            text = stringResource(Res.string.prefs_title),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.screenHeading()
+        )
         FailureBanner(failure = uiState.failure, onRetry = viewModel::reload)
-        PreferenceSwitch(
+        PreferenceToggleRow(
             label = stringResource(Res.string.prefs_pregnancy),
             checked = stored.profile.pregnancyCaution,
             onCheckedChange = viewModel::setPregnancyCaution
         )
-        PreferenceSwitch(
+        PreferenceToggleRow(
             label = stringResource(Res.string.prefs_fragrance_free),
             checked = stored.profile.fragranceFree,
             onCheckedChange = viewModel::setFragranceFree
         )
-        PreferenceSwitch(
+        PreferenceToggleRow(
             label = stringResource(Res.string.prefs_eu_allergens),
             checked = stored.profile.euAllergens,
             onCheckedChange = viewModel::setEuAllergens
@@ -79,46 +62,37 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             text = stringResource(Res.string.prefs_eu_allergens_hint),
             style = MaterialTheme.typography.bodySmall
         )
-        PreferenceSwitch(
+        PreferenceToggleRow(
             label = stringResource(Res.string.prefs_children_caution),
             checked = stored.profile.childrenCaution,
             onCheckedChange = viewModel::setChildrenCaution
         )
-        PreferenceSwitch(
+        PreferenceToggleRow(
             label = stringResource(Res.string.prefs_alcohol_leave_on),
             checked = stored.profile.alcoholLeaveOn,
             onCheckedChange = viewModel::setAlcoholLeaveOn
         )
-        PreferenceSwitch(
+        PreferenceToggleRow(
             label = stringResource(Res.string.prefs_essential_oil),
             checked = stored.profile.essentialOilCluster,
             onCheckedChange = viewModel::setEssentialOilCluster
         )
-        Text(text = stringResource(Res.string.prefs_language), style = MaterialTheme.typography.titleMedium)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(
-                selected = stored.localePreference == LocalePreference.FOLLOW_SYSTEM,
-                onClick = viewModel::setFollowSystemLocale,
-                label = { Text(stringResource(Res.string.prefs_language_system)) }
-            )
-            FilterChip(
-                selected = stored.localePreference == LocalePreference.PINNED && stored.pinnedLocale?.language == "en",
-                onClick = { viewModel.pinLocale(AppLocale.ENGLISH) },
-                label = { Text(stringResource(Res.string.prefs_language_en)) }
-            )
-            FilterChip(
-                selected = stored.localePreference == LocalePreference.PINNED && stored.pinnedLocale?.language == "pl",
-                onClick = { viewModel.pinLocale(AppLocale.POLISH) },
-                label = { Text(stringResource(Res.string.prefs_language_pl)) }
-            )
-        }
+        PreferencesLocaleSection(
+            stored = stored,
+            onFollowSystem = viewModel::setFollowSystemLocale,
+            onPin = viewModel::pinLocale
+        )
         PreferencesThemeSection(
             preference = stored.themePreference,
             onFollowSystem = viewModel::setFollowSystemTheme,
             onLight = viewModel::setLightTheme,
             onDark = viewModel::setDarkTheme
         )
-        Text(text = stringResource(Res.string.prefs_avoid_title), style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = stringResource(Res.string.prefs_avoid_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.screenHeading()
+        )
         OutlinedTextField(
             value = uiState.avoidQuery,
             onValueChange = viewModel::setAvoidQuery,
@@ -127,7 +101,7 @@ fun PreferencesScreen(viewModel: PreferencesViewModel) {
             singleLine = true
         )
         uiState.ingredients.forEach { ingredient ->
-            PreferenceSwitch(
+            PreferenceToggleRow(
                 label = ingredient.inciName,
                 checked = stored.profile.avoidedIngredientIds.contains(ingredient.id),
                 onCheckedChange = { viewModel.toggleAvoid(ingredient.id) }
@@ -189,20 +163,4 @@ private fun AdsPurchaseSection(
         return
     }
     Text(text = stringResource(Res.string.prefs_remove_ads_unavailable))
-}
-
-@Composable
-private fun PreferenceSwitch(
-    label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label, modifier = Modifier.weight(1f).padding(end = 12.dp))
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
-    }
 }

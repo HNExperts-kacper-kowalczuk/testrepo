@@ -14,6 +14,7 @@ import com.hnexperts.cosmetics.resources.prefs_reports_empty
 import com.hnexperts.cosmetics.resources.prefs_reports_send
 import com.hnexperts.cosmetics.resources.prefs_reports_send_unavailable
 import com.hnexperts.cosmetics.resources.prefs_reports_sent
+import com.hnexperts.cosmetics.ui.common.StatusAnnouncement
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -36,9 +37,9 @@ fun PreferencesReportsSection(
     ) {
         Text(stringResource(Res.string.prefs_reports_copy))
     }
-    if (reportsCopied) {
-        Text(text = stringResource(Res.string.prefs_reports_copied))
-    }
+    StatusAnnouncement(
+        message = if (reportsCopied) stringResource(Res.string.prefs_reports_copied) else null
+    )
     if (reportsSendAvailable) {
         Button(onClick = onSendReports, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(Res.string.prefs_reports_send))
@@ -46,7 +47,7 @@ fun PreferencesReportsSection(
     } else {
         Text(text = stringResource(Res.string.prefs_reports_send_unavailable))
     }
-    if (reportsSent) {
-        Text(text = stringResource(Res.string.prefs_reports_sent))
-    }
+    StatusAnnouncement(
+        message = if (reportsSent) stringResource(Res.string.prefs_reports_sent) else null
+    )
 }

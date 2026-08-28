@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
@@ -50,7 +51,7 @@ fun RatingBadge(
 @Composable
 private fun RatingMark(level: DangerLevel, size: Dp) {
     val color = RatingColors.of(level)
-    val markModifier: Modifier = Modifier.size(size)
+    val markModifier: Modifier = Modifier.size(size).clearAndSetSemantics { }
     when (level) {
         DangerLevel.SAFE -> Box(
             modifier = markModifier.clip(CircleShape).background(color)

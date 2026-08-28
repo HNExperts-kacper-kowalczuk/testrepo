@@ -30,6 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +64,7 @@ import com.hnexperts.cosmetics.resources.crop_use
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.QuadCorner
 import com.hnexperts.cosmetics.scanning.domain.SelectionQuad
+import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
@@ -243,12 +247,19 @@ private fun CropControls(
     viewModel: CropIngredientsViewModel,
     onRetake: () -> Unit
 ) {
+    var selectedCorner: QuadCorner by remember { mutableStateOf(QuadCorner.TOP_LEFT) }
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = stringResource(Res.string.crop_hint), style = MaterialTheme.typography.bodySmall)
+        CropNudgeBar(
+            selected = selectedCorner,
+            enabled = !uiState.busy,
+            onSelect = { corner -> selectedCorner = corner },
+            onNudge = { dx, dy -> viewModel.nudgeNormalized(selectedCorner, dx, dy) }
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TextButton(onClick = viewModel::resetQuad, enabled = !uiState.busy) {
                 Text(stringResource(Res.string.crop_reset))
@@ -265,8 +276,7 @@ private fun CropControls(
             Text(stringResource(Res.string.crop_use))
         }
         if (uiState.busy) {
-            CircularProgressIndicator()
-            Text(text = stringResource(Res.string.scan_working))
+            BusyStatus(message = stringResource(Res.string.scan_working))
         }
     }
 }

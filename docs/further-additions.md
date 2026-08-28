@@ -113,6 +113,7 @@ Traffic lights fail for colour vision deficiency and in bright shops.
 
 - Each rating: **icon + short word + colour** (and a pattern, e.g. fill vs outline).
 - TalkBack: “Avoid. Two prohibited ingredients. Three names unidentified.”
+- Headings, 48dp targets, live error/status regions, wrapping chips, and a non-drag crop nudge (WCAG 2.2). Motion respects the system reduce-motion setting.
 - Do **not** let Material You recolour rating semantics.
 
 ### 5.2 Onboarding that sets expectations
@@ -201,7 +202,7 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–26 in **[plan-after-twenty.md](plan-after-twenty.md)** and **[plan-after-twenty-three.md](plan-after-twenty-three.md)** are shipped (this PR is the in-app theme override). Remaining: accessibility / TalkBack in §5.1 and items still listed here.
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–26 in **[plan-after-twenty.md](plan-after-twenty.md)** and **[plan-after-twenty-three.md](plan-after-twenty-three.md)** are shipped. This PR is the WCAG 2.2 / TalkBack / fluid layout pass in §5.1.
 
 Still out of git: real Remove-ads IAP, production AdMob / sync URLs, vegan/cruelty as safety scores, foldables, CJK OCR.
 

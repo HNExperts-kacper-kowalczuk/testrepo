@@ -38,6 +38,7 @@
 
     <string name="history_title">Ostatnie skany</string>
     <string name="history_select_compare">Zaznacz do porównania</string>
+    <string name="history_select_compare_item">Zaznacz %1$s do porównania</string>
     <string name="history_insight_title">W Twoich ostatnich skanach</string>
     <string name="history_insight_hint">Nazwy, które często mają ocenę wysokiego ryzyka lub zakazane w Twoich ostatnich skanach. Tylko informacyjnie — to nie diagnoza.</string>
     <string name="history_empty">Nie oceniono jeszcze żadnego produktu.</string>
@@ -170,6 +171,10 @@
     <string name="onboarding_scan_body">Skieruj aparat na kod kreskowy albo skład INCI (skład). Ocena zostaje na urządzeniu. Jeśli kodu nie ma w katalogu i jest internet, skład jest pobierany i oceniany automatycznie. Możesz też wpisać GTIN albo wkleić skład, jeśli aparat nie odczyta opakowania.</string>
     <string name="onboarding_unknown_title">Nieznany to nie bezpieczny</string>
     <string name="onboarding_unknown_body">Jeśli nazwy nie ma w bazie wiedzy, jest oznaczona jako nieznana. Wynik może być niepełny. Popraw błędy OCR przed oceną. Składy z katalogu społecznościowego są oznaczone jako niezweryfikowane.</string>
+    <string name="a11y_onboarding_step">Krok %1$d z %2$d</string>
+    <string name="a11y_open_result">Otwórz wynik</string>
+    <string name="a11y_open_product">Otwórz produkt</string>
+    <string name="a11y_open_ingredient">Otwórz składnik</string>
 
     <string name="usage_prompt">Jak używasz tego produktu?</string>
     <string name="usage_leave_on">Leave-on</string>
@@ -205,7 +210,7 @@
     <string name="camera_hint_inci">Wypłaszcz etykietę, a potem zrób zdjęcie bloku INCI / składu.</string>
     <string name="camera_capture">Zrób zdjęcie składu</string>
     <string name="crop_title">Zaznacz listę składników</string>
-    <string name="crop_hint">Przeciągnij cztery narożniki wokół listy zaczynającej się od „Ingredients” lub „Skład”.</string>
+    <string name="crop_hint">Przeciągnij narożnik albo wybierz go i użyj strzałek. Umieść je wokół listy zaczynającej się od „Ingredients” lub „Skład”.</string>
     <string name="crop_use">Użyj tego obszaru</string>
     <string name="crop_reset">Resetuj narożniki</string>
     <string name="crop_retake">Zrób zdjęcie ponownie</string>
@@ -213,6 +218,11 @@
     <string name="crop_handle_top_right">Prawy górny narożnik</string>
     <string name="crop_handle_bottom_right">Prawy dolny narożnik</string>
     <string name="crop_handle_bottom_left">Lewy dolny narożnik</string>
+    <string name="crop_nudge_title">Dostosuj wybrany narożnik</string>
+    <string name="crop_nudge_up">Przesuń w górę</string>
+    <string name="crop_nudge_down">Przesuń w dół</string>
+    <string name="crop_nudge_left">Przesuń w lewo</string>
+    <string name="crop_nudge_right">Przesuń w prawo</string>
     <string name="camera_torch_on">Latarka włączona</string>
     <string name="camera_torch_off">Latarka wyłączona</string>
     <string name="camera_unavailable">Skanowanie aparatem nie jest dostępne na tym urządzeniu. Wpisz kod albo wklej skład.</string>
