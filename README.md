@@ -46,6 +46,8 @@ export ANDROID_HOME=/path/to/android-sdk
 ./gradlew :shared:jvmTest
 ```
 
+Pull requests and `main` run `./scripts/check-quality.sh` and `:shared:jvmTest` (see `.github/workflows/quality.yml`). That job does not assemble the APK or call live CosIng/OBF.
+
 iOS: open `iosApp/iosApp.xcodeproj` on macOS after a Gradle sync.
 
 ### Fixture barcodes
