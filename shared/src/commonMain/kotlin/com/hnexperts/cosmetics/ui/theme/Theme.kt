@@ -56,19 +56,41 @@ private val LightColors: ColorScheme = lightColorScheme(
     surface = Color.White,
     onSurface = Color(0xFF1A1C1B),
     surfaceVariant = Color(0xFFEFF1F0),
-    onSurfaceVariant = Color(0xFF404944)
+    onSurfaceVariant = Color(0xFF404944),
+    error = Color(0xFFBA1A1A),
+    onError = Color.White,
+    errorContainer = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF410002)
 )
 
 private val DarkColors: ColorScheme = darkColorScheme(
     primary = Color(0xFF4DB6AC),
-    onPrimary = Color(0xFF00332E)
+    onPrimary = Color(0xFF00332E),
+    primaryContainer = Color(0xFF004D40),
+    onPrimaryContainer = Color(0xFFB2DFDB),
+    secondary = Color(0xFFB0BEC5),
+    onSecondary = Color(0xFF1C313A),
+    background = Color(0xFF121413),
+    onBackground = Color(0xFFE2E3E1),
+    surface = Color(0xFF1A1C1B),
+    onSurface = Color(0xFFE2E3E1),
+    surfaceVariant = Color(0xFF3F4946),
+    onSurfaceVariant = Color(0xFFBEC9C5),
+    error = Color(0xFFFFB4AB),
+    onError = Color(0xFF690005),
+    errorContainer = Color(0xFF93000A),
+    onErrorContainer = Color(0xFFFFDAD6)
 )
+
+internal fun cosmeticsColorScheme(dark: Boolean): ColorScheme {
+    return if (dark) DarkColors else LightColors
+}
 
 @Composable
 fun CosmeticsTheme(content: @Composable () -> Unit) {
     val dark: Boolean = isSystemInDarkTheme()
     MaterialTheme(
-        colorScheme = if (dark) DarkColors else LightColors,
+        colorScheme = cosmeticsColorScheme(dark),
         content = content
     )
 }
