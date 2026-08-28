@@ -69,6 +69,20 @@ class SqlProductRepository(
         }
     }
 
+    override suspend fun frequentCategories(limit: Int): Outcome<List<String>> {
+        if (limit <= 0) {
+            return Outcome.Ok(emptyList())
+        }
+        return FailureCatcher.database("catalog.frequentCategories") {
+            withContext(dispatchers.catalogDatabase) {
+                database.catalogDatabaseQueries
+                    .selectFrequentCategories(limit.toLong())
+                    .executeAsList()
+                    .mapNotNull { category -> category }
+            }
+        }
+    }
+
     private fun toProduct(row: ProductRow): Product {
         return Product(
             id = row.id,

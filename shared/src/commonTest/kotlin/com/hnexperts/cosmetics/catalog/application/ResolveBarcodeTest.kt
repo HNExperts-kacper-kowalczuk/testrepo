@@ -69,6 +69,10 @@ class ResolveBarcodeTest {
         override suspend fun findByCategory(category: String, limit: Int): Outcome<List<Product>> {
             return Outcome.Ok(emptyList())
         }
+
+        override suspend fun frequentCategories(limit: Int): Outcome<List<String>> {
+            return Outcome.Ok(emptyList())
+        }
     }
 
     private fun requireOk(outcome: Outcome<BarcodeLookup>): BarcodeLookup {
