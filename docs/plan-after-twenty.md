@@ -18,7 +18,7 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 | Phototoxic / children | Fixture `Salicylic Acid` only. Packed CosIng `SALICYLIC ACID` has `ANNEX_III,PREGNANCY_CAUTION` — **no** `PHOTOTOXIC` or `CHILDREN`. Packed `PHOTOTOXIC`/`CHILDREN` counts are **0**. |
 | Pregnancy preset | Works on fixture Retinol / Salicylic Acid. CosIng `RETINAL` has empty tags. |
 | Sun caution UI | Finding-row copy already exists (`finding_sun_caution`). It never fires on a CosIng-scale citrus oil. |
-| Settings notes | Allergen + microplastics + annex; no phototoxic/children/pregnancy tag explanation |
+| Settings notes | Allergen, microplastics, annex, sun caution, children, and pregnancy: incomplete lists, not diagnoses, not the traffic light |
 | Extra chips | Microplastics only. Animal-derived still P3 |
 
 The children-caution preset and sun-caution badge are correct in **fixture** tests. They barely apply to a drugstore CosIng-scale scan until phase 21.
@@ -59,10 +59,17 @@ Apply in `MaintainedCatalogTags.merge` and `CosingAssembler` (next ingest still 
 ## Phase 22 — Settings notes for the new tags
 
 **PR:** `cursor/phase-22-preset-tag-notes-4039`  
-**Depends on:** 21.  
+**Depends on:** 21 (shipped as **#32**).  
 **Outcome:** Catalog notes mention sun caution, children, and pregnancy tags in shopper language: incomplete lists, not diagnoses, not the traffic light.
 
 Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unchanged.
+
+### 22.1 Done when
+
+- Settings catalog notes explain sun caution, children, and pregnancy tags.
+- Copy says the lists are incomplete, not diagnoses, and not the traffic light.
+- Existing allergen / microplastics / annex lines stay.
+- Tag-load note covers the new lists. Stamp line is unchanged.
 
 **Out of this PR:** a SQLite changelog table.
 
@@ -97,8 +104,8 @@ Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unch
 ## Implementation order (one PR each)
 
 ```
-21 phototoxic / children / pregnancy indexes   ← correctness; do this first
-22 settings notes for those tags
+21 phototoxic / children / pregnancy indexes   ← shipped #32
+22 settings notes for those tags               ← this PR
 23 animal-derived chip (optional last)
 ```
 
@@ -109,5 +116,5 @@ Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unch
 - `./scripts/check-quality.sh` then `:shared:jvmTest`
 - EN/PL key parity; files ≤ 500 lines; rethrow `CancellationException`; no `catch (Throwable)`
 - Do not call live OBF/CosIng from unit tests
-- Rebuild `releases/inci-scan-debug.apk` when UI or catalog packing changes (phase 21 overlay does not pack)
+- Rebuild `releases/inci-scan-debug.apk` when UI or catalog packing changes (phase 22 is UI copy)
 - Walk [quality-checklist.md](quality-checklist.md) points 1–11 before commit
