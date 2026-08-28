@@ -1,6 +1,6 @@
 # Further improvements: phases 6–15
 
-Phases **1–5** in [plan-next-phases.md](plan-next-phases.md) are **shipped** (bundled catalog, online GTIN cache, pack verify, presets, shelf/compare, share/gallery). This document is the next slice.
+**Status: shipped** (PRs #14–#23). Phases **1–5** in [plan-next-phases.md](plan-next-phases.md) were already shipped. This document is the completed next slice (trust settings through the microplastics chip).
 
 **Each phase is one PR.** Stack on `main` after the previous phase merges. Suggested branches: `cursor/phase-6-trust-settings-4039` … `cursor/phase-15-microplastics-chip-4039`. Do not combine two phases in one PR. If a phase grows past a focused review, split it *before* opening the PR, and update this file.
 

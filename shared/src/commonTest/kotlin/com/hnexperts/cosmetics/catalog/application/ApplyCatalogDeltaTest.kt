@@ -173,7 +173,7 @@ class ApplyCatalogDeltaTest {
     private class FixedDeltaSource(
         private val delta: CatalogDelta
     ) : CatalogDeltaSource {
-        override suspend fun deltaFor(fromVersion: String, toVersion: String): CatalogDelta {
+        override suspend fun deltaFor(fromVersion: String, published: CatalogManifest): CatalogDelta {
             return delta
         }
     }

@@ -1,6 +1,6 @@
 # Next phases: catalog, pack trust, profiles, compare, polish
 
-This is the working plan for phases **1–5** (catalog, pack trust, profiles, compare, polish). Those phases are **shipped**. Remaining work is **[plan-further-improvements.md](plan-further-improvements.md)** (phases 6–15, one PR each).
+This is the working plan for phases **1–5** (catalog, pack trust, profiles, compare, polish). Those phases are **shipped**. Phases **6–15** in **[plan-further-improvements.md](plan-further-improvements.md)** are also shipped.
 
 Related: [plan.md](plan.md), [plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md) (tracks A–D, largely done), [further-additions.md](further-additions.md), [catalog/README.md](../catalog/README.md).
 

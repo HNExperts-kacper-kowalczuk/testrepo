@@ -11,6 +11,8 @@ import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.catalog.application.CatalogMutationStore
 import com.hnexperts.cosmetics.catalog.application.CatalogRemote
 import com.hnexperts.cosmetics.catalog.application.CheckCatalogUpdates
+import com.hnexperts.cosmetics.catalog.application.HttpCatalogDeltaSource
+import com.hnexperts.cosmetics.catalog.application.HttpCatalogRemote
 import com.hnexperts.cosmetics.catalog.application.LocalPublishedCatalogRemote
 import com.hnexperts.cosmetics.catalog.application.OnlineGtinLookup
 import com.hnexperts.cosmetics.catalog.application.ResolveBarcode
@@ -27,15 +29,18 @@ import com.hnexperts.cosmetics.data.CatalogSeeder
 import com.hnexperts.cosmetics.data.DatabaseDriverFactory
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
 import com.hnexperts.cosmetics.data.userdb.UserDatabase
+import com.hnexperts.cosmetics.evaluation.application.SummarizeScanHazards
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
 import com.hnexperts.cosmetics.evaluation.application.CompareSession
 import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.legal.data.SqlLegalRepository
 import com.hnexperts.cosmetics.legal.domain.LegalStore
+import com.hnexperts.cosmetics.network.SyncConfig
 import com.hnexperts.cosmetics.preferences.application.UserDataReset
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
+import com.hnexperts.cosmetics.scanning.application.FlushReports
 import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
 import com.hnexperts.cosmetics.scanning.application.LaunchIntentSession
 import com.hnexperts.cosmetics.scanning.application.PendingCaptureSession
@@ -47,6 +52,7 @@ import com.hnexperts.cosmetics.scanning.data.SqlReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.shelf.application.WatchShelfFormulas
 import com.hnexperts.cosmetics.shelf.data.SqlUserShelf
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.camera.CameraScanViewModel
@@ -74,7 +80,14 @@ val appModule = module {
     single { CatalogSeeder(get()) }
     single { CatalogSnapshotReader(get()) }
     single<CatalogMutationStore> { get<CatalogWriter>() }
-    single<CatalogDeltaSource> { BundledCatalogDeltaSource() }
+    single<CatalogDeltaSource> {
+        val base: String = SyncConfig.catalogBaseUrl
+        if (base.isBlank()) {
+            BundledCatalogDeltaSource()
+        } else {
+            HttpCatalogDeltaSource(get(), base)
+        }
+    }
     single<CatalogGateway> { CatalogBootstrap(get(), get(), get(), get(), get()) }
     single<ProductRepository> { SqlProductRepository(get(), get()) }
     single<PreferencesStore> { SqlPreferencesRepository(get(), get()) }
@@ -93,13 +106,23 @@ val appModule = module {
     single { PendingCaptureSession() }
     single { PendingVerifySession() }
     single<ReportQueue> { SqlReportQueue(get(), get()) }
-    single<CatalogRemote> { LocalPublishedCatalogRemote(get()) }
+    single<CatalogRemote> {
+        val base: String = SyncConfig.catalogBaseUrl
+        if (base.isBlank()) {
+            LocalPublishedCatalogRemote(get())
+        } else {
+            HttpCatalogRemote(get(), base)
+        }
+    }
     single { CheckCatalogUpdates(get(), get(), get()) }
     single { ApplyCatalogDelta(get(), get(), get(), get()) }
+    single { FlushReports(get(), get(), SyncConfig.reportsUrl) }
     single { AdsSession(get(), get(), get(), get(), get()) }
     single<BillingPort> { NoOpBillingPort() }
     single { CompareSession() }
     single<UserShelf> { SqlUserShelf(get(), get()) }
+    single { WatchShelfFormulas(get(), get()) }
+    single { SummarizeScanHazards() }
     single { UserDataReset(get(), get(), get(), get(), get()) }
     single { LaunchIntentSession() }
 

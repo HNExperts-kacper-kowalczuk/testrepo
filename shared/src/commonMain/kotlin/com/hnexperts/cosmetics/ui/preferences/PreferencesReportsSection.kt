@@ -1,0 +1,52 @@
+package com.hnexperts.cosmetics.ui.preferences
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import com.hnexperts.cosmetics.resources.Res
+import com.hnexperts.cosmetics.resources.prefs_reports_copy
+import com.hnexperts.cosmetics.resources.prefs_reports_copied
+import com.hnexperts.cosmetics.resources.prefs_reports_count
+import com.hnexperts.cosmetics.resources.prefs_reports_empty
+import com.hnexperts.cosmetics.resources.prefs_reports_send
+import com.hnexperts.cosmetics.resources.prefs_reports_send_unavailable
+import com.hnexperts.cosmetics.resources.prefs_reports_sent
+import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun PreferencesReportsSection(
+    openReportCount: Long,
+    reportsCopied: Boolean,
+    reportsSent: Boolean,
+    reportsSendAvailable: Boolean,
+    onCopyReports: (String) -> Unit,
+    onSendReports: () -> Unit
+) {
+    Text(
+        text = stringResource(Res.string.prefs_reports_count, openReportCount.toString()),
+        style = MaterialTheme.typography.bodyLarge
+    )
+    val emptyReports: String = stringResource(Res.string.prefs_reports_empty)
+    Button(
+        onClick = { onCopyReports(emptyReports) },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(stringResource(Res.string.prefs_reports_copy))
+    }
+    if (reportsCopied) {
+        Text(text = stringResource(Res.string.prefs_reports_copied))
+    }
+    if (reportsSendAvailable) {
+        Button(onClick = onSendReports, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(Res.string.prefs_reports_send))
+        }
+    } else {
+        Text(text = stringResource(Res.string.prefs_reports_send_unavailable))
+    }
+    if (reportsSent) {
+        Text(text = stringResource(Res.string.prefs_reports_sent))
+    }
+}

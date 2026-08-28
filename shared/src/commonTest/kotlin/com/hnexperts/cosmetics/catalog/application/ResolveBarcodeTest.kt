@@ -58,11 +58,19 @@ class ResolveBarcodeTest {
             return Outcome.Ok(byGtin[rawGtin])
         }
 
+        override suspend fun findById(productId: String): Outcome<Product?> {
+            return Outcome.Ok(null)
+        }
+
         override suspend fun search(query: String): Outcome<List<Product>> {
             return Outcome.Ok(emptyList())
         }
 
         override suspend fun findByCategory(category: String, limit: Int): Outcome<List<Product>> {
+            return Outcome.Ok(emptyList())
+        }
+
+        override suspend fun frequentCategories(limit: Int): Outcome<List<String>> {
             return Outcome.Ok(emptyList())
         }
     }

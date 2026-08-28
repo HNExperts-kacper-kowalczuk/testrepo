@@ -21,8 +21,18 @@ data class Finding(
         return level == DangerLevel.HIGH || level == DangerLevel.RESTRICTED
     }
 
+    fun sunCaution(): Boolean {
+        return regulatoryTags.contains(TAG_PHOTOTOXIC)
+    }
+
+    fun microplastic(): Boolean {
+        return regulatoryTags.contains(TAG_MICROPLASTIC)
+    }
+
     private companion object {
         const val EARLY_LIST_LIMIT: Int = 5
+        const val TAG_PHOTOTOXIC: String = "PHOTOTOXIC"
+        const val TAG_MICROPLASTIC: String = "MICROPLASTIC"
     }
 }
 
@@ -41,4 +51,8 @@ data class ProductAssessment(
     val packVerified: Boolean = false,
     val category: String? = null,
     val productId: String? = null
-)
+) {
+    fun hasMicroplastics(): Boolean {
+        return findings.any { finding -> finding.microplastic() }
+    }
+}

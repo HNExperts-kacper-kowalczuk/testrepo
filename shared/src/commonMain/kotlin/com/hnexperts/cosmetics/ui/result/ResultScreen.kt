@@ -38,6 +38,7 @@ import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
 import com.hnexperts.cosmetics.resources.finding_early_list
 import com.hnexperts.cosmetics.resources.finding_rating_a11y
+import com.hnexperts.cosmetics.resources.finding_sun_caution
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
 import com.hnexperts.cosmetics.resources.result_a11y_summary
@@ -49,7 +50,6 @@ import com.hnexperts.cosmetics.resources.result_missing
 import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_pack_verified
 import com.hnexperts.cosmetics.resources.result_rating_a11y
-import com.hnexperts.cosmetics.resources.result_share
 import com.hnexperts.cosmetics.resources.result_shelf_add
 import com.hnexperts.cosmetics.resources.result_shelf_remove
 import com.hnexperts.cosmetics.resources.result_suitable
@@ -57,6 +57,7 @@ import com.hnexperts.cosmetics.resources.result_title
 import com.hnexperts.cosmetics.resources.result_unknown_count
 import com.hnexperts.cosmetics.resources.result_usage
 import com.hnexperts.cosmetics.resources.result_usage_assumed
+import com.hnexperts.cosmetics.resources.result_usage_pick
 import com.hnexperts.cosmetics.resources.share_scanned_at
 import com.hnexperts.cosmetics.resources.share_scanned_product
 import com.hnexperts.cosmetics.resources.usage_eye
@@ -67,6 +68,7 @@ import com.hnexperts.cosmetics.resources.usage_spray
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
+import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
 import com.hnexperts.cosmetics.ui.theme.RatingColors
 import org.jetbrains.compose.resources.pluralStringResource
@@ -117,6 +119,25 @@ fun ResultScreen(
             item {
                 ResultHeader(assessment)
             }
+            if (assessment.hasMicroplastics()) {
+                item {
+                    ResultMicroplasticChip()
+                }
+            }
+            if (assessment.usageAssumed) {
+                item {
+                    ResultUsageConfirm(onSelect = viewModel::setUsage)
+                }
+            }
+            if (showCategoryPicker(assessment, uiState)) {
+                item {
+                    ResultCategoryPicker(
+                        choices = uiState.categoryChoices,
+                        onPick = viewModel::setCategory,
+                        onSkip = viewModel::skipCategory
+                    )
+                }
+            }
             if (assessment.packVerified) {
                 item {
                     Text(text = stringResource(Res.string.result_pack_verified))
@@ -153,12 +174,7 @@ fun ResultScreen(
                     overallLabel = dangerLevelText(assessment.overall),
                     scannedAtLabel = stringResource(Res.string.share_scanned_at)
                 )
-                Button(
-                    onClick = { viewModel.share(shareCopy) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(Res.string.result_share))
-                }
+                ResultShareActions(copy = shareCopy, viewModel = viewModel)
             }
             item {
                 FailureBanner(failure = uiState.failure)
@@ -305,6 +321,12 @@ private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
             if (comment != null) {
                 Text(text = comment.summary, style = MaterialTheme.typography.bodyLarge)
             }
+            if (finding.sunCaution()) {
+                Text(
+                    text = stringResource(Res.string.finding_sun_caution),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
             if (finding.earlyListConcern()) {
                 Text(
                     text = stringResource(Res.string.finding_early_list),
@@ -329,6 +351,30 @@ private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
             }
         }
     }
+}
+
+@Composable
+private fun ResultUsageConfirm(onSelect: (ProductUsage) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(Res.string.result_usage_pick),
+            style = MaterialTheme.typography.bodyMedium
+        )
+        UsagePicker(selected = ProductUsage.UNKNOWN, onSelect = onSelect)
+    }
+}
+
+private fun showCategoryPicker(assessment: ProductAssessment, uiState: ResultUiState): Boolean {
+    if (!assessment.category.isNullOrBlank()) {
+        return false
+    }
+    if (uiState.categorySkipped) {
+        return false
+    }
+    return uiState.categoryChoices.isNotEmpty()
 }
 
 @Composable

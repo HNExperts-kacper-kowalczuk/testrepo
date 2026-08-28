@@ -2,13 +2,19 @@ package com.hnexperts.cosmetics.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
+import com.hnexperts.cosmetics.concurrency.AppDispatchers
 import com.hnexperts.cosmetics.evaluation.application.CompareCandidate
 import com.hnexperts.cosmetics.evaluation.application.CompareSession
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
+import com.hnexperts.cosmetics.evaluation.application.SummarizeScanHazards
 import com.hnexperts.cosmetics.failure.AppFailure
+import com.hnexperts.cosmetics.failure.Outcome
+import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.scanning.domain.ScanHistoryRepository
+import com.hnexperts.cosmetics.shelf.application.WatchShelfFormulas
 import com.hnexperts.cosmetics.shelf.domain.ShelfItem
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
 import com.hnexperts.cosmetics.ui.runUiAction
@@ -18,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class HistoryUiState(
     val entries: List<HistoryEntry> = emptyList(),
@@ -27,7 +34,9 @@ data class HistoryUiState(
     val busy: Boolean = false,
     val failure: AppFailure? = null,
     val navigateToResult: Boolean = false,
-    val navigateToCompare: Boolean = false
+    val navigateToCompare: Boolean = false,
+    val formulaChangedKeys: Set<String> = emptySet(),
+    val frequentConcerns: List<String> = emptyList()
 ) {
     val compareCount: Int
         get() = selectedHistoryIds.size + selectedShelfKeys.size
@@ -40,7 +49,12 @@ class HistoryViewModel(
     private val history: ScanHistoryRepository,
     private val evaluateProduct: EvaluateProduct,
     private val shelf: UserShelf,
-    private val compareSession: CompareSession
+    private val compareSession: CompareSession,
+    private val watchFormulas: WatchShelfFormulas,
+    private val catalog: CatalogGateway,
+    private val preferences: PreferencesStore,
+    private val summarizeHazards: SummarizeScanHazards,
+    private val dispatchers: AppDispatchers
 ) : ViewModel() {
     private val state: MutableStateFlow<HistoryUiState> = MutableStateFlow(HistoryUiState())
     val uiState: StateFlow<HistoryUiState> = state.asStateFlow()
@@ -54,13 +68,46 @@ class HistoryViewModel(
             val saved: List<ShelfItem>? = runUiAction(onFailure = ::showFailure) {
                 shelf.all()
             }
+            val changedKeys: Set<String>? = if (saved == null) {
+                emptySet()
+            } else {
+                runUiAction(onFailure = ::showFailure) { watchFormulas.changedKeys(saved) }
+            }
+            val concerns: List<String> = if (entries == null) {
+                emptyList()
+            } else {
+                loadConcerns(entries)
+            }
             state.update { current ->
                 current.copy(
                     entries = entries ?: current.entries,
                     shelf = saved ?: current.shelf,
-                    failure = if (entries != null && saved != null) null else current.failure
+                    formulaChangedKeys = changedKeys ?: current.formulaChangedKeys,
+                    frequentConcerns = concerns,
+                    failure = if (entries != null && saved != null && changedKeys != null) {
+                        null
+                    } else {
+                        current.failure
+                    }
                 )
             }
+        }
+    }
+
+    private suspend fun loadConcerns(entries: List<HistoryEntry>): List<String> {
+        if (entries.size < 2) {
+            return emptyList()
+        }
+        val index = when (val loaded = catalog.awaitIndex()) {
+            is Outcome.Err -> return emptyList()
+            is Outcome.Ok -> loaded.value
+        }
+        val profile = when (val loaded = preferences.load()) {
+            is Outcome.Err -> return emptyList()
+            is Outcome.Ok -> loaded.value.profile
+        }
+        return withContext(dispatchers.computation) {
+            summarizeHazards.invoke(entries, index.evaluateFormula, profile)
         }
     }
 

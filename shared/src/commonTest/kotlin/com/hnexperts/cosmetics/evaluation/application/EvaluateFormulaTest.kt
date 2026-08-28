@@ -151,6 +151,28 @@ class EvaluateFormulaTest {
     }
 
     @Test
+    fun alcoholAssumedLeaveOnUntilRinseOffIsPicked() {
+        val profile: UserAvoidanceProfile = UserAvoidanceProfile.EMPTY.copy(alcoholLeaveOn = true)
+        val inciRaw: String = "Aqua, Alcohol Denat., Glycerin"
+        val assumed: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = inciRaw,
+            profile = profile,
+            usage = ProductUsage.UNKNOWN
+        )
+        val rinseOff: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = inciRaw,
+            profile = profile,
+            usage = ProductUsage.RINSE_OFF
+        )
+        assertTrue(assumed.usageAssumed)
+        assertFalse(assumed.suitableForUser)
+        assertFalse(rinseOff.usageAssumed)
+        assertTrue(rinseOff.suitableForUser)
+        assertEquals(DangerLevel.MODERATE, assumed.overall)
+        assertEquals(DangerLevel.LOW, rinseOff.overall)
+    }
+
+    @Test
     fun alcoholPresetFlagsLeaveOnMist() {
         val leaveOn: ProductAssessment = evaluateFormula.evaluate(
             inciRaw = "Aqua, Alcohol Denat., Glycerin",
@@ -201,5 +223,38 @@ class EvaluateFormulaTest {
         )
         assertEquals(DangerLevel.PROHIBITED, assessment.overall)
         assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "formaldehyde" }.earlyListConcern())
+    }
+
+    @Test
+    fun phototoxicTagIsACommentBadgeNotANewDangerLevel() {
+        val assessment: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = "Aqua, Salicylic Acid, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        val salicylic = assessment.findings.first { finding -> finding.ingredient.id == "salicylic-acid" }
+        assertTrue(salicylic.sunCaution())
+        assertEquals(DangerLevel.RESTRICTED, salicylic.level)
+        assertEquals(DangerLevel.RESTRICTED, assessment.overall)
+        assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "aqua" }.sunCaution())
+    }
+
+    @Test
+    fun microplasticTagIsAChipNotASafetyScore() {
+        val product = FixtureCatalog.products.first { item -> item.product.id == "bead-scrub" }.product
+        val assessment: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = product.inciRaw,
+            profile = UserAvoidanceProfile.EMPTY,
+            usage = ProductUsage.parse(product.usage)
+        )
+        assertEquals(DangerLevel.SAFE, assessment.overall)
+        assertTrue(assessment.hasMicroplastics())
+        assertTrue(assessment.findings.first { finding -> finding.ingredient.id == "polyethylene" }.microplastic())
+        assertFalse(assessment.findings.first { finding -> finding.ingredient.id == "aqua" }.microplastic())
+        val withoutBeads: ProductAssessment = evaluateFormula.evaluate(
+            inciRaw = "Aqua, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        assertEquals(DangerLevel.SAFE, withoutBeads.overall)
+        assertFalse(withoutBeads.hasMicroplastics())
     }
 }

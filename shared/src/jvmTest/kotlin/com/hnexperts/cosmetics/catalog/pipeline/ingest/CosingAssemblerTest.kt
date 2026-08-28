@@ -28,6 +28,7 @@ class CosingAssemblerTest {
         assertEquals("sodium-lauryl-sulfate", record.id)
         assertEquals("LOW", record.dangerLevel)
         assertEquals(listOf("CLEANSING", "FOAMING"), record.functionTags)
+        assertTrue(record.regulatoryTags.none { tag -> tag.startsWith("ALLERGEN_") })
     }
 
     @Test
@@ -73,5 +74,37 @@ class CosingAssemblerTest {
     fun entryWithoutAnyNameIsSkipped() {
         val record = CosingAssembler().toRecord(metadata("""{"casNo":["123-45-6"]}"""))
         assertEquals(null, record)
+    }
+
+    @Test
+    fun hexylCinnamalGetsAllergen26Tag() {
+        val record: CosingIngredientRecord? = CosingAssembler().toRecord(
+            metadata("""{"inciName":["HEXYL CINNAMAL"],"annexNo":["III"],"functionName":["PERFUMING"]}""")
+        )
+        assertNotNull(record)
+        assertEquals("hexyl-cinnamal", record.id)
+        assertTrue(record.regulatoryTags.contains("ALLERGEN_26"))
+        assertTrue(record.regulatoryTags.contains("ANNEX_III"))
+    }
+
+    @Test
+    fun vanillinGetsAllergen80Tag() {
+        val record: CosingIngredientRecord? = CosingAssembler().toRecord(
+            metadata("""{"inciName":["VANILLIN"],"annexNo":[],"functionName":["PERFUMING"]}""")
+        )
+        assertNotNull(record)
+        assertEquals("LOW", record.dangerLevel)
+        assertEquals(listOf("ALLERGEN_80"), record.regulatoryTags)
+    }
+
+    @Test
+    fun polyethyleneGetsMicroplasticTagWithoutChangingDanger() {
+        val record: CosingIngredientRecord? = CosingAssembler().toRecord(
+            metadata("""{"inciName":["POLYETHYLENE"],"annexNo":[],"functionName":["ABRASIVE"]}""")
+        )
+        assertNotNull(record)
+        assertEquals("LOW", record.dangerLevel)
+        assertTrue(record.regulatoryTags.contains("MICROPLASTIC"))
+        assertEquals(listOf("ABRASIVE"), record.functionTags)
     }
 }

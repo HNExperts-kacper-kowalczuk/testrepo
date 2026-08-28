@@ -71,7 +71,8 @@ object UserSchemaGuard {
         "brand TEXT",
         "rating TEXT NOT NULL DEFAULT ''",
         "usage TEXT NOT NULL DEFAULT 'UNKNOWN'",
-        "category TEXT"
+        "category TEXT",
+        "inci_hash TEXT"
     )
 
     private const val CACHED_PRODUCT_TABLE: String =

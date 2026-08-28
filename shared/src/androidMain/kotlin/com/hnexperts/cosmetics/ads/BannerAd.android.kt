@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -23,12 +24,18 @@ actual fun BannerAd(
     onFailed: () -> Unit,
     modifier: Modifier
 ) {
+    if (!AdMobConfig.isConfigured) {
+        LaunchedEffect(placement) {
+            onFailed()
+        }
+        return
+    }
     val context = LocalContext.current
     val widthDp: Int = LocalConfiguration.current.screenWidthDp
     val adView: AdView = remember(placement, widthDp) {
         AdView(context).apply {
             setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, widthDp))
-            adUnitId = AdUnits.ANDROID_BANNER
+            adUnitId = AdMobConfig.bannerUnitId
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT

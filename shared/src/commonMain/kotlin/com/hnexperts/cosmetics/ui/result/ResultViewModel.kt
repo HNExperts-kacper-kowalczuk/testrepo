@@ -3,6 +3,7 @@ package com.hnexperts.cosmetics.ui.result
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hnexperts.cosmetics.catalog.application.CatalogGateway
+import com.hnexperts.cosmetics.catalog.domain.InciIdentity
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.catalog.domain.ProductRepository
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
@@ -21,7 +22,9 @@ import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.i18n.systemAppLocale
+import com.hnexperts.cosmetics.platform.encodeSharePng
 import com.hnexperts.cosmetics.platform.sharePlainText
+import com.hnexperts.cosmetics.platform.sharePngBytes
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
@@ -47,7 +50,9 @@ data class ResultUiState(
     val onShelf: Boolean = false,
     val alternatives: List<CatalogAlternative> = emptyList(),
     val failure: AppFailure? = null,
-    val navigateToCamera: Boolean = false
+    val navigateToCamera: Boolean = false,
+    val categoryChoices: List<String> = emptyList(),
+    val categorySkipped: Boolean = false
 )
 
 class ResultViewModel(
@@ -109,6 +114,21 @@ class ResultViewModel(
         )
     }
 
+    fun shareImage(copy: ShareCopy) {
+        val assessment: ProductAssessment = state.value.assessment ?: return
+        extrasJob?.cancel()
+        extrasJob = viewModelScope.launch {
+            val title: String = assessment.productName ?: assessment.gtin ?: copy.scannedProduct
+            val png: ByteArray = withContext(dispatchers.computation) {
+                encodeSharePng(ShareResultText.layout(assessment, copy))
+            }
+            if (png.isEmpty()) {
+                return@launch
+            }
+            sharePngBytes(title, png)
+        }
+    }
+
     fun openAlternative(alternative: CatalogAlternative) {
         extrasJob?.cancel()
         extrasJob = viewModelScope.launch {
@@ -133,6 +153,96 @@ class ResultViewModel(
 
     fun consumeNavigation() {
         state.value = state.value.copy(navigateToCamera = false)
+    }
+
+    fun skipCategory() {
+        state.value = state.value.copy(categorySkipped = true)
+    }
+
+    fun setCategory(category: String) {
+        val trimmed: String = category.trim()
+        if (trimmed.isEmpty()) {
+            return
+        }
+        val current: ProductAssessment = state.value.assessment ?: return
+        extrasJob?.cancel()
+        extrasJob = viewModelScope.launch {
+            applyChosenCategory(current, trimmed)
+        }
+    }
+
+    private suspend fun applyChosenCategory(current: ProductAssessment, category: String) {
+        val source: String = session.currentSource()
+        val scored: Outcome<ProductAssessment> = evaluateProduct.invoke(
+            inciRaw = current.inciRaw,
+            source = source,
+            productName = current.productName,
+            brand = current.brand,
+            gtin = current.gtin,
+            usage = current.usage,
+            packVerified = current.packVerified,
+            category = category,
+            productId = current.productId
+        )
+        when (scored) {
+            is Outcome.Err -> state.value = state.value.copy(failure = scored.failure)
+            is Outcome.Ok -> {
+                state.value = state.value.copy(
+                    assessment = scored.value,
+                    categorySkipped = false,
+                    categoryChoices = emptyList(),
+                    failure = null
+                )
+                persistShelfIfStarred(scored.value)
+                loadShelfAndAlternatives(scored.value, state.value.commentLocale)
+            }
+        }
+    }
+
+    fun setUsage(usage: ProductUsage) {
+        if (usage == ProductUsage.UNKNOWN) {
+            return
+        }
+        val current: ProductAssessment = state.value.assessment ?: return
+        extrasJob?.cancel()
+        extrasJob = viewModelScope.launch {
+            applyChosenUsage(current, usage)
+        }
+    }
+
+    private suspend fun applyChosenUsage(current: ProductAssessment, usage: ProductUsage) {
+        val source: String = session.currentSource()
+        val scored: Outcome<ProductAssessment> = evaluateProduct.invoke(
+            inciRaw = current.inciRaw,
+            source = source,
+            productName = current.productName,
+            brand = current.brand,
+            gtin = current.gtin,
+            usage = usage,
+            packVerified = current.packVerified,
+            category = current.category,
+            productId = current.productId
+        )
+        when (scored) {
+            is Outcome.Err -> state.value = state.value.copy(failure = scored.failure)
+            is Outcome.Ok -> {
+                state.value = state.value.copy(assessment = scored.value, failure = null)
+                persistShelfIfStarred(scored.value)
+                loadShelfAndAlternatives(scored.value, state.value.commentLocale)
+            }
+        }
+    }
+
+    private suspend fun persistShelfIfStarred(assessment: ProductAssessment) {
+        if (!state.value.onShelf) {
+            return
+        }
+        shelfMutex.withLock {
+            when (val saved: Outcome<Unit> = shelf.save(toShelfItem(assessment, ShelfKeys.of(assessment)))) {
+                is Outcome.Err -> state.value = state.value.copy(failure = saved.failure)
+                is Outcome.Ok -> Unit
+            }
+        }
     }
 
     private suspend fun applyShelfToggle(assessment: ProductAssessment) {
@@ -163,6 +273,7 @@ class ResultViewModel(
                     state.value = ResultUiState(assessment = assessment, commentLocale = locale, failure = null)
                     if (assessment != null) {
                         loadShelfAndAlternatives(assessment, locale)
+                        loadCategoryChoices(assessment)
                     }
                 }
             }
@@ -222,6 +333,25 @@ class ResultViewModel(
         )
     }
 
+    private suspend fun loadCategoryChoices(assessment: ProductAssessment) {
+        if (!assessment.category.isNullOrBlank()) {
+            state.value = state.value.copy(categoryChoices = emptyList())
+            return
+        }
+        val choices: List<String> = when (
+            val loaded: Outcome<List<String>> = products.frequentCategories(FindLocalAlternatives.CATEGORY_PICK_CAP)
+        ) {
+            is Outcome.Err -> {
+                if (state.value.failure == null) {
+                    state.value = state.value.copy(failure = loaded.failure)
+                }
+                emptyList()
+            }
+            is Outcome.Ok -> loaded.value
+        }
+        state.value = state.value.copy(categoryChoices = choices)
+    }
+
     private fun toShelfItem(assessment: ProductAssessment, key: String): ShelfItem {
         return ShelfItem(
             shelfKey = key,
@@ -233,7 +363,8 @@ class ResultViewModel(
             rating = assessment.overall.name,
             usage = assessment.usage,
             category = assessment.category,
-            savedAt = Clock.System.now().toString()
+            savedAt = Clock.System.now().toString(),
+            inciHash = InciIdentity.hash(assessment.inciRaw)
         )
     }
 

@@ -27,6 +27,19 @@ class SqlProductRepository(
         }
     }
 
+    override suspend fun findById(productId: String): Outcome<Product?> {
+        val trimmed: String = productId.trim()
+        if (trimmed.isEmpty()) {
+            return Outcome.Ok(null)
+        }
+        return FailureCatcher.database("catalog.findById") {
+            withContext(dispatchers.catalogDatabase) {
+                val row = database.catalogDatabaseQueries.selectProductById(trimmed).executeAsOneOrNull()
+                row?.let(::toProduct)
+            }
+        }
+    }
+
     override suspend fun search(query: String): Outcome<List<Product>> {
         val trimmed: String = query.trim()
         return FailureCatcher.database("catalog.search") {
@@ -52,6 +65,20 @@ class SqlProductRepository(
                     .selectProductsByCategory(trimmed, limit.toLong())
                     .executeAsList()
                     .map(::toProduct)
+            }
+        }
+    }
+
+    override suspend fun frequentCategories(limit: Int): Outcome<List<String>> {
+        if (limit <= 0) {
+            return Outcome.Ok(emptyList())
+        }
+        return FailureCatcher.database("catalog.frequentCategories") {
+            withContext(dispatchers.catalogDatabase) {
+                database.catalogDatabaseQueries
+                    .selectFrequentCategories(limit.toLong())
+                    .executeAsList()
+                    .mapNotNull { category -> category }
             }
         }
     }

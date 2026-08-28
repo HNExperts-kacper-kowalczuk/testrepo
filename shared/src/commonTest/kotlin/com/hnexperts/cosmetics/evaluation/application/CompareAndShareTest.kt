@@ -59,6 +59,30 @@ class CompareFormulasTest {
         )
         assertTrue(summary.sharedPersonalAvoids.contains("Parfum"))
     }
+
+    @Test
+    fun summaryKeepsStoredUsage() {
+        val paste = FixtureCatalog.products.first { item -> item.product.id == "problem-paste" }.product
+        val shampoo = FixtureCatalog.products.first { item -> item.product.id == "strong-shampoo" }.product
+        val summary = CompareFormulas.fromAssessments(
+            listOf(
+                evaluateFormula.evaluate(
+                    inciRaw = paste.inciRaw,
+                    profile = UserAvoidanceProfile.EMPTY,
+                    productName = paste.name,
+                    usage = ProductUsage.LEAVE_ON
+                ),
+                evaluateFormula.evaluate(
+                    inciRaw = shampoo.inciRaw,
+                    profile = UserAvoidanceProfile.EMPTY,
+                    productName = shampoo.name,
+                    usage = ProductUsage.RINSE_OFF
+                )
+            )
+        )
+        assertEquals(ProductUsage.LEAVE_ON, summary.products[0].assessment.usage)
+        assertEquals(ProductUsage.RINSE_OFF, summary.products[1].assessment.usage)
+    }
 }
 
 class FindLocalAlternativesTest {
@@ -105,6 +129,41 @@ class FindLocalAlternativesTest {
         )
         assertTrue(hits.isEmpty())
     }
+
+    @Test
+    fun ocrInciPickingMoisturizerSurfacesCalmerAlternative() {
+        val nightCream = FixtureCatalog.products.first { item -> item.product.id == "night-cream" }.product
+        val ocr = evaluateFormula.evaluate(
+            inciRaw = nightCream.inciRaw,
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        val calmer: Product = Product(
+            id = "calm-moisturizer",
+            name = "Calm Cream",
+            brand = "Fixture Lab",
+            category = "moisturizer",
+            inciRaw = "Aqua, Glycerin, Petrolatum",
+            usage = "LEAVE_ON",
+            source = "curated",
+            verified = true
+        )
+        val candidates: List<Product> = listOf(nightCream, calmer)
+        assertTrue(
+            FindLocalAlternatives.invoke(
+                current = ocr,
+                candidates = candidates,
+                evaluateFormula = evaluateFormula,
+                profile = UserAvoidanceProfile.EMPTY
+            ).isEmpty()
+        )
+        val hits = FindLocalAlternatives.invoke(
+            current = ocr.copy(category = "moisturizer"),
+            candidates = candidates,
+            evaluateFormula = evaluateFormula,
+            profile = UserAvoidanceProfile.EMPTY
+        )
+        assertEquals("calm-moisturizer", hits.first().product.id)
+    }
 }
 
 class ShareResultTextTest {
@@ -133,5 +192,34 @@ class ShareResultTextTest {
         assertTrue(text.contains("No personal avoid-list hits."))
         assertTrue(text.contains("Scanned 2026-08-19"))
         assertTrue(text.contains(copy.disclaimer))
+    }
+}
+
+class ShareResultImageLayoutTest {
+    @Test
+    fun payloadContainsDisclaimerRatingAndDate() {
+        val assessment = EvaluationFactory.create().evaluate(
+            inciRaw = "Aqua, Glycerin",
+            profile = UserAvoidanceProfile.EMPTY,
+            productName = "Gentle Cream Cleanser"
+        )
+        val copy = ShareCopy(
+            scannedProduct = "Scanned product",
+            suitable = "No personal avoid-list hits.",
+            notSuitable = "Not suitable for your current filters.",
+            disclaimer = "Informational only. This is not a medical device or a substitute for the ingredient list, a dermatologist, or official EU annexes.",
+            overallLabel = "Generally acceptable",
+            scannedAtLabel = "Scanned"
+        )
+        val layout: ShareResultImageLayout = ShareResultText.layout(
+            assessment = assessment,
+            copy = copy,
+            scannedAt = Instant.parse("2026-08-19T12:00:00Z")
+        )
+        val payload: String = layout.payloadText()
+        assertTrue(payload.contains("Gentle Cream Cleanser"))
+        assertTrue(payload.contains("Generally acceptable"))
+        assertTrue(payload.contains("Scanned 2026-08-19"))
+        assertTrue(payload.contains(copy.disclaimer))
     }
 }

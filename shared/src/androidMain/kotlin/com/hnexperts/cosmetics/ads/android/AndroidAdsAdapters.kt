@@ -6,6 +6,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
+import com.hnexperts.cosmetics.ads.AdMobConfig
 import com.hnexperts.cosmetics.ads.domain.AdsInitializer
 import com.hnexperts.cosmetics.ads.domain.ConsentClient
 import com.hnexperts.cosmetics.ads.domain.ConsentSnapshot
@@ -32,6 +33,9 @@ class AndroidAdsInitializer : AdsInitializer {
     private var ready: Boolean = false
 
     override suspend fun initialize(): Boolean {
+        if (!AdMobConfig.isConfigured) {
+            return false
+        }
         mutex.withLock {
             if (ready) {
                 return true

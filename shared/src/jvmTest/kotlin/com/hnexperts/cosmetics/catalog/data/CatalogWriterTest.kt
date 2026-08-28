@@ -4,6 +4,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.hnexperts.cosmetics.catalog.application.CatalogDelta
 import com.hnexperts.cosmetics.catalog.domain.CatalogIntegrity
 import com.hnexperts.cosmetics.catalog.domain.CatalogMeta
+import com.hnexperts.cosmetics.catalog.domain.InciIdentity
 import com.hnexperts.cosmetics.catalog.domain.Product
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
 import com.hnexperts.cosmetics.catalog.fixture.FixtureProduct
@@ -66,5 +67,16 @@ class CatalogWriterTest {
         assertEquals(checksum, updated.meta.checksum)
         val names = database.catalogDatabaseQueries.selectAllProducts().executeAsList().map { row -> row.id }
         assertTrue(names.contains("pipeline-sample-balm"))
+        val writtenHash: String? = database.catalogDatabaseQueries
+            .selectProductById("pipeline-sample-balm")
+            .executeAsOne()
+            .inci_hash
+        assertEquals(InciIdentity.hash("Aqua, Petrolatum"), writtenHash)
+        val frequent: List<String> = database.catalogDatabaseQueries
+            .selectFrequentCategories(20L)
+            .executeAsList()
+            .mapNotNull { category -> category }
+        assertEquals("balm", frequent.first())
+        assertTrue(frequent.contains("moisturizer"))
     }
 }

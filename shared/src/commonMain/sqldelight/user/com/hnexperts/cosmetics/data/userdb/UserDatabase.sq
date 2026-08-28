@@ -39,7 +39,8 @@ CREATE TABLE user_shelf (
     rating TEXT NOT NULL,
     usage TEXT NOT NULL,
     category TEXT,
-    saved_at TEXT NOT NULL
+    saved_at TEXT NOT NULL,
+    inci_hash TEXT
 );
 
 CREATE TABLE report_queue (
@@ -160,6 +161,11 @@ WHERE flushed = 0
 ORDER BY created_at DESC
 LIMIT 200;
 
+markOpenReportsFlushed:
+UPDATE report_queue
+SET flushed = 1
+WHERE flushed = 0;
+
 selectShelf:
 SELECT *
 FROM user_shelf
@@ -181,9 +187,10 @@ INSERT OR REPLACE INTO user_shelf(
     rating,
     usage,
     category,
-    saved_at
+    saved_at,
+    inci_hash
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 deleteShelf:
 DELETE FROM user_shelf

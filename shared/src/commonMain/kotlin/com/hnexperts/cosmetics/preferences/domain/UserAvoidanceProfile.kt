@@ -27,7 +27,7 @@ data class UserAvoidanceProfile(
         if (pregnancyCaution && regulatoryTags.contains(TAG_PREGNANCY_CAUTION)) {
             return true
         }
-        if (euAllergens && regulatoryTags.contains(TAG_ALLERGEN_26)) {
+        if (euAllergens && isEuAllergen(regulatoryTags)) {
             return true
         }
         if (childrenCaution && regulatoryTags.contains(TAG_CHILDREN)) {
@@ -40,6 +40,10 @@ data class UserAvoidanceProfile(
             return true
         }
         return false
+    }
+
+    private fun isEuAllergen(regulatoryTags: List<String>): Boolean {
+        return regulatoryTags.contains(TAG_ALLERGEN_26) || regulatoryTags.contains(TAG_ALLERGEN_80)
     }
 
     private fun isAlcoholLeaveOnHit(ingredientId: String, usage: ProductUsage, inciName: String?): Boolean {
@@ -72,6 +76,7 @@ data class UserAvoidanceProfile(
         const val TAG_FRAGRANCE: String = "FRAGRANCE"
         const val TAG_PREGNANCY_CAUTION: String = "PREGNANCY_CAUTION"
         const val TAG_ALLERGEN_26: String = "ALLERGEN_26"
+        const val TAG_ALLERGEN_80: String = "ALLERGEN_80"
         const val TAG_CHILDREN: String = "CHILDREN"
         const val TAG_ESSENTIAL_OIL: String = "ESSENTIAL_OIL"
 

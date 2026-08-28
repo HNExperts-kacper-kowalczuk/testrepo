@@ -38,9 +38,12 @@
 
     <string name="history_title">Recent scans</string>
     <string name="history_select_compare">Select to compare</string>
+    <string name="history_insight_title">In your recent scans</string>
+    <string name="history_insight_hint">Names that often rate high or prohibited in your recent scans. Informational only — not a diagnosis.</string>
     <string name="history_empty">You have not evaluated a product yet.</string>
     <string name="shelf_title">Shelf</string>
     <string name="shelf_empty">Star a result to keep it here. Shelf stays on this device if the catalog is replaced.</string>
+    <string name="shelf_formula_changed">Catalog formula differs — check the label.</string>
     <string name="compare_title">Compare</string>
     <string name="compare_action">Compare selected</string>
     <string name="compare_select_hint">Select 2 or 3 items to compare overall ratings and unique high-concern names.</string>
@@ -58,12 +61,15 @@
     <string name="result_check_label">Check the label</string>
     <string name="result_pack_verified">The photographed list matches the catalog.</string>
     <string name="result_share">Share result</string>
+    <string name="result_share_image">Share as image</string>
     <string name="share_scanned_product">Scanned product</string>
     <string name="share_scanned_at">Scanned</string>
     <string name="result_shelf_add">Save to shelf</string>
     <string name="result_shelf_remove">Remove from shelf</string>
     <string name="result_alternatives">Lower-concern products in this category</string>
     <string name="result_alternatives_source">In this app’s catalog</string>
+    <string name="result_category_pick">Pick a category to look for lower-concern products in this app’s catalog.</string>
+    <string name="result_category_skip">Skip</string>
     <string name="confirm_add_photo">Add another photo</string>
     <string name="level_safe">Generally acceptable</string>
     <string name="level_low">Low concern</string>
@@ -74,6 +80,9 @@
     <string name="level_unknown">Unknown</string>
     <string name="finding_personal_avoid">On your avoid list</string>
     <string name="finding_early_list">Near the start of the INCI list (often a higher amount).</string>
+    <string name="finding_sun_caution">Sun caution in this catalog — not a diagnosis.</string>
+    <string name="result_microplastics_chip">Microplastics tagged</string>
+    <string name="result_microplastics_a11y">Microplastics tagged in this catalog. This list is incomplete and is not a safety rating.</string>
     <string name="finding_unmatched">Not in the knowledge base</string>
     <string name="back">Back</string>
 
@@ -81,6 +90,7 @@
     <string name="prefs_pregnancy">Pregnancy / breastfeeding caution</string>
     <string name="prefs_fragrance_free">Prefer fragrance-free</string>
     <string name="prefs_eu_allergens">Avoid EU-labelled fragrance allergens</string>
+    <string name="prefs_eu_allergens_hint">The list follows the labelled-allergen annex snapshot in this catalog version.</string>
     <string name="prefs_children_caution">Children / not for under 3 caution</string>
     <string name="prefs_alcohol_leave_on">Avoid alcohol in leave-on products</string>
     <string name="prefs_essential_oil">Avoid common essential-oil allergens</string>
@@ -117,6 +127,15 @@
     <string name="prefs_reports_copy">Copy unsent reports as text</string>
     <string name="prefs_reports_copied">Report list copied.</string>
     <string name="prefs_reports_empty">kind	gtin	payload</string>
+    <string name="prefs_reports_send">Send unsent reports</string>
+    <string name="prefs_reports_sent">Unsent reports were sent.</string>
+    <string name="prefs_reports_send_unavailable">Sending reports is not configured on this build.</string>
+    <string name="prefs_export_avoid">Copy avoid-list</string>
+    <string name="prefs_export_avoid_copied">Avoid-list copied.</string>
+    <string name="prefs_export_avoid_empty">(no avoid-list ingredients)</string>
+    <string name="prefs_export_shelf">Copy shelf</string>
+    <string name="prefs_export_shelf_copied">Shelf copied.</string>
+    <string name="prefs_export_shelf_empty">(no shelf items)</string>
     <string name="prefs_remove_ads">Remove ads</string>
     <string name="prefs_remove_ads_unavailable">In-app purchase to remove ads is not available yet.</string>
     <string name="prefs_ads_removed">Ads are turned off on this device.</string>
@@ -138,6 +157,7 @@
     <string name="usage_eye">Eye area</string>
     <string name="result_usage">Scored as %1$s.</string>
     <string name="result_usage_assumed">Usage was not given, so the stricter leave-on reading was used.</string>
+    <string name="result_usage_pick">Usage was assumed — pick how you use this.</string>
     <string name="finding_usage_adjusted">Level adjusted for this product type.</string>
 
     <string name="result_rating_a11y">Overall rating: %1$s</string>

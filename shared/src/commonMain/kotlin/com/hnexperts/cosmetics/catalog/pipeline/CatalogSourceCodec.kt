@@ -1,5 +1,7 @@
 package com.hnexperts.cosmetics.catalog.pipeline
 
+import com.hnexperts.cosmetics.catalog.application.CatalogDelta
+import com.hnexperts.cosmetics.catalog.domain.CatalogMeta
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
 import com.hnexperts.cosmetics.catalog.fixture.FixtureIngredient
 import com.hnexperts.cosmetics.catalog.fixture.FixtureProduct
@@ -38,6 +40,38 @@ object CatalogSourceCodec {
 
     fun parseProducts(raw: String): ObfProductDump {
         return json.decodeFromString(ObfProductDump.serializer(), raw)
+    }
+
+    fun encodeDelta(delta: CatalogDelta): String {
+        val dump = CatalogDeltaDump(
+            fromCatalogVersion = delta.fromCatalogVersion,
+            catalogVersion = delta.meta.catalogVersion,
+            rulesetVersion = delta.meta.rulesetVersion,
+            builtAt = delta.meta.builtAt,
+            region = delta.meta.region,
+            checksum = delta.meta.checksum,
+            supportedCommentLocales = delta.meta.supportedCommentLocales,
+            ingredients = delta.ingredients.map(::toRecord),
+            products = delta.products.map(::toRecord)
+        )
+        return json.encodeToString(CatalogDeltaDump.serializer(), dump)
+    }
+
+    fun decodeDelta(raw: String): CatalogDelta {
+        val dump: CatalogDeltaDump = json.decodeFromString(CatalogDeltaDump.serializer(), raw)
+        return CatalogDelta(
+            fromCatalogVersion = dump.fromCatalogVersion,
+            meta = CatalogMeta(
+                catalogVersion = dump.catalogVersion,
+                rulesetVersion = dump.rulesetVersion,
+                builtAt = dump.builtAt,
+                region = dump.region,
+                checksum = dump.checksum,
+                supportedCommentLocales = dump.supportedCommentLocales
+            ),
+            ingredients = dump.ingredients.map(CatalogBuilder::ingredientFrom),
+            products = dump.products.map(CatalogBuilder::productFrom)
+        )
     }
 
     private fun toRecord(item: FixtureIngredient): CosingIngredientRecord {

@@ -1,7 +1,9 @@
 package com.hnexperts.cosmetics.catalog.pipeline
 
+import com.hnexperts.cosmetics.catalog.application.CatalogDelta
 import com.hnexperts.cosmetics.catalog.domain.CatalogIntegrity
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
+import com.hnexperts.cosmetics.catalog.fixture.FixtureProduct
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -18,6 +20,22 @@ class CatalogPipelineTest {
         assertEquals(FixtureCatalog.ingredients.size, build.ingredients.size)
         assertEquals(FixtureCatalog.products.size, build.products.size)
         assertEquals(FixtureCatalog.CATALOG_VERSION, build.manifest.catalogVersion)
+    }
+
+    @Test
+    fun deltaRoundTripKeepsAddedProduct() {
+        val extra: FixtureProduct = FixtureCatalog.products.first()
+        val delta = CatalogDelta(
+            fromCatalogVersion = FixtureCatalog.CATALOG_VERSION,
+            meta = CatalogIntegrity.fixtureMeta().copy(catalogVersion = "2026.09-hosted"),
+            ingredients = emptyList(),
+            products = listOf(extra)
+        )
+        val decoded = CatalogSourceCodec.decodeDelta(CatalogSourceCodec.encodeDelta(delta))
+        assertEquals(delta.fromCatalogVersion, decoded.fromCatalogVersion)
+        assertEquals(delta.meta.catalogVersion, decoded.meta.catalogVersion)
+        assertEquals(extra.product.id, decoded.products.single().product.id)
+        assertEquals(extra.product.inciRaw, decoded.products.single().product.inciRaw)
     }
 
     @Test

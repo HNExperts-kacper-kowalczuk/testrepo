@@ -26,6 +26,16 @@
 	<string>Photos are used only to read a product barcode from a gallery image. Nothing is uploaded.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Tracking is used only to show relevant ads. Scan history and avoid-lists stay on this device.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.hnexperts.cosmetics.scanner.scan</string>
+	</array>
+	<key>GADBannerUnitID</key>
+	<string>$(ADMOB_BANNER_ID)</string>
+	<key>CatalogSyncURL</key>
+	<string>$(CATALOG_SYNC_URL)</string>
+	<key>ReportsFlushURL</key>
+	<string>$(REPORTS_FLUSH_URL)</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

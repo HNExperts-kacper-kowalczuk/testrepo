@@ -201,7 +201,7 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-The next PRs are **[plan-further-improvements.md](plan-further-improvements.md)** (phases 6–15, one PR each): trust settings, usage confirm, formula watch, history insight, category picker, comment badges, allergen ingest, store polish, hosted catalog, optional microplastics chip.
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** are **shipped**. What remains is P3 / out-of-scope work in this file (real Remove-ads IAP, vegan/cruelty as safety scores, foldables, CJK OCR).
 
 ---
 

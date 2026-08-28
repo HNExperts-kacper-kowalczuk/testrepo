@@ -14,6 +14,7 @@ data class CatalogAlternative(
 object FindLocalAlternatives {
     const val CANDIDATE_CAP: Int = 20
     const val RESULT_CAP: Int = 3
+    const val CATEGORY_PICK_CAP: Int = 20
 
     fun invoke(
         current: ProductAssessment,

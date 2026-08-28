@@ -268,7 +268,7 @@ internal object FixtureIngredients {
             name = "Salicylic Acid",
             aliases = listOf("BHA Acid"),
             level = DangerLevel.RESTRICTED,
-            tags = listOf("KERATOLYTIC", "ANNEX_III", "PREGNANCY_CAUTION", "CHILDREN"),
+            tags = listOf("KERATOLYTIC", "ANNEX_III", "PREGNANCY_CAUTION", "CHILDREN", "PHOTOTOXIC"),
             en = "Restricted keratolytic. Not for children under three; caution in pregnancy.",
             pl = "Ograniczony keratolotyk. Nie dla dzieci poniżej 3 lat; ostrożnie w ciąży."
         ),
@@ -336,6 +336,15 @@ internal object FixtureIngredients {
             tags = listOf("ANNEX_II", "CMR"),
             en = "Listed as prohibited in EU cosmetics (Annex II).",
             pl = "Wykazany jako substancja zakazana w kosmetykach UE (załącznik II)."
+        ),
+        ing(
+            id = "polyethylene",
+            name = "Polyethylene",
+            aliases = listOf("PE"),
+            level = DangerLevel.SAFE,
+            tags = listOf("ABRASIVE", "MICROPLASTIC"),
+            en = "Solid polyethylene used as a film former or microbead. Tagged as a possible microplastic in this catalog; the list is incomplete.",
+            pl = "Stały polietylen stosowany jako filmotwórczy lub mikrokuleczka. W tym katalogu oznaczony jako możliwy mikroplastik; lista jest niepełna."
         )
     )
 
@@ -353,11 +362,13 @@ internal object FixtureIngredients {
         val functionTags: List<String> = tags.filter { tag ->
             tag != "ANNEX_II" && tag != "ANNEX_III" && tag != "ANNEX_IV" &&
                 tag != "ANNEX_V" && tag != "ANNEX_VI" && tag != "ALLERGEN_26" &&
-                tag != "CMR" && tag != "PREGNANCY_CAUTION" && tag != "CHILDREN"
+                tag != "CMR" && tag != "PREGNANCY_CAUTION" && tag != "CHILDREN" &&
+                tag != "PHOTOTOXIC" && tag != "MICROPLASTIC"
         }
         val regulatoryTags: List<String> = tags.filter { tag ->
             tag.startsWith("ANNEX_") || tag == "ALLERGEN_26" || tag == "CMR" ||
-                tag == "PREGNANCY_CAUTION" || tag == "CHILDREN"
+                tag == "PREGNANCY_CAUTION" || tag == "CHILDREN" || tag == "PHOTOTOXIC" ||
+                tag == "MICROPLASTIC"
         }
         return FixtureIngredient(
             ingredient = Ingredient(
