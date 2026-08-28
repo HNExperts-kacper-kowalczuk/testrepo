@@ -199,9 +199,9 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 ## 11. Suggested order after v1
 
-The committed next slice (catalog scale, four-corner INCI OCR, Fitatu-inspired UI) is **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely implemented). The remaining work is **[plan-next-phases.md](plan-next-phases.md)**: bundled CosIng/OBF catalog, online GTIN cache, pack verify, personal presets, shelf/compare, then share/gallery polish.
+Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-Schema to reserve **now** (cheap, even if UI waits): `product.usage`, `product.inci_hash`, `user` shelf table, `report_queue`, `supported_comment_locales` (already planned).
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** are **shipped**. What remains is P3 / out-of-scope work in this file (real Remove-ads IAP, vegan/cruelty as safety scores, foldables, CJK OCR).
 
 ---
 

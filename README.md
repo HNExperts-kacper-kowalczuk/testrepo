@@ -65,8 +65,8 @@ Unknown barcodes are looked up online automatically when the device is connected
 ## Docs
 
 - **[Product and architecture plan](docs/plan.md)**
-- **[Next phases](docs/plan-next-phases.md)** — bundled catalog, pack verify, personal presets, compare, polish
-- **[Further improvements](docs/plan-further-improvements.md)** — phases 6–15 (shipped: trust settings through microplastics chip)
+- **[Next phases 1–5](docs/plan-next-phases.md)** — bundled catalog, pack verify, personal presets, compare, polish (shipped)
+- **[Further improvements 6–15](docs/plan-further-improvements.md)** — trust settings through microplastics chip (shipped)
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**
