@@ -55,7 +55,8 @@ object UserSchemaGuard {
         "children_caution INTEGER NOT NULL DEFAULT 0",
         "alcohol_leave_on INTEGER NOT NULL DEFAULT 0",
         "essential_oil_cluster INTEGER NOT NULL DEFAULT 0",
-        "ads_removed INTEGER NOT NULL DEFAULT 0"
+        "ads_removed INTEGER NOT NULL DEFAULT 0",
+        "theme_preference TEXT NOT NULL DEFAULT 'system'"
     )
 
     private val HISTORY_COLUMNS: List<String> = listOf(

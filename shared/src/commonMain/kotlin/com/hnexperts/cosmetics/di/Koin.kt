@@ -37,6 +37,7 @@ import com.hnexperts.cosmetics.i18n.CommentLocalizer
 import com.hnexperts.cosmetics.legal.data.SqlLegalRepository
 import com.hnexperts.cosmetics.legal.domain.LegalStore
 import com.hnexperts.cosmetics.network.SyncConfig
+import com.hnexperts.cosmetics.preferences.application.ThemeSession
 import com.hnexperts.cosmetics.preferences.application.UserDataReset
 import com.hnexperts.cosmetics.preferences.data.SqlPreferencesRepository
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
@@ -118,6 +119,7 @@ val appModule = module {
     single { ApplyCatalogDelta(get(), get(), get(), get()) }
     single { FlushReports(get(), get(), SyncConfig.reportsUrl) }
     single { AdsSession(get(), get(), get(), get(), get()) }
+    single { ThemeSession(get(), get()) }
     single<BillingPort> { NoOpBillingPort() }
     single { CompareSession() }
     single<UserShelf> { SqlUserShelf(get(), get()) }

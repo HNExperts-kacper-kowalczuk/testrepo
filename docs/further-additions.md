@@ -201,7 +201,7 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–24 are shipped. In **[plan-after-twenty-three.md](plan-after-twenty-three.md)**, this PR is store listing copy (25). Remaining: optional theme override (26).
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–26 in **[plan-after-twenty.md](plan-after-twenty.md)** and **[plan-after-twenty-three.md](plan-after-twenty-three.md)** are shipped (this PR is the in-app theme override). Remaining: accessibility / TalkBack in §5.1 and items still listed here.
 
 Still out of git: real Remove-ads IAP, production AdMob / sync URLs, vegan/cruelty as safety scores, foldables, CJK OCR.
 

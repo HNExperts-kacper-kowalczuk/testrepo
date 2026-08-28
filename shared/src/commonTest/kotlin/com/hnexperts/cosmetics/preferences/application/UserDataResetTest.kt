@@ -10,6 +10,7 @@ import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
+import com.hnexperts.cosmetics.preferences.domain.ThemePreference
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import com.hnexperts.cosmetics.scanning.domain.CatalogReport
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
@@ -69,7 +70,7 @@ class UserDataResetTest {
     }
 
     @Test
-    fun resetDeviceClearsUserStoresAndKeepsLocale() = runBlocking {
+    fun resetDeviceClearsUserStoresAndKeepsLocaleAndTheme() = runBlocking {
         val history = MemoryHistory()
         val shelf = MemoryShelf()
         val reports = MemoryReports()
@@ -87,7 +88,8 @@ class UserDataResetTest {
                 ),
                 localePreference = LocalePreference.PINNED,
                 pinnedLocale = AppLocale.POLISH,
-                adsRemoved = true
+                adsRemoved = true,
+                themePreference = ThemePreference.DARK
             )
         )
         history.entries += sampleHistory()
@@ -107,6 +109,7 @@ class UserDataResetTest {
         assertFalse(preferences.stored.adsRemoved)
         assertEquals(LocalePreference.PINNED, preferences.stored.localePreference)
         assertEquals(AppLocale.POLISH, preferences.stored.pinnedLocale)
+        assertEquals(ThemePreference.DARK, preferences.stored.themePreference)
     }
 
     @Test

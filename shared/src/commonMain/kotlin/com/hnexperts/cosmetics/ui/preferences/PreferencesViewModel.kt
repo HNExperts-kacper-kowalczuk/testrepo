@@ -18,9 +18,11 @@ import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.ingredients.domain.Ingredient
 import com.hnexperts.cosmetics.platform.copyPlainText
 import com.hnexperts.cosmetics.preferences.application.PreferencesExportText
+import com.hnexperts.cosmetics.preferences.application.ThemeSession
 import com.hnexperts.cosmetics.preferences.application.UserDataReset
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
+import com.hnexperts.cosmetics.preferences.domain.ThemePreference
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import com.hnexperts.cosmetics.scanning.application.FlushReports
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
@@ -77,7 +79,8 @@ class PreferencesViewModel(
     private val flushReports: FlushReports,
     private val billing: BillingPort,
     private val userDataReset: UserDataReset,
-    private val shelf: UserShelf
+    private val shelf: UserShelf,
+    private val themeSession: ThemeSession
 ) : ViewModel() {
     private val state: MutableStateFlow<PreferencesUiState> = MutableStateFlow(PreferencesUiState())
     val uiState: StateFlow<PreferencesUiState> = state.asStateFlow()
@@ -115,6 +118,7 @@ class PreferencesViewModel(
                         catalogIndex = indexValue
                         ingredientsById = indexValue?.ingredientsById.orEmpty()
                         val storedPrefs: StoredPreferences = stored.value
+                        themeSession.publish(storedPrefs.themePreference)
                         state.value = state.value.copy(
                             stored = storedPrefs,
                             ingredients = displayedAvoid(storedPrefs.profile, state.value.avoidQuery),
@@ -168,6 +172,18 @@ class PreferencesViewModel(
 
     fun pinLocale(locale: AppLocale) {
         update { current -> current.copy(localePreference = LocalePreference.PINNED, pinnedLocale = locale) }
+    }
+
+    fun setFollowSystemTheme() {
+        update { current -> current.copy(themePreference = ThemePreference.FOLLOW_SYSTEM) }
+    }
+
+    fun setLightTheme() {
+        update { current -> current.copy(themePreference = ThemePreference.LIGHT) }
+    }
+
+    fun setDarkTheme() {
+        update { current -> current.copy(themePreference = ThemePreference.DARK) }
     }
 
     fun toggleAvoid(ingredientId: String) {
@@ -296,6 +312,7 @@ class PreferencesViewModel(
                 val next: StoredPreferences = transform(state.value.stored)
                 val saved = runUiAction(onFailure = ::showFailure) { repository.save(next) }
                 if (saved != null) {
+                    themeSession.publish(next.themePreference)
                     state.value = state.value.copy(
                         stored = next,
                         ingredients = displayedAvoid(next.profile, state.value.avoidQuery),

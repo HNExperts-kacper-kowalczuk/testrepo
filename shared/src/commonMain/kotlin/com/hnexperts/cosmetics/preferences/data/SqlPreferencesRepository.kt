@@ -9,6 +9,7 @@ import com.hnexperts.cosmetics.i18n.AppLocale
 import com.hnexperts.cosmetics.i18n.LocalePreference
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
+import com.hnexperts.cosmetics.preferences.domain.ThemePreference
 import com.hnexperts.cosmetics.preferences.domain.UserAvoidanceProfile
 import kotlinx.coroutines.withContext
 
@@ -42,7 +43,9 @@ class SqlPreferencesRepository(
     private fun ensureProfile() {
         val existing = database.userDatabaseQueries.selectProfile().executeAsOneOrNull()
         if (existing == null) {
-            database.userDatabaseQueries.upsertProfile(0, 0, "system", null, 0, 0, 0, 0, 0)
+            database.userDatabaseQueries.upsertProfile(
+                0, 0, "system", null, 0, 0, 0, 0, 0, ThemePreference.FOLLOW_SYSTEM.storageValue()
+            )
         }
     }
 
@@ -63,7 +66,8 @@ class SqlPreferencesRepository(
             ),
             localePreference = localePreference,
             pinnedLocale = pinned,
-            adsRemoved = row.ads_removed != 0L
+            adsRemoved = row.ads_removed != 0L,
+            themePreference = ThemePreference.fromStorage(row.theme_preference)
         )
     }
 
@@ -78,7 +82,8 @@ class SqlPreferencesRepository(
             children_caution = flag(profile.childrenCaution),
             alcohol_leave_on = flag(profile.alcoholLeaveOn),
             essential_oil_cluster = flag(profile.essentialOilCluster),
-            ads_removed = flag(preferences.adsRemoved)
+            ads_removed = flag(preferences.adsRemoved),
+            theme_preference = preferences.themePreference.storageValue()
         )
     }
 

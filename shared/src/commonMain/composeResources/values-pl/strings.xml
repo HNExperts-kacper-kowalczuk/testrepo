@@ -101,6 +101,10 @@
     <string name="prefs_language_system">Jak system</string>
     <string name="prefs_language_en">Angielski</string>
     <string name="prefs_language_pl">Polski</string>
+    <string name="prefs_theme">Wygląd</string>
+    <string name="prefs_theme_system">Jak system</string>
+    <string name="prefs_theme_light">Jasny</string>
+    <string name="prefs_theme_dark">Ciemny</string>
     <string name="prefs_avoid_title">Unikaj wybranych składników</string>
     <string name="prefs_catalog_title">Katalog offline</string>
     <string name="prefs_catalog_stamp">Wersja %1$s · zbudowano %2$s · %3$s</string>

@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,8 @@ import androidx.navigation.toRoute
 import com.hnexperts.cosmetics.failure.Outcome
 import com.hnexperts.cosmetics.legal.domain.LegalState
 import com.hnexperts.cosmetics.legal.domain.LegalStore
+import com.hnexperts.cosmetics.preferences.application.ThemeSession
+import com.hnexperts.cosmetics.preferences.domain.ThemePreference
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.tab_history
 import com.hnexperts.cosmetics.resources.tab_more
@@ -98,7 +101,9 @@ object ConfirmIngredientsDestination
 
 @Composable
 fun App() {
-    CosmeticsTheme {
+    val themeSession: ThemeSession = koinInject()
+    val themePreference: ThemePreference by themeSession.preference.collectAsState()
+    CosmeticsTheme(preference = themePreference) {
         val legal: LegalStore = koinInject()
         var accepted: Boolean? by remember { mutableStateOf(null) }
         LaunchedEffect(Unit) {
