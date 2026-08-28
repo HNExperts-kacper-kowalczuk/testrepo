@@ -5,6 +5,7 @@ import com.hnexperts.cosmetics.ingredients.domain.InciNormalizer
 /**
  * Solid synthetic polymers commonly used as microbeads or powders.
  * This list is incomplete; it is a catalog tag, not a hazard score.
+ * Applied at CosIng ingest and when assembling the in-memory index.
  */
 object MicroplasticIndex {
     const val TAG: String = "MICROPLASTIC"
