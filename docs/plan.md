@@ -575,8 +575,8 @@ Each phase should leave the app **installable**. Camera and ads are add-ons on t
 
 ## 19. Further additions (not v1 scope)
 
-Recommended next capabilities — usage type (leave-on vs rinse-off), verify pack vs catalog, structured allergen/children profiles, colour-safe ratings, shelf/compare, encyclopedia — are listed with priority in **[further-additions.md](further-additions.md)**. Phases 1–15 are shipped; see **[plan-further-improvements.md](plan-further-improvements.md)** and **[further-additions.md](further-additions.md)** for what is still out of scope.
+Recommended next capabilities — usage type (leave-on vs rinse-off), verify pack vs catalog, structured allergen/children profiles, colour-safe ratings, shelf/compare, encyclopedia — are listed with priority in **[further-additions.md](further-additions.md)**. Phases 1–15 are shipped. The next code slice is **[plan-after-fifteen.md](plan-after-fifteen.md)**. Store secrets, IAP, and vegan/cruelty-as-scores stay out of git; see **[further-additions.md](further-additions.md)**.
 
-The next implementation slice (regional CosIng/OBF catalog, ingredients-only OCR with a four-corner crop, Fitatu-inspired scan UI) is specified in **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)**.
+Catalog OCR/UI tracks A–D are specified in **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done).
 
 Reserve in the v1 schema even if the UI waits: `product.usage`, `product.inci_hash`, user shelf, local report queue.

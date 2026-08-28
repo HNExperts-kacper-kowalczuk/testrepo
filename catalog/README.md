@@ -18,4 +18,8 @@ Replace those JSON files with a larger EU/PL dump without changing the mobile ev
 
 Pass extra flags with `-PingestArgs="--skip-obf --max-products=5000"`.
 
-The app still seeds from the curated fixture catalog **until Phase 1 of [plan-next-phases.md](../docs/plan-next-phases.md)** lands: `./gradlew :shared:packShippedCatalog` writes `composeResources/files/catalog.sqlite.gz` from CosIng + OBF ingest (fixtures win on id/GTIN conflict). JVM tests keep using fixtures.
+The app unpacks `shared/src/commonMain/composeResources/files/catalog.sqlite.gz` (~36k CosIng ingredients, ~17k OBF-style products). JVM tests keep using the curated fixtures.
+
+`./gradlew :shared:packShippedCatalog` writes that gzip from **`catalog/ingest/`** when present (fixtures win on id/GTIN conflict), otherwise from `catalog/sources/` (fixture-sized). Do not run it without ingest dumps or you will replace the shipped catalog with eight SKUs.
+
+Allergen and microplastic **tag indexes** are written at CosIng ingest (`CosingAssembler`). The packed gzip may predate those indexes; phase 16 in [plan-after-fifteen.md](../docs/plan-after-fifteen.md) applies the same lists when `CatalogIndex` is assembled so evaluation does not wait on a re-pack.
