@@ -109,6 +109,17 @@ class CosingAssemblerTest {
     }
 
     @Test
+    fun carmineGetsAnimalDerivedTagWithoutChangingDanger() {
+        val record: CosingIngredientRecord? = CosingAssembler().toRecord(
+            metadata("""{"inciName":["CARMINE"],"annexNo":[],"functionName":["COLORANT"]}""")
+        )
+        assertNotNull(record)
+        assertEquals("LOW", record.dangerLevel)
+        assertTrue(record.regulatoryTags.contains("ANIMAL_DERIVED"))
+        assertEquals(listOf("COLORANT"), record.functionTags)
+    }
+
+    @Test
     fun salicylicAcidGetsSunChildrenAndPregnancyTags() {
         val record: CosingIngredientRecord? = CosingAssembler().toRecord(
             metadata("""{"inciName":["SALICYLIC ACID"],"annexNo":["III"],"functionName":["KERATOLYTIC"]}""")

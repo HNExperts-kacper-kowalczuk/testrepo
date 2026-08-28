@@ -345,6 +345,15 @@ internal object FixtureIngredients {
             tags = listOf("ABRASIVE", "MICROPLASTIC"),
             en = "Solid polyethylene used as a film former or microbead. Tagged as a possible microplastic in this catalog; the list is incomplete.",
             pl = "Stały polietylen stosowany jako filmotwórczy lub mikrokuleczka. W tym katalogu oznaczony jako możliwy mikroplastik; lista jest niepełna."
+        ),
+        ing(
+            id = "carmine",
+            name = "Carmine",
+            aliases = listOf("CI 75470"),
+            level = DangerLevel.SAFE,
+            tags = listOf("COLORANT", "ANIMAL_DERIVED"),
+            en = "Red pigment from cochineal. Tagged as animal-derived in this catalog; the list is incomplete and is not a vegan certification.",
+            pl = "Czerwony barwnik z koszenili. W tym katalogu oznaczony jako pochodzenia zwierzęcego; lista jest niepełna i nie jest certyfikatem wegańskim."
         )
     )
 
@@ -363,12 +372,12 @@ internal object FixtureIngredients {
             tag != "ANNEX_II" && tag != "ANNEX_III" && tag != "ANNEX_IV" &&
                 tag != "ANNEX_V" && tag != "ANNEX_VI" && tag != "ALLERGEN_26" &&
                 tag != "CMR" && tag != "PREGNANCY_CAUTION" && tag != "CHILDREN" &&
-                tag != "PHOTOTOXIC" && tag != "MICROPLASTIC"
+                tag != "PHOTOTOXIC" && tag != "MICROPLASTIC" && tag != "ANIMAL_DERIVED"
         }
         val regulatoryTags: List<String> = tags.filter { tag ->
             tag.startsWith("ANNEX_") || tag == "ALLERGEN_26" || tag == "CMR" ||
                 tag == "PREGNANCY_CAUTION" || tag == "CHILDREN" || tag == "PHOTOTOXIC" ||
-                tag == "MICROPLASTIC"
+                tag == "MICROPLASTIC" || tag == "ANIMAL_DERIVED"
         }
         return FixtureIngredient(
             ingredient = Ingredient(

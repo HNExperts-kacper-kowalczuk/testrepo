@@ -5,9 +5,9 @@ import com.hnexperts.cosmetics.hazards.domain.IngredientHazard
 
 /**
  * Tag lists that live in code (EU labelled allergens, microplastics,
- * phototoxic / children / pregnancy caution). Ingest writes them into a
- * new pack; assemble still unions them so a gzip packed before those
- * indexes evaluates the same way.
+ * phototoxic / children / pregnancy caution, animal-derived). Ingest
+ * writes them into a new pack; assemble still unions them so a gzip
+ * packed before those indexes evaluates the same way.
  */
 object MaintainedCatalogTags {
     fun applyTo(snapshot: CatalogSnapshot): CatalogSnapshot {
@@ -22,7 +22,8 @@ object MaintainedCatalogTags {
             MicroplasticIndex.tagsFor(inciName) +
             PhototoxicIndex.tagsFor(inciName) +
             ChildrenCautionIndex.tagsFor(inciName) +
-            PregnancyCautionIndex.tagsFor(inciName)
+            PregnancyCautionIndex.tagsFor(inciName) +
+            AnimalDerivedIndex.tagsFor(inciName)
         if (extra.isEmpty()) {
             return existing
         }

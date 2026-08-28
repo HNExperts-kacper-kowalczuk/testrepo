@@ -36,7 +36,7 @@ import com.hnexperts.cosmetics.ui.theme.RatingColors
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Traffic-light rating, usage line, and microplastics chip. Stays on screen
+ * Traffic-light rating, usage line, and extra catalog chips. Stays on screen
  * while findings scroll. Ads stay in the result bottom bar, not here.
  */
 @Composable
@@ -48,9 +48,17 @@ fun ResultStickyRating(assessment: ProductAssessment) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         ResultHeader(assessment)
-        if (assessment.hasMicroplastics()) {
-            ResultMicroplasticChip()
-        }
+        ResultCatalogChips(assessment)
+    }
+}
+
+@Composable
+private fun ResultCatalogChips(assessment: ProductAssessment) {
+    if (assessment.hasMicroplastics()) {
+        ResultMicroplasticChip()
+    }
+    if (assessment.hasAnimalDerived()) {
+        ResultAnimalDerivedChip()
     }
 }
 

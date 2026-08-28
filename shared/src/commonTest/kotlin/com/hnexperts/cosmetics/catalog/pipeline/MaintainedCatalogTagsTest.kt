@@ -20,6 +20,15 @@ class MaintainedCatalogTagsTest {
     }
 
     @Test
+    fun carmineGainsAnimalDerivedWithoutDroppingAnnex() {
+        val merged: List<String> = MaintainedCatalogTags.merge(
+            inciName = "CARMINE",
+            existing = listOf("ANNEX_IV")
+        )
+        assertEquals(listOf("ANNEX_IV", AnimalDerivedIndex.TAG), merged)
+    }
+
+    @Test
     fun geraniolAndAcetylCedreneGainAllergenTags() {
         assertTrue(MaintainedCatalogTags.merge("GERANIOL", emptyList()).contains("ALLERGEN_26"))
         assertTrue(MaintainedCatalogTags.merge("ACETYL CEDRENE", emptyList()).contains("ALLERGEN_80"))

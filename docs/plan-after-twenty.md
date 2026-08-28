@@ -19,7 +19,7 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 | Pregnancy preset | Works on fixture Retinol / Salicylic Acid. CosIng `RETINAL` has empty tags. |
 | Sun caution UI | Finding-row copy already exists (`finding_sun_caution`). It never fires on a CosIng-scale citrus oil. |
 | Settings notes | Allergen, microplastics, annex, sun caution, children, and pregnancy: incomplete lists, not diagnoses, not the traffic light |
-| Extra chips | Microplastics only. Animal-derived still P3 |
+| Extra chips | Microplastics and animal-derived (incomplete; not safety scores) |
 
 The children-caution preset and sun-caution badge are correct in **fixture** tests. They barely apply to a drugstore CosIng-scale scan until phase 21.
 
@@ -78,12 +78,19 @@ Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unch
 ## Phase 23 — Animal-derived chip (optional, last)
 
 **PR:** `cursor/phase-23-animal-derived-chip-4039`  
-**Depends on:** 21 (tag-overlay pattern).  
+**Depends on:** 21 (tag-overlay pattern; shipped as **#32**).  
 **Outcome:** People who asked for vegan get a **separate** chip under the safety rating, same rules as microplastics.
 
 - Incomplete INCI set (carmine, keratin, lactose, beeswax, lanolin, squalene, collagen, …). False negatives expected.
 - Chip below the traffic light, not inside it. TalkBack: list is incomplete; not a safety rating.
 - Overall rating unchanged.
+
+### 23.1 Done when
+
+- Assemble untagged CosIng-like `CARMINE` → animal-derived chip; overall rating unchanged.
+- Fixture `Carmine Lip Tint` is SAFE with the chip; Aqua + Glycerin has no chip.
+- `Squalane` is not tagged (only `Squalene` on this incomplete list).
+- Settings note says the chip is incomplete, not a safety rating, and not a vegan certification.
 
 **Out of this PR:** cruelty-free / Leaping Bunny (brand-level); palm; endocrine extra flag; treating the chip as SAFE/HIGH.
 
@@ -105,8 +112,8 @@ Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unch
 
 ```
 21 phototoxic / children / pregnancy indexes   ← shipped #32
-22 settings notes for those tags               ← this PR
-23 animal-derived chip (optional last)
+22 settings notes for those tags               ← shipped #33
+23 animal-derived chip (optional last)         ← this PR
 ```
 
 ---
@@ -116,5 +123,5 @@ Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unch
 - `./scripts/check-quality.sh` then `:shared:jvmTest`
 - EN/PL key parity; files ≤ 500 lines; rethrow `CancellationException`; no `catch (Throwable)`
 - Do not call live OBF/CosIng from unit tests
-- Rebuild `releases/inci-scan-debug.apk` when UI or catalog packing changes (phase 22 is UI copy)
+- Rebuild `releases/inci-scan-debug.apk` when UI or catalog packing changes (phase 23 is UI + fixture)
 - Walk [quality-checklist.md](quality-checklist.md) points 1–11 before commit

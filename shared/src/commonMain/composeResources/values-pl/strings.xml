@@ -83,6 +83,8 @@
     <string name="finding_sun_caution">Ostrzeżenie o słońcu w tym katalogu — to nie diagnoza.</string>
     <string name="result_microplastics_chip">Oznaczono mikroplastik</string>
     <string name="result_microplastics_a11y">W tym katalogu oznaczono mikroplastik. Ta lista jest niepełna i nie jest oceną bezpieczeństwa.</string>
+    <string name="result_animal_derived_chip">Oznaczono pochodzenie zwierzęce</string>
+    <string name="result_animal_derived_a11y">W tym katalogu oznaczono składniki pochodzenia zwierzęcego. Ta lista jest niepełna i nie jest oceną bezpieczeństwa.</string>
     <string name="finding_unmatched">Brak w bazie wiedzy</string>
     <string name="back">Wstecz</string>
 
@@ -112,11 +114,12 @@
     <string name="prefs_catalog_notes_title">Co zawiera ten katalog</string>
     <string name="prefs_catalog_notes_allergens">Przełącznik alergenów UE korzysta z oznaczanych alergenów zapachowych w tym katalogu (pierwotne 26 nazw i rozszerzenie z 2023 r.). Oznacza te składniki jako osobiste unikanie. Nie zmienia semafora bezpieczeństwa.</string>
     <string name="prefs_catalog_notes_microplastics">Chip mikroplastików to niekompletny znacznik katalogu, nie ocena bezpieczeństwa.</string>
+    <string name="prefs_catalog_notes_animal_derived">Chip pochodzenia zwierzęcego to niekompletny znacznik katalogu, nie ocena bezpieczeństwa i nie certyfikat wegański.</string>
     <string name="prefs_catalog_notes_annex">Poziomy zagrożenia pochodzą ze zrzutu załączników UE w tym katalogu, nie z bieżącego źródła prawnego.</string>
     <string name="prefs_catalog_notes_sun_caution">Wiersz ostrzeżenia o słońcu oznacza fototoksyczność w tym katalogu (na przykład niektóre olejki ze skórek cytrusów). Lista jest niekompletna. To nie diagnoza i nie zmienia semafora bezpieczeństwa.</string>
     <string name="prefs_catalog_notes_children">Przełącznik ostrożności u dzieci / nie dla dzieci poniżej 3 lat korzysta z niekompletnej listy w tym katalogu (na przykład kwas salicylowy). Oznacza te składniki jako osobiste unikanie. To nie diagnoza i nie zmienia semafora bezpieczeństwa.</string>
     <string name="prefs_catalog_notes_pregnancy">Przełącznik ostrożności w ciąży / podczas karmienia korzysta z niekompletnej listy w tym katalogu (na przykład niektóre retinoidy). Oznacza te składniki jako osobiste unikanie. To nie diagnoza i nie zmienia semafora bezpieczeństwa.</string>
-    <string name="prefs_catalog_notes_tags">Znaczniki alergenów, mikroplastików, ostrzeżenia o słońcu, ostrożności u dzieci i ostrożności w ciąży są stosowane przy wczytaniu katalogu, nawet gdy spakowany plik jest starszy niż te listy.</string>
+    <string name="prefs_catalog_notes_tags">Znaczniki alergenów, mikroplastików, ostrzeżenia o słońcu, ostrożności u dzieci, ostrożności w ciąży i pochodzenia zwierzęcego są stosowane przy wczytaniu katalogu, nawet gdy spakowany plik jest starszy niż te listy.</string>
     <string name="prefs_privacy">Opcje prywatności reklam</string>
     <string name="prefs_clear_history">Wyczyść historię skanów</string>
     <string name="prefs_cleared_history">Historia skanów została usunięta z tego urządzenia.</string>

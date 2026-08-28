@@ -29,10 +29,15 @@ data class Finding(
         return regulatoryTags.contains(TAG_MICROPLASTIC)
     }
 
+    fun animalDerived(): Boolean {
+        return regulatoryTags.contains(TAG_ANIMAL_DERIVED)
+    }
+
     private companion object {
         const val EARLY_LIST_LIMIT: Int = 5
         const val TAG_PHOTOTOXIC: String = "PHOTOTOXIC"
         const val TAG_MICROPLASTIC: String = "MICROPLASTIC"
+        const val TAG_ANIMAL_DERIVED: String = "ANIMAL_DERIVED"
     }
 }
 
@@ -54,5 +59,9 @@ data class ProductAssessment(
 ) {
     fun hasMicroplastics(): Boolean {
         return findings.any { finding -> finding.microplastic() }
+    }
+
+    fun hasAnimalDerived(): Boolean {
+        return findings.any { finding -> finding.animalDerived() }
     }
 }
