@@ -12,6 +12,7 @@ import com.hnexperts.cosmetics.resources.prefs_export_avoid_empty
 import com.hnexperts.cosmetics.resources.prefs_export_shelf
 import com.hnexperts.cosmetics.resources.prefs_export_shelf_copied
 import com.hnexperts.cosmetics.resources.prefs_export_shelf_empty
+import com.hnexperts.cosmetics.ui.common.StatusAnnouncement
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -28,9 +29,9 @@ fun PreferencesExportSection(
     ) {
         Text(stringResource(Res.string.prefs_export_avoid))
     }
-    if (avoidCopied) {
-        Text(text = stringResource(Res.string.prefs_export_avoid_copied))
-    }
+    StatusAnnouncement(
+        message = if (avoidCopied) stringResource(Res.string.prefs_export_avoid_copied) else null
+    )
     val emptyShelf: String = stringResource(Res.string.prefs_export_shelf_empty)
     Button(
         onClick = { onCopyShelf(emptyShelf) },
@@ -38,7 +39,7 @@ fun PreferencesExportSection(
     ) {
         Text(stringResource(Res.string.prefs_export_shelf))
     }
-    if (shelfCopied) {
-        Text(text = stringResource(Res.string.prefs_export_shelf_copied))
-    }
+    StatusAnnouncement(
+        message = if (shelfCopied) stringResource(Res.string.prefs_export_shelf_copied) else null
+    )
 }

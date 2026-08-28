@@ -9,6 +9,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.resources.Res
@@ -21,6 +24,7 @@ import com.hnexperts.cosmetics.resources.error_camera
 import com.hnexperts.cosmetics.resources.error_ocr
 import com.hnexperts.cosmetics.resources.error_network
 import com.hnexperts.cosmetics.resources.error_unexpected
+import com.hnexperts.cosmetics.ui.motion.Reveal
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -28,26 +32,32 @@ fun FailureBanner(
     failure: AppFailure?,
     onRetry: (() -> Unit)? = null
 ) {
-    if (failure == null) {
-        return
-    }
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Text(
-            text = titleFor(failure),
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.titleSmall
-        )
-        Text(
-            text = failure.verboseMessage(),
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall
-        )
-        if (onRetry != null) {
-            Button(onClick = onRetry) {
-                Text(stringResource(Res.string.common_retry))
+    Reveal(visible = failure != null) {
+        val shown: AppFailure = failure ?: return@Reveal
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Column(
+                modifier = Modifier.semantics(mergeDescendants = true) {
+                    liveRegion = LiveRegionMode.Assertive
+                }
+            ) {
+                Text(
+                    text = titleFor(shown),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = shown.verboseMessage(),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (onRetry != null) {
+                Button(onClick = onRetry) {
+                    Text(stringResource(Res.string.common_retry))
+                }
             }
         }
     }

@@ -26,4 +26,11 @@ class CropQuadGeometryTest {
         assertEquals(0.1f, nx, 0.001f)
         assertEquals(0.9f, ny, 0.001f)
     }
+
+    @Test
+    fun nudgeStaysInsideTheNormalizedSquare() {
+        val (x, y) = CropQuadGeometry.nudgedNormalized(0.99f, 0.01f, CropQuadGeometry.NUDGE_STEP, -CropQuadGeometry.NUDGE_STEP)
+        assertEquals(1f, x, 0.0001f)
+        assertEquals(0f, y, 0.0001f)
+    }
 }

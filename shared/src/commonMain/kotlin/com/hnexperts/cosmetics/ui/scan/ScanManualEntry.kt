@@ -3,7 +3,7 @@ package com.hnexperts.cosmetics.ui.scan
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -28,6 +28,7 @@ import com.hnexperts.cosmetics.resources.scan_inci_label
 import com.hnexperts.cosmetics.resources.scan_invalid_barcode
 import com.hnexperts.cosmetics.resources.scan_more_ways
 import com.hnexperts.cosmetics.ui.common.UsagePicker
+import com.hnexperts.cosmetics.ui.motion.Reveal
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -56,55 +57,55 @@ internal fun ManualEntrySection(viewModel: ScanViewModel, uiState: ScanUiState) 
     TextButton(onClick = { expanded = !expanded }) {
         Text(stringResource(Res.string.scan_more_ways))
     }
-    if (!expanded) {
-        return
-    }
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        OutlinedTextField(
-            value = barcode,
-            onValueChange = { value -> barcode = value },
+    Reveal(visible = expanded) {
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.busy,
-            label = { Text(stringResource(Res.string.scan_barcode_label)) },
-            placeholder = { Text(stringResource(Res.string.scan_hint_gtin)) },
-            singleLine = true
-        )
-        Button(
-            onClick = { viewModel.lookupBarcode(barcode) },
-            enabled = !uiState.busy,
-            modifier = Modifier.fillMaxWidth()
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(stringResource(Res.string.scan_barcode_action))
-        }
-        if (uiState.invalidBarcode) {
-            Text(
-                text = stringResource(Res.string.scan_invalid_barcode),
-                color = MaterialTheme.colorScheme.error
+            OutlinedTextField(
+                value = barcode,
+                onValueChange = { value -> barcode = value },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.busy,
+                label = { Text(stringResource(Res.string.scan_barcode_label)) },
+                placeholder = { Text(stringResource(Res.string.scan_hint_gtin)) },
+                singleLine = true
             )
-        }
-        OutlinedTextField(
-            value = inci,
-            onValueChange = { value -> inci = value },
-            enabled = !uiState.busy,
-            modifier = Modifier.fillMaxWidth().height(160.dp),
-            label = { Text(stringResource(Res.string.scan_inci_label)) }
-        )
-        UsagePicker(selected = usage, onSelect = { next -> usage = next })
-        Button(
-            onClick = { viewModel.evaluateTypedList(inci, usage) },
-            enabled = !uiState.busy,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(Res.string.scan_inci_action))
-        }
-        if (uiState.emptyInci) {
-            Text(
-                text = stringResource(Res.string.scan_empty_inci),
-                color = MaterialTheme.colorScheme.error
+            Button(
+                onClick = { viewModel.lookupBarcode(barcode) },
+                enabled = !uiState.busy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(Res.string.scan_barcode_action))
+            }
+            if (uiState.invalidBarcode) {
+                Text(
+                    text = stringResource(Res.string.scan_invalid_barcode),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            OutlinedTextField(
+                value = inci,
+                onValueChange = { value -> inci = value },
+                enabled = !uiState.busy,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 160.dp),
+                label = { Text(stringResource(Res.string.scan_inci_label)) },
+                minLines = 6
             )
+            UsagePicker(selected = usage, onSelect = { next -> usage = next })
+            Button(
+                onClick = { viewModel.evaluateTypedList(inci, usage) },
+                enabled = !uiState.busy,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(Res.string.scan_inci_action))
+            }
+            if (uiState.emptyInci) {
+                Text(
+                    text = stringResource(Res.string.scan_empty_inci),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }

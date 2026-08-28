@@ -54,13 +54,19 @@ class CropIngredientsViewModel(
             return
         }
         val current: CornerPoint = state.value.quad.corner(corner)
-        updateCorner(
-            corner,
-            CornerPoint(
-                x = current.x + deltaX / rectWidth,
-                y = current.y + deltaY / rectHeight
-            )
+        val (x, y) = CropQuadGeometry.nudgedNormalized(
+            current.x,
+            current.y,
+            deltaX / rectWidth,
+            deltaY / rectHeight
         )
+        updateCorner(corner, CornerPoint(x = x, y = y))
+    }
+
+    fun nudgeNormalized(corner: QuadCorner, deltaX: Float, deltaY: Float) {
+        val current: CornerPoint = state.value.quad.corner(corner)
+        val (x, y) = CropQuadGeometry.nudgedNormalized(current.x, current.y, deltaX, deltaY)
+        updateCorner(corner, CornerPoint(x = x, y = y))
     }
 
     fun resetQuad() {

@@ -2,7 +2,9 @@ package com.hnexperts.cosmetics.ui.history
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,8 +23,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
@@ -34,17 +38,20 @@ import com.hnexperts.cosmetics.resources.compare_unnamed
 import com.hnexperts.cosmetics.resources.history_empty
 import com.hnexperts.cosmetics.resources.history_insight_hint
 import com.hnexperts.cosmetics.resources.history_insight_title
-import com.hnexperts.cosmetics.resources.history_select_compare
+import com.hnexperts.cosmetics.resources.history_select_compare_item
 import com.hnexperts.cosmetics.resources.history_title
 import com.hnexperts.cosmetics.resources.shelf_empty
 import com.hnexperts.cosmetics.resources.shelf_formula_changed
 import com.hnexperts.cosmetics.resources.shelf_title
+import com.hnexperts.cosmetics.resources.a11y_open_result
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.shelf.domain.ShelfItem
+import com.hnexperts.cosmetics.ui.a11y.screenHeading
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.HistoryEntryCard
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.layout.AppLayout
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -76,23 +83,41 @@ fun HistoryScreen(
                 failure = uiState.failure,
                 onRetry = { viewModel.refresh() }
             )
-            HistoryBody(uiState = uiState, viewModel = viewModel)
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val gutter = AppLayout.horizontalGutterDp(maxWidth.value.toInt()).dp
+                HistoryBody(
+                    uiState = uiState,
+                    viewModel = viewModel,
+                    horizontalPadding = gutter
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
+private fun HistoryBody(
+    uiState: HistoryUiState,
+    viewModel: HistoryViewModel,
+    horizontalPadding: Dp
+) {
     val entries: List<HistoryEntry> = uiState.entries
     val shelf: List<ShelfItem> = uiState.shelf
     if (entries.isEmpty() && shelf.isEmpty() && uiState.failure == null) {
         Text(
             text = stringResource(Res.string.history_empty),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 16.dp)
         )
         return
     }
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = horizontalPadding,
+            end = horizontalPadding,
+            bottom = 16.dp
+        )
+    ) {
         item {
             val unnamedFormat: String = stringResource(Res.string.compare_unnamed)
             CompareBar(
@@ -108,7 +133,7 @@ private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
         item {
             Text(
                 text = stringResource(Res.string.shelf_title),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(vertical = 8.dp).screenHeading(),
                 style = MaterialTheme.typography.headlineSmall
             )
         }
@@ -116,7 +141,7 @@ private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
             item {
                 Text(
                     text = stringResource(Res.string.shelf_empty),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
         } else {
@@ -134,7 +159,7 @@ private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
         item {
             Text(
                 text = stringResource(Res.string.history_title),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(vertical = 16.dp).screenHeading(),
                 style = MaterialTheme.typography.headlineSmall
             )
         }
@@ -153,7 +178,7 @@ private fun HistoryBody(uiState: HistoryUiState, viewModel: HistoryViewModel) {
 @Composable
 private fun CompareBar(uiState: HistoryUiState, onCompare: () -> Unit) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
@@ -173,12 +198,13 @@ private fun CompareBar(uiState: HistoryUiState, onCompare: () -> Unit) {
 @Composable
 private fun HistoryInsight(names: List<String>) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
             text = stringResource(Res.string.history_insight_title),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.screenHeading()
         )
         Text(
             text = stringResource(Res.string.history_insight_hint),
@@ -200,7 +226,12 @@ private fun HistorySelectableRow(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CompareCheckbox(selected = selected, busy = busy, onToggle = onToggle)
+        CompareCheckbox(
+            selected = selected,
+            busy = busy,
+            itemLabel = entry.name ?: entry.gtin ?: entry.inciRaw.take(40),
+            onToggle = onToggle
+        )
         HistoryEntryCard(
             entry = entry,
             enabled = !busy,
@@ -223,8 +254,13 @@ private fun ShelfRow(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CompareCheckbox(selected = selected, busy = busy, onToggle = onToggle)
         val title: String = item.name ?: item.gtin ?: item.inciRaw.take(40)
+        CompareCheckbox(
+            selected = selected,
+            busy = busy,
+            itemLabel = title,
+            onToggle = onToggle
+        )
         ListItem(
             headlineContent = { Text(title) },
             supportingContent = {
@@ -239,7 +275,12 @@ private fun ShelfRow(
                     }
                 }
             },
-            modifier = Modifier.clickable(enabled = !busy, onClick = onOpen).weight(1f)
+            modifier = Modifier.clickable(
+                enabled = !busy,
+                role = Role.Button,
+                onClickLabel = stringResource(Res.string.a11y_open_result),
+                onClick = onOpen
+            ).weight(1f)
         )
     }
 }
@@ -248,9 +289,10 @@ private fun ShelfRow(
 private fun CompareCheckbox(
     selected: Boolean,
     busy: Boolean,
+    itemLabel: String,
     onToggle: () -> Unit
 ) {
-    val label: String = stringResource(Res.string.history_select_compare)
+    val label: String = stringResource(Res.string.history_select_compare_item, itemLabel)
     Checkbox(
         checked = selected,
         onCheckedChange = { onToggle() },

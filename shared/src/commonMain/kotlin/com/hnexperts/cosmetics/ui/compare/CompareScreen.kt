@@ -2,11 +2,8 @@ package com.hnexperts.cosmetics.ui.compare
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -30,10 +27,12 @@ import com.hnexperts.cosmetics.resources.compare_unique_concerns
 import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_usage
+import com.hnexperts.cosmetics.ui.a11y.screenHeading
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
 import com.hnexperts.cosmetics.ui.common.usageWord
+import com.hnexperts.cosmetics.ui.layout.AppScrollPane
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,14 +54,7 @@ fun CompareScreen(
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        AppScrollPane(modifier = Modifier.padding(padding)) {
             FailureBanner(failure = uiState.failure)
             val summary: CompareSummary? = uiState.summary
             if (summary == null) {
@@ -77,7 +69,8 @@ fun CompareScreen(
                 if (summary.sharedPersonalAvoids.isNotEmpty()) {
                     Text(
                         text = stringResource(Res.string.compare_shared_avoids),
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.screenHeading()
                     )
                     Text(text = summary.sharedPersonalAvoids.joinToString(separator = ", "))
                 }

@@ -17,10 +17,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
 import com.hnexperts.cosmetics.hazards.domain.DangerLevelParser
 import com.hnexperts.cosmetics.resources.Res
+import com.hnexperts.cosmetics.resources.a11y_open_result
 import com.hnexperts.cosmetics.resources.source_barcode
 import com.hnexperts.cosmetics.resources.source_manual
 import com.hnexperts.cosmetics.resources.source_ocr
@@ -44,7 +46,11 @@ fun HistoryEntryCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(enabled = enabled) { onOpen(entry) }
+            .clickable(
+                enabled = enabled,
+                role = Role.Button,
+                onClickLabel = stringResource(Res.string.a11y_open_result)
+            ) { onOpen(entry) }
     ) {
         Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
             Box(

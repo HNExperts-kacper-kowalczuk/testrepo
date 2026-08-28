@@ -2,9 +2,7 @@ package com.hnexperts.cosmetics.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,17 +24,16 @@ fun UsagePicker(
     onSelect: (ProductUsage) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val chips: List<ChoiceChip<ProductUsage>> = listOf(
+        ChoiceChip(ProductUsage.LEAVE_ON, stringResource(Res.string.usage_leave_on), selected == ProductUsage.LEAVE_ON),
+        ChoiceChip(ProductUsage.RINSE_OFF, stringResource(Res.string.usage_rinse_off), selected == ProductUsage.RINSE_OFF),
+        ChoiceChip(ProductUsage.SPRAY, stringResource(Res.string.usage_spray), selected == ProductUsage.SPRAY),
+        ChoiceChip(ProductUsage.LIP, stringResource(Res.string.usage_lip), selected == ProductUsage.LIP),
+        ChoiceChip(ProductUsage.EYE, stringResource(Res.string.usage_eye), selected == ProductUsage.EYE)
+    )
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = stringResource(Res.string.usage_prompt), style = MaterialTheme.typography.titleSmall)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            UsageChip(ProductUsage.LEAVE_ON, selected, onSelect, stringResource(Res.string.usage_leave_on))
-            UsageChip(ProductUsage.RINSE_OFF, selected, onSelect, stringResource(Res.string.usage_rinse_off))
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            UsageChip(ProductUsage.SPRAY, selected, onSelect, stringResource(Res.string.usage_spray))
-            UsageChip(ProductUsage.LIP, selected, onSelect, stringResource(Res.string.usage_lip))
-            UsageChip(ProductUsage.EYE, selected, onSelect, stringResource(Res.string.usage_eye))
-        }
+        ChoiceChipFlow(chips = chips, onSelect = onSelect)
     }
 }
 
@@ -49,18 +46,4 @@ fun usageWord(usage: ProductUsage): String {
         ProductUsage.LIP -> stringResource(Res.string.usage_lip)
         ProductUsage.EYE -> stringResource(Res.string.usage_eye)
     }
-}
-
-@Composable
-private fun UsageChip(
-    usage: ProductUsage,
-    selected: ProductUsage,
-    onSelect: (ProductUsage) -> Unit,
-    label: String
-) {
-    FilterChip(
-        selected = selected == usage,
-        onClick = { onSelect(usage) },
-        label = { Text(label) }
-    )
 }

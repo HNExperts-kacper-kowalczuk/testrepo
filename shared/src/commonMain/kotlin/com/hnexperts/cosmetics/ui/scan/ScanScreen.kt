@@ -2,16 +2,12 @@ package com.hnexperts.cosmetics.ui.scan
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -32,8 +28,12 @@ import com.hnexperts.cosmetics.resources.scan_recent_title
 import com.hnexperts.cosmetics.resources.scan_title
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
+import com.hnexperts.cosmetics.ui.a11y.screenHeading
+import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.HistoryEntryCard
+import com.hnexperts.cosmetics.ui.layout.AppScrollPane
+import com.hnexperts.cosmetics.ui.motion.Reveal
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -55,20 +55,17 @@ fun ScanScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(text = stringResource(Res.string.scan_title), style = MaterialTheme.typography.headlineSmall)
+    AppScrollPane(modifier = Modifier.statusBarsPadding()) {
+        Text(
+            text = stringResource(Res.string.scan_title),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.screenHeading()
+        )
         FailureBanner(failure = uiState.failure)
         Button(
             onClick = onOpenBarcodeCamera,
             enabled = !uiState.busy,
-            modifier = Modifier.fillMaxWidth().height(60.dp)
+            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
         ) {
             Text(
                 text = stringResource(Res.string.scan_open_barcode),
@@ -87,16 +84,15 @@ fun ScanScreen(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        if (uiState.notFoundGtin != null) {
+        Reveal(visible = uiState.notFoundGtin != null) {
             NotFoundCard(
                 busy = uiState.busy,
                 onlineNoIngredients = uiState.onlineNoIngredients,
                 onOpenInciCamera = onOpenInciCamera
             )
         }
-        if (uiState.busy) {
-            CircularProgressIndicator()
-            Text(text = stringResource(Res.string.scan_working))
+        Reveal(visible = uiState.busy) {
+            BusyStatus(message = stringResource(Res.string.scan_working))
         }
         RecentScans(entries = uiState.recent, busy = uiState.busy, onOpen = viewModel::reopen)
         ManualEntrySection(viewModel = viewModel, uiState = uiState)
@@ -139,7 +135,11 @@ private fun RecentScans(
     if (entries.isEmpty()) {
         return
     }
-    Text(text = stringResource(Res.string.scan_recent_title), style = MaterialTheme.typography.titleMedium)
+    Text(
+        text = stringResource(Res.string.scan_recent_title),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.screenHeading()
+    )
     for (entry in entries) {
         HistoryEntryCard(entry = entry, enabled = !busy, onOpen = onOpen)
     }

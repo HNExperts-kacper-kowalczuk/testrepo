@@ -1,6 +1,7 @@
 package com.hnexperts.cosmetics.ui.result
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,6 +59,7 @@ import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.layout.AppLayout
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -114,21 +116,24 @@ private fun ResultAssessmentBody(
     viewModel: ResultViewModel,
     padding: PaddingValues
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(padding),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        stickyHeader(key = "result-rating") {
-            Surface(
-                color = MaterialTheme.colorScheme.background,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                ResultStickyRating(assessment)
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(padding)) {
+        val gutter = AppLayout.horizontalGutterDp(maxWidth.value.toInt()).dp
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = gutter, end = gutter, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            stickyHeader(key = "result-rating") {
+                Surface(
+                    color = MaterialTheme.colorScheme.background,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    ResultStickyRating(assessment)
+                }
             }
+            resultActions(assessment, uiState, viewModel)
+            resultDetails(assessment, uiState, viewModel)
         }
-        resultActions(assessment, uiState, viewModel)
-        resultDetails(assessment, uiState, viewModel)
     }
 }
 

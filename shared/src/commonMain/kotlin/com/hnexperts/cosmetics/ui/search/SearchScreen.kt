@@ -2,15 +2,13 @@ package com.hnexperts.cosmetics.ui.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -22,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
@@ -36,10 +35,17 @@ import com.hnexperts.cosmetics.resources.search_placeholder
 import com.hnexperts.cosmetics.resources.search_placeholder_ingredients
 import com.hnexperts.cosmetics.resources.search_products
 import com.hnexperts.cosmetics.resources.search_title
+import com.hnexperts.cosmetics.resources.a11y_open_ingredient
+import com.hnexperts.cosmetics.resources.a11y_open_product
+import com.hnexperts.cosmetics.ui.a11y.screenHeading
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
+import com.hnexperts.cosmetics.ui.common.BusyStatus
+import com.hnexperts.cosmetics.ui.common.ChoiceChip
+import com.hnexperts.cosmetics.ui.common.ChoiceChipFlow
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.layout.AppWidthColumn
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,24 +68,30 @@ fun SearchScreen(
             BannerAdSlot(screen = AppScreen.SEARCH, placement = AdPlacement.SEARCH)
         }
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
-            Text(text = stringResource(Res.string.search_title), style = MaterialTheme.typography.headlineSmall)
+        AppWidthColumn(
+            modifier = Modifier.fillMaxSize().padding(padding).imePadding().padding(vertical = 16.dp)
+        ) {
+            Text(
+                text = stringResource(Res.string.search_title),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.screenHeading()
+            )
             FailureBanner(failure = uiState.failure)
-            Row(
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                FilterChip(
-                    selected = uiState.mode == SearchMode.PRODUCTS,
-                    onClick = { viewModel.setMode(SearchMode.PRODUCTS) },
-                    label = { Text(stringResource(Res.string.search_products)) },
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                FilterChip(
-                    selected = uiState.mode == SearchMode.INGREDIENTS,
-                    onClick = { viewModel.setMode(SearchMode.INGREDIENTS) },
-                    label = { Text(stringResource(Res.string.search_ingredients)) }
-                )
-            }
+            ChoiceChipFlow(
+                chips = listOf(
+                    ChoiceChip(
+                        SearchMode.PRODUCTS,
+                        stringResource(Res.string.search_products),
+                        uiState.mode == SearchMode.PRODUCTS
+                    ),
+                    ChoiceChip(
+                        SearchMode.INGREDIENTS,
+                        stringResource(Res.string.search_ingredients),
+                        uiState.mode == SearchMode.INGREDIENTS
+                    )
+                ),
+                onSelect = viewModel::setMode
+            )
             OutlinedTextField(
                 value = uiState.query,
                 onValueChange = viewModel::onQueryChange,
@@ -97,12 +109,20 @@ fun SearchScreen(
                 singleLine = true
             )
             if (uiState.busy) {
-                CircularProgressIndicator()
-                Text(text = stringResource(Res.string.scan_working))
+                BusyStatus(message = stringResource(Res.string.scan_working))
             } else if (uiState.mode == SearchMode.PRODUCTS) {
-                ProductResults(products = products, busy = uiState.busy, onOpen = viewModel::openProduct)
+                ProductResults(
+                    products = products,
+                    busy = uiState.busy,
+                    onOpen = viewModel::openProduct,
+                    modifier = Modifier.weight(1f)
+                )
             } else {
-                IngredientResults(hits = ingredients, onOpen = viewModel::openIngredient)
+                IngredientResults(
+                    hits = ingredients,
+                    onOpen = viewModel::openIngredient,
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
@@ -115,13 +135,15 @@ fun SearchScreen(
 private fun ProductResults(
     products: List<Product>,
     busy: Boolean,
-    onOpen: (Product) -> Unit
+    onOpen: (Product) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (products.isEmpty()) {
-        Text(text = stringResource(Res.string.search_empty))
+        Text(text = stringResource(Res.string.search_empty), modifier = modifier)
         return
     }
-    LazyColumn {
+    val openLabel: String = stringResource(Res.string.a11y_open_product)
+    LazyColumn(modifier = modifier) {
         items(products, key = { product -> product.id }) { product ->
             val details: String = listOfNotNull(product.brand, product.category)
                 .filter { part -> part.isNotBlank() }
@@ -129,7 +151,11 @@ private fun ProductResults(
             ListItem(
                 headlineContent = { Text(product.name) },
                 supportingContent = { if (details.isNotEmpty()) Text(details) },
-                modifier = Modifier.clickable(enabled = !busy) { onOpen(product) }
+                modifier = Modifier.clickable(
+                    enabled = !busy,
+                    role = Role.Button,
+                    onClickLabel = openLabel
+                ) { onOpen(product) }
             )
         }
     }
@@ -138,13 +164,15 @@ private fun ProductResults(
 @Composable
 private fun IngredientResults(
     hits: List<IngredientHit>,
-    onOpen: (IngredientHit) -> Unit
+    onOpen: (IngredientHit) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (hits.isEmpty()) {
-        Text(text = stringResource(Res.string.search_empty))
+        Text(text = stringResource(Res.string.search_empty), modifier = modifier)
         return
     }
-    LazyColumn {
+    val openLabel: String = stringResource(Res.string.a11y_open_ingredient)
+    LazyColumn(modifier = modifier) {
         items(hits, key = { hit -> hit.ingredient.id }) { hit ->
             ListItem(
                 headlineContent = { Text(hit.ingredient.inciName) },
@@ -152,7 +180,10 @@ private fun IngredientResults(
                     val cas: String = hit.ingredient.casNumbers.orEmpty()
                     if (cas.isNotEmpty()) Text(cas)
                 },
-                modifier = Modifier.clickable { onOpen(hit) }
+                modifier = Modifier.clickable(
+                    role = Role.Button,
+                    onClickLabel = openLabel
+                ) { onOpen(hit) }
             )
         }
     }

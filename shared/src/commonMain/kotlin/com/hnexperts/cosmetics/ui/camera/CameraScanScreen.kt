@@ -4,12 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +43,7 @@ import com.hnexperts.cosmetics.resources.scan_looking_up
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import org.jetbrains.compose.resources.stringResource
 
@@ -146,6 +147,7 @@ private fun PermissionOverlay(status: CameraPermissionStatus) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CameraControls(
     uiState: CameraScanUiState,
@@ -164,7 +166,10 @@ private fun CameraControls(
             },
             style = MaterialTheme.typography.bodyMedium
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             TextButton(onClick = viewModel::toggleTorch, enabled = uiState.permission == CameraPermissionStatus.GRANTED) {
                 Text(
                     text = if (uiState.torchOn) {
@@ -191,9 +196,8 @@ private fun CameraControls(
             }
         }
         if (uiState.busy) {
-            CircularProgressIndicator()
-            Text(
-                text = if (uiState.mode == ScannerMode.BARCODE) {
+            BusyStatus(
+                message = if (uiState.mode == ScannerMode.BARCODE) {
                     stringResource(Res.string.scan_looking_up)
                 } else {
                     stringResource(Res.string.scan_working)

@@ -22,6 +22,7 @@ import com.hnexperts.cosmetics.resources.prefs_reset_confirm
 import com.hnexperts.cosmetics.resources.prefs_reset_device
 import com.hnexperts.cosmetics.resources.prefs_reset_device_body
 import com.hnexperts.cosmetics.resources.prefs_reset_device_done
+import com.hnexperts.cosmetics.ui.common.StatusAnnouncement
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -75,9 +76,7 @@ private fun ClearedMessage(cleared: DataResetKind?) {
         DataResetKind.DEVICE -> stringResource(Res.string.prefs_reset_device_done)
         null -> null
     }
-    if (message != null) {
-        Text(text = message)
-    }
+    StatusAnnouncement(message = message)
 }
 
 @Composable

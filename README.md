@@ -27,7 +27,7 @@ Working now:
 - AdMob banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, on no-fill, or when release IDs are missing from `local.properties`; never on Scan, camera, OCR review, or Preferences
 - Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
-The 21–26 slices are shipped. Next after this PR: accessibility / TalkBack work in [further-additions.md](docs/further-additions.md) §5.
+The 21–26 slices are shipped. This PR is the WCAG 2.2 accessibility, fluid layout, and motion pass.
 
 Not in git / not as safety scores (see `docs/plan.md` and `docs/further-additions.md`):
 
