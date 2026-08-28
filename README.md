@@ -27,7 +27,7 @@ Working now:
 - AdMob banners after UMP (Android) / ATT (iOS) consent; slot collapses offline, on deny, on no-fill, or when release IDs are missing from `local.properties`; never on Scan, camera, OCR review, or Preferences
 - Background work: catalog bootstrap, matching, OCR, and SQLite stay off the UI thread; catalog and user databases can run in parallel
 
-Next code slice: [phases 21–23](docs/plan-after-twenty.md) (phototoxic/children/pregnancy CosIng tags, Settings notes, optional animal-derived chip).
+Next code slice: [phase 23](docs/plan-after-twenty.md) (optional animal-derived chip).
 
 Not in git / not as safety scores (see `docs/plan.md` and `docs/further-additions.md`):
 
@@ -72,7 +72,7 @@ Unknown barcodes are looked up online automatically when the device is connected
 - **[Next phases 1–5](docs/plan-next-phases.md)** — bundled catalog, pack verify, personal presets, compare, polish (shipped)
 - **[Further improvements 6–15](docs/plan-further-improvements.md)** — trust settings through microplastics chip (shipped)
 - **[After 1–15: phases 16–20](docs/plan-after-fifteen.md)** — CosIng tag overlay, sticky result header, catalog notes, CI, dark surfaces (shipped)
-- **[After 16–20: phases 21–23](docs/plan-after-twenty.md)** — phototoxic/children/pregnancy tags, Settings notes, optional animal-derived chip
+- **[After 16–20: phases 21–23](docs/plan-after-twenty.md)** — phototoxic/children/pregnancy tags (shipped), Settings notes, optional animal-derived chip
 - **[Internationalization](docs/i18n.md)**
 - **[Further additions](docs/further-additions.md)**
 - **[Module layout](docs/module-layout.md)**

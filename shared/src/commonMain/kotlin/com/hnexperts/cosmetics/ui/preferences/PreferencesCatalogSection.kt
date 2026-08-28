@@ -16,7 +16,10 @@ import com.hnexperts.cosmetics.resources.prefs_catalog_applied
 import com.hnexperts.cosmetics.resources.prefs_catalog_check_action
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_allergens
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_annex
+import com.hnexperts.cosmetics.resources.prefs_catalog_notes_children
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_microplastics
+import com.hnexperts.cosmetics.resources.prefs_catalog_notes_pregnancy
+import com.hnexperts.cosmetics.resources.prefs_catalog_notes_sun_caution
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_tags
 import com.hnexperts.cosmetics.resources.prefs_catalog_notes_title
 import com.hnexperts.cosmetics.resources.prefs_catalog_offline
@@ -25,6 +28,7 @@ import com.hnexperts.cosmetics.resources.prefs_catalog_title
 import com.hnexperts.cosmetics.resources.prefs_catalog_unknown
 import com.hnexperts.cosmetics.resources.prefs_catalog_update
 import com.hnexperts.cosmetics.resources.prefs_catalog_uptodate
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -66,20 +70,19 @@ private fun CatalogNotes() {
         text = stringResource(Res.string.prefs_catalog_notes_title),
         style = MaterialTheme.typography.titleSmall
     )
+    CatalogNote(Res.string.prefs_catalog_notes_allergens)
+    CatalogNote(Res.string.prefs_catalog_notes_microplastics)
+    CatalogNote(Res.string.prefs_catalog_notes_annex)
+    CatalogNote(Res.string.prefs_catalog_notes_sun_caution)
+    CatalogNote(Res.string.prefs_catalog_notes_children)
+    CatalogNote(Res.string.prefs_catalog_notes_pregnancy)
+    CatalogNote(Res.string.prefs_catalog_notes_tags)
+}
+
+@Composable
+private fun CatalogNote(key: StringResource) {
     Text(
-        text = stringResource(Res.string.prefs_catalog_notes_allergens),
-        style = MaterialTheme.typography.bodySmall
-    )
-    Text(
-        text = stringResource(Res.string.prefs_catalog_notes_microplastics),
-        style = MaterialTheme.typography.bodySmall
-    )
-    Text(
-        text = stringResource(Res.string.prefs_catalog_notes_annex),
-        style = MaterialTheme.typography.bodySmall
-    )
-    Text(
-        text = stringResource(Res.string.prefs_catalog_notes_tags),
+        text = stringResource(key),
         style = MaterialTheme.typography.bodySmall
     )
 }

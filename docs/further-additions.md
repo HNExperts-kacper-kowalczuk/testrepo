@@ -201,7 +201,7 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. The next implementation slice is **[plan-after-twenty.md](plan-after-twenty.md)** (phototoxic/children/pregnancy tag indexes, Settings notes, optional animal-derived chip).
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. In **[plan-after-twenty.md](plan-after-twenty.md)**, phase 21 is shipped and phase 22 is Settings notes. Remaining: optional animal-derived chip (23).
 
 Still out of git: real Remove-ads IAP, production AdMob / sync URLs, vegan/cruelty as safety scores, foldables, CJK OCR.
 

@@ -113,7 +113,10 @@
     <string name="prefs_catalog_notes_allergens">The EU-allergens switch uses labelled fragrance allergens in this catalog (the original 26 names and the 2023 expansion). It marks those ingredients as personal avoid. It does not change the safety traffic light.</string>
     <string name="prefs_catalog_notes_microplastics">A microplastics chip is an incomplete catalog tag, not a safety rating.</string>
     <string name="prefs_catalog_notes_annex">Hazard levels come from the EU annex snapshot in this catalog, not from a live legal lookup.</string>
-    <string name="prefs_catalog_notes_tags">Allergen and microplastics tags are applied when the catalog loads, even if the packed file is older than those lists.</string>
+    <string name="prefs_catalog_notes_sun_caution">A sun-caution line means this catalog tags that ingredient as phototoxic (for example some citrus peel oils). The list is incomplete. It is not a diagnosis and it does not change the safety traffic light.</string>
+    <string name="prefs_catalog_notes_children">The children / not-for-under-3 switch uses an incomplete catalog list (for example salicylic acid). It marks those ingredients as personal avoid. It is not a diagnosis and it does not change the safety traffic light.</string>
+    <string name="prefs_catalog_notes_pregnancy">The pregnancy / breastfeeding switch uses an incomplete catalog list (for example some retinoids). It marks those ingredients as personal avoid. It is not a diagnosis and it does not change the safety traffic light.</string>
+    <string name="prefs_catalog_notes_tags">Allergen, microplastics, sun-caution, children, and pregnancy tags are applied when the catalog loads, even if the packed file is older than those lists.</string>
     <string name="prefs_privacy">Ad privacy options</string>
     <string name="prefs_clear_history">Clear scan history</string>
     <string name="prefs_cleared_history">Scan history was deleted on this device.</string>
