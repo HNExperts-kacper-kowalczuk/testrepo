@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +26,7 @@ import com.hnexperts.cosmetics.resources.error_camera
 import com.hnexperts.cosmetics.resources.error_ocr
 import com.hnexperts.cosmetics.resources.error_network
 import com.hnexperts.cosmetics.resources.error_unexpected
+import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.motion.Reveal
 import org.jetbrains.compose.resources.stringResource
 
@@ -56,7 +59,10 @@ fun FailureBanner(
             }
             if (onRetry != null) {
                 Button(onClick = onRetry) {
-                    Text(stringResource(Res.string.common_retry))
+                    ButtonIconLabel(
+                        imageVector = Icons.Filled.Refresh,
+                        text = stringResource(Res.string.common_retry)
+                    )
                 }
             }
         }

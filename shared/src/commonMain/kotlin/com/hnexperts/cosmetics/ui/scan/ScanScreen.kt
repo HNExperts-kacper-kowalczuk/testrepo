@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DocumentScanner
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +32,7 @@ import com.hnexperts.cosmetics.resources.scan_title
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.ui.a11y.screenHeading
+import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.HistoryEntryCard
@@ -67,9 +71,9 @@ fun ScanScreen(
             enabled = !uiState.busy,
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
         ) {
-            Text(
-                text = stringResource(Res.string.scan_open_barcode),
-                style = MaterialTheme.typography.titleMedium
+            ButtonIconLabel(
+                imageVector = Icons.Filled.QrCodeScanner,
+                text = stringResource(Res.string.scan_open_barcode)
             )
         }
         OutlinedButton(
@@ -77,7 +81,10 @@ fun ScanScreen(
             enabled = !uiState.busy,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(Res.string.scan_open_inci))
+            ButtonIconLabel(
+                imageVector = Icons.Filled.DocumentScanner,
+                text = stringResource(Res.string.scan_open_inci)
+            )
         }
         Text(
             text = stringResource(Res.string.scan_camera_note),
@@ -120,7 +127,10 @@ private fun NotFoundCard(
                 enabled = !busy,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(Res.string.scan_open_inci))
+                ButtonIconLabel(
+                    imageVector = Icons.Filled.DocumentScanner,
+                    text = stringResource(Res.string.scan_open_inci)
+                )
             }
         }
     }

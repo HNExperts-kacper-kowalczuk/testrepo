@@ -72,6 +72,15 @@ class CatalogWriter(
         }
     }
 
+    fun applyProductOverlay(products: List<FixtureProduct>) {
+        if (products.isEmpty()) {
+            return
+        }
+        database.transaction {
+            products.forEach(::insertProduct)
+        }
+    }
+
     private fun insertIngredient(item: FixtureIngredient) {
         database.catalogDatabaseQueries.insertIngredient(
             id = item.ingredient.id,

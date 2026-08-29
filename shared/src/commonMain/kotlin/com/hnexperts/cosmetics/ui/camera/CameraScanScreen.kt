@@ -9,13 +9,15 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FlashOff
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.platform.openAppSettings
 import com.hnexperts.cosmetics.resources.Res
-import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.camera_capture
 import com.hnexperts.cosmetics.resources.camera_hint_barcode
 import com.hnexperts.cosmetics.resources.camera_hint_inci
@@ -43,6 +44,8 @@ import com.hnexperts.cosmetics.resources.scan_looking_up
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.ui.chrome.AppBackButton
+import com.hnexperts.cosmetics.ui.chrome.AppIconButton
 import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import org.jetbrains.compose.resources.stringResource
@@ -85,9 +88,7 @@ fun CameraScanScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Text(stringResource(Res.string.back))
-                    }
+                    AppBackButton(onClick = onBack)
                 }
             )
         }
@@ -170,22 +171,23 @@ private fun CameraControls(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            TextButton(onClick = viewModel::toggleTorch, enabled = uiState.permission == CameraPermissionStatus.GRANTED) {
-                Text(
-                    text = if (uiState.torchOn) {
-                        stringResource(Res.string.camera_torch_on)
-                    } else {
-                        stringResource(Res.string.camera_torch_off)
-                    }
-                )
-            }
+            AppIconButton(
+                imageVector = if (uiState.torchOn) Icons.Filled.FlashOn else Icons.Filled.FlashOff,
+                contentDescription = if (uiState.torchOn) {
+                    stringResource(Res.string.camera_torch_on)
+                } else {
+                    stringResource(Res.string.camera_torch_off)
+                },
+                onClick = viewModel::toggleTorch,
+                enabled = uiState.permission == CameraPermissionStatus.GRANTED
+            )
             if (uiState.mode == ScannerMode.INGREDIENT_LIST) {
-                Button(
+                AppIconButton(
+                    imageVector = Icons.Filled.PhotoCamera,
+                    contentDescription = stringResource(Res.string.camera_capture),
                     onClick = viewModel::captureStill,
                     enabled = uiState.permission == CameraPermissionStatus.GRANTED && !uiState.busy
-                ) {
-                    Text(stringResource(Res.string.camera_capture))
-                }
+                )
             } else {
                 GalleryBarcodeButton(
                     enabled = !uiState.busy,

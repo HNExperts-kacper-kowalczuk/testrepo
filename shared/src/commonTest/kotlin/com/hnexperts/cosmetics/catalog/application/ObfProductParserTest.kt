@@ -47,6 +47,22 @@ class ObfProductParserTest {
     }
 
     @Test
+    fun prefersPolishIngredientTextForGs1PolandGtins() {
+        val hit: OnlineGtinHit = ObfProductParser.parse(
+            gtin = "5901887019367",
+            body = """{"status":1,"product":{
+              "product_name":"Cream EN",
+              "product_name_pl":"Anty-perspirant w kremie",
+              "ingredients_text_en":"Aqua, Glycerin, Niacinamide, Panthenol, Extra English filler",
+              "ingredients_text_pl":"Aqua, Aluminum Chlorohydrate, Dimethicone, Steareth-2"
+            }}"""
+        )
+        val found = assertIs<OnlineGtinHit.WithIngredients>(hit)
+        assertEquals("Anty-perspirant w kremie", found.name)
+        assertEquals("Aqua, Aluminum Chlorohydrate, Dimethicone, Steareth-2", found.inciRaw)
+    }
+
+    @Test
     fun prefersEnglishIngredientText() {
         val hit: OnlineGtinHit = ObfProductParser.parse(
             gtin = "1",

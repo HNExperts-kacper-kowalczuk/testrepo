@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.catalog.application
 
+import com.hnexperts.cosmetics.catalog.domain.GtinNormalizer
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -40,10 +41,8 @@ object ObfProductParser {
         if (status != 1 && product.isEmpty()) {
             return OnlineGtinHit.NotFound(gtin)
         }
-        val inci: String? = bestInci(product)
-        val name: String? = stringField(product, "product_name")
-            ?: stringField(product, "generic_name")
-            ?: stringField(product, "product_name_en")
+        val inci: String? = bestInci(product, gtin)
+        val name: String? = bestName(product, gtin)
         if (inci == null) {
             return OnlineGtinHit.MissingIngredients(gtin, name)
         }
@@ -56,9 +55,8 @@ object ObfProductParser {
         )
     }
 
-    private fun bestInci(product: JsonObject): String? {
-        val preferred: List<String> = listOf("ingredients_text_en", "ingredients_text")
-        for (key in preferred) {
+    private fun bestInci(product: JsonObject, gtin: String): String? {
+        for (key in preferredInciKeys(gtin)) {
             val value: String? = stringField(product, key)
             if (value != null && value.length >= MIN_INCI) {
                 return value
@@ -69,6 +67,32 @@ object ObfProductParser {
             .mapNotNull { entry -> stringField(product, entry.key) }
             .filter { text -> text.length >= MIN_INCI }
             .maxByOrNull { text -> text.length }
+    }
+
+    private fun bestName(product: JsonObject, gtin: String): String? {
+        for (key in preferredNameKeys(gtin)) {
+            val value: String? = stringField(product, key)
+            if (value != null) {
+                return value
+            }
+        }
+        return null
+    }
+
+    private fun preferredInciKeys(gtin: String): List<String> {
+        return if (GtinNormalizer.isGs1Poland(gtin)) {
+            listOf("ingredients_text_pl", "ingredients_text", "ingredients_text_en")
+        } else {
+            listOf("ingredients_text_en", "ingredients_text")
+        }
+    }
+
+    private fun preferredNameKeys(gtin: String): List<String> {
+        return if (GtinNormalizer.isGs1Poland(gtin)) {
+            listOf("product_name_pl", "product_name", "generic_name", "product_name_en")
+        } else {
+            listOf("product_name", "generic_name", "product_name_en")
+        }
     }
 
     private fun usageFor(product: JsonObject): ProductUsage {

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.evaluation.application.ComparedProduct
 import com.hnexperts.cosmetics.evaluation.application.CompareSummary
 import com.hnexperts.cosmetics.resources.Res
-import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.compare_empty
 import com.hnexperts.cosmetics.resources.compare_shared_avoids
 import com.hnexperts.cosmetics.resources.compare_title
@@ -28,6 +26,7 @@ import com.hnexperts.cosmetics.resources.result_not_suitable
 import com.hnexperts.cosmetics.resources.result_suitable
 import com.hnexperts.cosmetics.resources.result_usage
 import com.hnexperts.cosmetics.ui.a11y.screenHeading
+import com.hnexperts.cosmetics.ui.chrome.AppBackButton
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
@@ -47,9 +46,7 @@ fun CompareScreen(
             TopAppBar(
                 title = { Text(stringResource(Res.string.compare_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Text(stringResource(Res.string.back))
-                    }
+                    AppBackButton(onClick = onBack)
                 }
             )
         }

@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -28,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
 import com.hnexperts.cosmetics.resources.Res
-import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.confirm_add
 import com.hnexperts.cosmetics.resources.confirm_add_photo
 import com.hnexperts.cosmetics.resources.confirm_empty
@@ -43,6 +45,8 @@ import com.hnexperts.cosmetics.resources.confirm_title
 import com.hnexperts.cosmetics.resources.confirm_unknown
 import com.hnexperts.cosmetics.scanning.domain.FuzzyDecision
 import com.hnexperts.cosmetics.scanning.domain.ReviewToken
+import com.hnexperts.cosmetics.ui.chrome.AppBackButton
+import com.hnexperts.cosmetics.ui.chrome.AppIconButton
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.UsagePicker
 import org.jetbrains.compose.resources.stringResource
@@ -74,9 +78,7 @@ fun ConfirmIngredientsScreen(
             TopAppBar(
                 title = { Text(stringResource(Res.string.confirm_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Text(stringResource(Res.string.back))
-                    }
+                    AppBackButton(onClick = onBack)
                 }
             )
         }
@@ -112,12 +114,20 @@ fun ConfirmIngredientsScreen(
                     )
                 }
             }
-            TextButton(onClick = viewModel::addToken, enabled = !uiState.busy) {
-                Text(stringResource(Res.string.confirm_add))
-            }
-            if (uiState.canAddPhoto) {
-                TextButton(onClick = viewModel::addAnotherPhoto, enabled = !uiState.busy) {
-                    Text(stringResource(Res.string.confirm_add_photo))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                AppIconButton(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(Res.string.confirm_add),
+                    onClick = viewModel::addToken,
+                    enabled = !uiState.busy
+                )
+                if (uiState.canAddPhoto) {
+                    AppIconButton(
+                        imageVector = Icons.Filled.AddAPhoto,
+                        contentDescription = stringResource(Res.string.confirm_add_photo),
+                        onClick = viewModel::addAnotherPhoto,
+                        enabled = !uiState.busy
+                    )
                 }
             }
             UsagePicker(
@@ -170,8 +180,11 @@ private fun TokenEditor(
                 }
             }
         }
-        TextButton(onClick = onRemove, enabled = enabled) {
-            Text(stringResource(Res.string.confirm_remove))
-        }
+        AppIconButton(
+            imageVector = Icons.Filled.Delete,
+            contentDescription = stringResource(Res.string.confirm_remove),
+            onClick = onRemove,
+            enabled = enabled
+        )
     }
 }

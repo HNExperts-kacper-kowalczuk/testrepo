@@ -12,35 +12,37 @@ class OnlineGtinLookup(
         if (!network.isOnline()) {
             return Outcome.Ok(OnlineGtinHit.NotFound(gtin))
         }
-        val beauty: Outcome<String> = http.getText("$OBF_PRODUCT$gtin.json")
-        val fromBeauty: OnlineGtinHit? = parseIfOk(gtin, beauty)
-        if (fromBeauty is OnlineGtinHit.WithIngredients) {
-            return Outcome.Ok(fromBeauty)
-        }
-        val food: Outcome<String> = http.getText("$OFF_PRODUCT$gtin.json")
-        val fromFood: OnlineGtinHit? = parseIfOk(gtin, food)
-        val hit: OnlineGtinHit = when {
-            fromFood is OnlineGtinHit.WithIngredients -> fromFood
-            fromBeauty is OnlineGtinHit.MissingIngredients -> fromBeauty
-            fromFood is OnlineGtinHit.MissingIngredients -> fromFood
-            fromBeauty != null -> fromBeauty
-            fromFood != null -> fromFood
-            beauty is Outcome.Err -> return beauty
-            food is Outcome.Err -> return food
-            else -> OnlineGtinHit.NotFound(gtin)
-        }
-        return Outcome.Ok(hit)
+        return firstHit(gtin)
     }
 
-    private fun parseIfOk(gtin: String, body: Outcome<String>): OnlineGtinHit? {
-        return when (body) {
-            is Outcome.Ok -> ObfProductParser.parse(gtin, body.value)
-            is Outcome.Err -> null
+    private suspend fun firstHit(gtin: String): Outcome<OnlineGtinHit> {
+        var fallback: OnlineGtinHit = OnlineGtinHit.NotFound(gtin)
+        var firstErr: Outcome.Err? = null
+        var anyBody: Boolean = false
+        for (url in GtinLookupEndpoints.productJsonUrls(gtin)) {
+            when (val body: Outcome<String> = http.getText(url)) {
+                is Outcome.Ok -> {
+                    anyBody = true
+                    val hit: OnlineGtinHit = ObfProductParser.parse(gtin, body.value)
+                    if (hit is OnlineGtinHit.WithIngredients) {
+                        return Outcome.Ok(hit)
+                    }
+                    fallback = strongerMiss(fallback, hit)
+                }
+                is Outcome.Err -> if (firstErr == null) firstErr = body
+            }
         }
+        val err: Outcome.Err? = firstErr
+        return if (!anyBody && err != null) err else Outcome.Ok(fallback)
     }
 
-    private companion object {
-        const val OBF_PRODUCT: String = "https://world.openbeautyfacts.org/api/v2/product/"
-        const val OFF_PRODUCT: String = "https://world.openfoodfacts.org/api/v2/product/"
+    private fun strongerMiss(current: OnlineGtinHit, next: OnlineGtinHit): OnlineGtinHit {
+        if (current is OnlineGtinHit.MissingIngredients) {
+            return current
+        }
+        if (next is OnlineGtinHit.MissingIngredients) {
+            return next
+        }
+        return current
     }
 }

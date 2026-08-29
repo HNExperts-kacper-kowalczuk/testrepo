@@ -1,6 +1,9 @@
 package com.hnexperts.cosmetics.ui.preferences
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,6 +17,7 @@ import com.hnexperts.cosmetics.resources.prefs_reports_empty
 import com.hnexperts.cosmetics.resources.prefs_reports_send
 import com.hnexperts.cosmetics.resources.prefs_reports_send_unavailable
 import com.hnexperts.cosmetics.resources.prefs_reports_sent
+import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.StatusAnnouncement
 import org.jetbrains.compose.resources.stringResource
 
@@ -35,14 +39,20 @@ fun PreferencesReportsSection(
         onClick = { onCopyReports(emptyReports) },
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(stringResource(Res.string.prefs_reports_copy))
+        ButtonIconLabel(
+            imageVector = Icons.Filled.ContentCopy,
+            text = stringResource(Res.string.prefs_reports_copy)
+        )
     }
     StatusAnnouncement(
         message = if (reportsCopied) stringResource(Res.string.prefs_reports_copied) else null
     )
     if (reportsSendAvailable) {
         Button(onClick = onSendReports, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(Res.string.prefs_reports_send))
+            ButtonIconLabel(
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                text = stringResource(Res.string.prefs_reports_send)
+            )
         }
     } else {
         Text(text = stringResource(Res.string.prefs_reports_send_unavailable))

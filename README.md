@@ -65,7 +65,15 @@ iOS: open `iosApp/iosApp.xcodeproj` on macOS after a Gradle sync.
 | `5901234123532` | Bead Face Scrub | Safe (microplastics chip) |
 | `5901234123549` | Carmine Lip Tint | Safe (animal-derived chip) |
 
-Unknown barcodes are looked up online automatically when the device is connected. If no ingredient list is found, the Scan tab offers a fallback to photograph or paste the INCI list.
+Polish overlay (always upserted into the on-device catalog, label still wins):
+
+| GTIN | Product | Source |
+| --- | --- | --- |
+| `5900017071398` | Bambino Rodzina żel pod prysznic Mirabelka 400 ml | Label transcript |
+| `5901887019367` | Ziaja anty-perspirant w kremie Sensitiv 60 ml | ziaja.com |
+| `5901887019374` | Ziaja anty-perspirant w kremie Soft 60 ml | ziaja.com |
+
+Unknown barcodes are looked up online automatically when the device is connected. GS1 Poland (`590…`) codes also query the Polish Open Beauty Facts / Open Food Facts hosts. If no ingredient list is found, the Scan tab offers a fallback to photograph or paste the INCI list.
 
 ## Docs
 

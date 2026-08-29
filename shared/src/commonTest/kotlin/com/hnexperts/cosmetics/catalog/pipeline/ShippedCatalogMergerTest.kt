@@ -1,6 +1,7 @@
 package com.hnexperts.cosmetics.catalog.pipeline
 
 import com.hnexperts.cosmetics.catalog.fixture.FixtureCatalog
+import com.hnexperts.cosmetics.catalog.overlay.PolishProductOverlay
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -48,11 +49,12 @@ class ShippedCatalogMergerTest {
         val build = ShippedCatalogMerger.merge(
             ingestedIngredients = null,
             ingestedProducts = ObfProductDump(region = "EU", products = listOf(colliding, extra)),
-            maxProducts = FixtureCatalog.products.size + 1,
+            maxProducts = FixtureCatalog.products.size + PolishProductOverlay.products.size + 1,
             builtAt = "2026-08-19T00:00:00Z"
         )
-        assertEquals(FixtureCatalog.products.size + 1, build.products.size)
+        assertEquals(FixtureCatalog.products.size + PolishProductOverlay.products.size + 1, build.products.size)
         assertTrue(build.products.any { item -> item.product.id == "obf-extra" })
+        assertTrue(build.products.any { item -> item.gtins.contains("5901887019367") })
         assertTrue(build.products.none { item -> item.product.id == "obf-collide" })
     }
 }
