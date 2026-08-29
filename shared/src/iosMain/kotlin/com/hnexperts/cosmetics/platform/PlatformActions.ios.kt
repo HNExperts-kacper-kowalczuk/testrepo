@@ -4,10 +4,11 @@ import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
 import platform.UIKit.UIImpactFeedbackGenerator
-import platform.UIKit.UIImpactFeedbackStyleMedium
+import platform.UIKit.UIImpactFeedbackStyle
+import platform.UIKit.popoverPresentationController
 
 actual fun performScanHaptic() {
-    UIImpactFeedbackGenerator(style = UIImpactFeedbackStyleMedium).impactOccurred()
+    UIImpactFeedbackGenerator(style = UIImpactFeedbackStyle.UIImpactFeedbackStyleMedium).impactOccurred()
 }
 
 actual fun openAppSettings() {

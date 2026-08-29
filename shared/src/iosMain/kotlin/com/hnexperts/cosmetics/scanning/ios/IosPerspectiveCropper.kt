@@ -19,8 +19,11 @@ import platform.CoreImage.CIContext
 import platform.CoreImage.CIFilter
 import platform.CoreImage.CIImage
 import platform.CoreImage.CIVector
+import platform.CoreImage.createCGImage
+import platform.CoreImage.filterWithName
 import platform.Foundation.NSData
 import platform.Foundation.create
+import platform.Foundation.setValue
 import platform.UIKit.UIGraphicsBeginImageContextWithOptions
 import platform.UIKit.UIGraphicsEndImageContext
 import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext

@@ -4,6 +4,7 @@ import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.domain.CameraFrame
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import kotlin.concurrent.Volatile
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -29,6 +30,9 @@ import platform.AVFoundation.AVMetadataObjectTypeEAN13Code
 import platform.AVFoundation.AVMetadataObjectTypeEAN8Code
 import platform.AVFoundation.AVMetadataObjectTypeUPCECode
 import platform.AVFoundation.AVCaptureDevice.Companion.defaultDeviceWithMediaType
+import platform.AVFoundation.fileDataRepresentation
+import platform.AVFoundation.hasTorch
+import platform.AVFoundation.torchMode
 import platform.Foundation.NSData
 import platform.Foundation.NSError
 import platform.darwin.NSObject

@@ -16,6 +16,8 @@ import platform.UIKit.UIGraphicsImageRenderer
 import platform.UIKit.UIImage
 import platform.UIKit.UIImagePNGRepresentation
 import platform.UIKit.UIRectFill
+import platform.UIKit.drawAtPoint
+import platform.UIKit.popoverPresentationController
 import platform.posix.memcpy
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
