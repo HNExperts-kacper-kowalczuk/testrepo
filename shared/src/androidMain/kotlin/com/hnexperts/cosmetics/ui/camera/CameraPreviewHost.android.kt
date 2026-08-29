@@ -2,6 +2,8 @@ package com.hnexperts.cosmetics.ui.camera
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.PreviewView
@@ -38,14 +40,10 @@ actual fun CameraPreviewHost(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val previewView: PreviewView = remember {
-        PreviewView(context).apply { implementationMode = PreviewView.ImplementationMode.COMPATIBLE }
-    }
     val session: AndroidCameraSession = remember {
         AndroidCameraSession(
             context = context,
             lifecycleOwner = lifecycleOwner,
-            previewView = previewView,
             onBarcode = onBarcode,
             onStill = onStill,
             onFailure = onFailure
@@ -68,11 +66,6 @@ actual fun CameraPreviewHost(
             permissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
-    LaunchedEffect(mode, granted) {
-        if (granted) {
-            session.bind(mode, torchOn)
-        }
-    }
     LaunchedEffect(torchOn) {
         session.setTorch(torchOn)
     }
@@ -85,7 +78,30 @@ actual fun CameraPreviewHost(
     DisposableEffect(session) {
         onDispose { session.release() }
     }
-    AndroidView(factory = { previewView }, modifier = modifier)
+    AndroidView(
+        factory = { viewContext ->
+            createPreviewView(viewContext).also { preview ->
+                session.attachPreview(preview)
+            }
+        },
+        modifier = modifier,
+        update = { preview ->
+            if (granted) {
+                session.bindWhenReady(mode, torchOn)
+            }
+        }
+    )
+}
+
+private fun createPreviewView(context: android.content.Context): PreviewView {
+    return PreviewView(context).apply {
+        implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+        scaleType = PreviewView.ScaleType.FILL_CENTER
+        layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+    }
 }
 
 private fun permissionStatus(context: android.content.Context, granted: Boolean): CameraPermissionStatus {

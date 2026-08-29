@@ -12,13 +12,13 @@ import com.hnexperts.cosmetics.scanning.domain.CameraFrame
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
 import com.hnexperts.cosmetics.scanning.ios.IosCameraSession
+import com.hnexperts.cosmetics.scanning.ios.IosPreviewContainer
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFoundation.AVAuthorizationStatusAuthorized
 import platform.AVFoundation.AVAuthorizationStatusDenied
 import platform.AVFoundation.AVAuthorizationStatusRestricted
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVMediaTypeVideo
-import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
@@ -58,7 +58,7 @@ actual fun CameraPreviewHost(
     }
     UIKitView(
         factory = {
-            val view = UIView()
+            val view = IosPreviewContainer()
             session.attach(view)
             view
         },
