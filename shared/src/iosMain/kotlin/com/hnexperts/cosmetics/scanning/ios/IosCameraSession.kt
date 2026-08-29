@@ -3,7 +3,6 @@ package com.hnexperts.cosmetics.scanning.ios
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.domain.CameraFrame
-import com.hnexperts.cosmetics.scanning.domain.ScannerMode
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -31,9 +30,11 @@ import platform.AVFoundation.AVMetadataObjectTypeUPCECode
 import platform.AVFoundation.AVCaptureDevice.Companion.defaultDeviceWithMediaType
 import platform.Foundation.NSData
 import platform.Foundation.NSError
+import platform.darwin.DISPATCH_QUEUE_PRIORITY_DEFAULT
 import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_global_queue
 import platform.darwin.dispatch_get_main_queue
-import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
 class IosCameraSession(
@@ -54,13 +55,37 @@ class IosCameraSession(
     @Volatile
     private var barcodeListening: Boolean = true
 
-    fun attach(view: UIView) {
+    fun attach(view: IosPreviewContainer) {
         session.sessionPreset = AVCaptureSessionPresetPhoto
         val device: AVCaptureDevice = defaultDeviceWithMediaType(AVMediaTypeVideo)
             ?: run {
                 onFailure(AppFailure.Camera("camera.device", "No video capture device is available"))
                 return
             }
+        addSessionPorts(device)
+        val layer = AVCaptureVideoPreviewLayer(session = session)
+        layer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        view.layer.addSublayer(layer)
+        view.previewLayer = layer
+        previewLayer = layer
+        view.syncLayerFrame()
+    }
+
+    fun start() {
+        if (started) {
+            return
+        }
+        started = true
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) {
+            session.startRunning()
+        }
+    }
+
+    fun layout(view: IosPreviewContainer) {
+        view.syncLayerFrame()
+    }
+
+    private fun addSessionPorts(device: AVCaptureDevice) {
         val input = AVCaptureDeviceInput.deviceInputWithDevice(device, null)
         if (input != null && session.canAddInput(input)) {
             session.addInput(input)
@@ -78,23 +103,6 @@ class IosCameraSession(
         if (session.canAddOutput(photoOutput)) {
             session.addOutput(photoOutput)
         }
-        val layer = AVCaptureVideoPreviewLayer(session = session)
-        layer.videoGravity = AVLayerVideoGravityResizeAspectFill
-        layer.frame = view.bounds
-        view.layer.addSublayer(layer)
-        previewLayer = layer
-    }
-
-    fun start() {
-        if (started) {
-            return
-        }
-        started = true
-        session.startRunning()
-    }
-
-    fun layout(view: UIView) {
-        previewLayer?.frame = view.bounds
     }
 
     fun setTorch(on: Boolean) {
