@@ -17,14 +17,16 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +53,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.resources.Res
-import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.crop_handle_bottom_left
 import com.hnexperts.cosmetics.resources.crop_handle_bottom_right
 import com.hnexperts.cosmetics.resources.crop_handle_top_left
@@ -64,6 +65,9 @@ import com.hnexperts.cosmetics.resources.crop_use
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.QuadCorner
 import com.hnexperts.cosmetics.scanning.domain.SelectionQuad
+import com.hnexperts.cosmetics.ui.chrome.AppBackButton
+import com.hnexperts.cosmetics.ui.chrome.AppIconButton
+import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import kotlin.math.roundToInt
@@ -96,12 +100,10 @@ fun CropIngredientsScreen(
             TopAppBar(
                 title = { Text(stringResource(Res.string.crop_title)) },
                 navigationIcon = {
-                    IconButton(onClick = {
+                    AppBackButton(onClick = {
                         viewModel.abandonCapture()
                         onBack()
-                    }) {
-                        Text(stringResource(Res.string.back))
-                    }
+                    })
                 }
             )
         }
@@ -261,19 +263,28 @@ private fun CropControls(
             onNudge = { dx, dy -> viewModel.nudgeNormalized(selectedCorner, dx, dy) }
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            TextButton(onClick = viewModel::resetQuad, enabled = !uiState.busy) {
-                Text(stringResource(Res.string.crop_reset))
-            }
-            TextButton(onClick = onRetake, enabled = !uiState.busy) {
-                Text(stringResource(Res.string.crop_retake))
-            }
+            AppIconButton(
+                imageVector = Icons.Filled.RestartAlt,
+                contentDescription = stringResource(Res.string.crop_reset),
+                onClick = viewModel::resetQuad,
+                enabled = !uiState.busy
+            )
+            AppIconButton(
+                imageVector = Icons.Filled.PhotoCamera,
+                contentDescription = stringResource(Res.string.crop_retake),
+                onClick = onRetake,
+                enabled = !uiState.busy
+            )
         }
         Button(
             onClick = viewModel::useSelection,
             enabled = !uiState.busy && uiState.previewJpeg != null,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(Res.string.crop_use))
+            ButtonIconLabel(
+                imageVector = Icons.Filled.Check,
+                text = stringResource(Res.string.crop_use)
+            )
         }
         if (uiState.busy) {
             BusyStatus(message = stringResource(Res.string.scan_working))

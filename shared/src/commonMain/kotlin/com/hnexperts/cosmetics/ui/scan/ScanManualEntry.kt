@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DocumentScanner
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -27,6 +30,7 @@ import com.hnexperts.cosmetics.resources.scan_inci_action
 import com.hnexperts.cosmetics.resources.scan_inci_label
 import com.hnexperts.cosmetics.resources.scan_invalid_barcode
 import com.hnexperts.cosmetics.resources.scan_more_ways
+import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.motion.Reveal
 import org.jetbrains.compose.resources.stringResource
@@ -76,7 +80,10 @@ internal fun ManualEntrySection(viewModel: ScanViewModel, uiState: ScanUiState) 
                 enabled = !uiState.busy,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(Res.string.scan_barcode_action))
+                ButtonIconLabel(
+                    imageVector = Icons.Filled.Search,
+                    text = stringResource(Res.string.scan_barcode_action)
+                )
             }
             if (uiState.invalidBarcode) {
                 Text(
@@ -98,7 +105,10 @@ internal fun ManualEntrySection(viewModel: ScanViewModel, uiState: ScanUiState) 
                 enabled = !uiState.busy,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(Res.string.scan_inci_action))
+                ButtonIconLabel(
+                    imageVector = Icons.Filled.DocumentScanner,
+                    text = stringResource(Res.string.scan_inci_action)
+                )
             }
             if (uiState.emptyInci) {
                 Text(

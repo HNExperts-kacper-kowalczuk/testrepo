@@ -8,4 +8,10 @@ object GtinNormalizer {
         }
         return digits
     }
+
+    fun isGs1Poland(raw: String): Boolean {
+        return normalize(raw).startsWith(GS1_POLAND_PREFIX)
+    }
+
+    private const val GS1_POLAND_PREFIX: String = "590"
 }

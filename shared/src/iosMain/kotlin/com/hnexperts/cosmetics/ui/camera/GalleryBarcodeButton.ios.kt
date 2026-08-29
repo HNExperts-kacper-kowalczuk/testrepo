@@ -1,15 +1,10 @@
 package com.hnexperts.cosmetics.ui.camera
 
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.hnexperts.cosmetics.platform.iosRootViewController
-import com.hnexperts.cosmetics.resources.Res
-import com.hnexperts.cosmetics.resources.camera_gallery
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.ios.IosStillBarcodeDecoder
-import org.jetbrains.compose.resources.stringResource
 import platform.UIKit.UIImage
 import platform.UIKit.UIImagePickerController
 import platform.UIKit.UIImagePickerControllerDelegateProtocol
@@ -26,13 +21,11 @@ actual fun GalleryBarcodeButton(
     onCancel: () -> Unit,
     modifier: Modifier
 ) {
-    TextButton(
-        onClick = { presentPicker(onBarcode = onBarcode, onEmpty = onEmpty, onCancel = onCancel) },
+    GalleryBarcodeIconButton(
         enabled = enabled,
+        onClick = { presentPicker(onBarcode = onBarcode, onEmpty = onEmpty, onCancel = onCancel) },
         modifier = modifier
-    ) {
-        Text(stringResource(Res.string.camera_gallery))
-    }
+    )
 }
 
 private var retainedDelegate: GalleryPickerDelegate? = null

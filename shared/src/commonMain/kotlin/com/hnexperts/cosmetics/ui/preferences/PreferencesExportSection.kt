@@ -1,8 +1,9 @@
 package com.hnexperts.cosmetics.ui.preferences
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.hnexperts.cosmetics.resources.Res
@@ -12,6 +13,7 @@ import com.hnexperts.cosmetics.resources.prefs_export_avoid_empty
 import com.hnexperts.cosmetics.resources.prefs_export_shelf
 import com.hnexperts.cosmetics.resources.prefs_export_shelf_copied
 import com.hnexperts.cosmetics.resources.prefs_export_shelf_empty
+import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.StatusAnnouncement
 import org.jetbrains.compose.resources.stringResource
 
@@ -27,7 +29,10 @@ fun PreferencesExportSection(
         onClick = { onCopyAvoid(emptyAvoid) },
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(stringResource(Res.string.prefs_export_avoid))
+        ButtonIconLabel(
+            imageVector = Icons.Filled.ContentCopy,
+            text = stringResource(Res.string.prefs_export_avoid)
+        )
     }
     StatusAnnouncement(
         message = if (avoidCopied) stringResource(Res.string.prefs_export_avoid_copied) else null
@@ -37,7 +42,10 @@ fun PreferencesExportSection(
         onClick = { onCopyShelf(emptyShelf) },
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(stringResource(Res.string.prefs_export_shelf))
+        ButtonIconLabel(
+            imageVector = Icons.Filled.ContentCopy,
+            text = stringResource(Res.string.prefs_export_shelf)
+        )
     }
     StatusAnnouncement(
         message = if (shelfCopied) stringResource(Res.string.prefs_export_shelf_copied) else null

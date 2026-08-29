@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -32,7 +35,6 @@ import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.resources.Res
-import com.hnexperts.cosmetics.resources.back
 import com.hnexperts.cosmetics.resources.finding_personal_avoid
 import com.hnexperts.cosmetics.resources.finding_early_list
 import com.hnexperts.cosmetics.resources.finding_rating_a11y
@@ -54,6 +56,8 @@ import com.hnexperts.cosmetics.resources.result_unknown_count
 import com.hnexperts.cosmetics.resources.result_usage_pick
 import com.hnexperts.cosmetics.resources.share_scanned_at
 import com.hnexperts.cosmetics.resources.share_scanned_product
+import com.hnexperts.cosmetics.ui.chrome.AppBackButton
+import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.RatingBadge
@@ -83,9 +87,7 @@ fun ResultScreen(
             TopAppBar(
                 title = { Text(stringResource(Res.string.result_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Text(stringResource(Res.string.back))
-                    }
+                    AppBackButton(onClick = onBack)
                 }
             )
         },
@@ -166,7 +168,10 @@ private fun LazyListScope.resultActions(
             onClick = viewModel::checkTheLabel,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(Res.string.result_check_label))
+            ButtonIconLabel(
+                imageVector = Icons.Filled.PhotoCamera,
+                text = stringResource(Res.string.result_check_label)
+            )
         }
     }
     item {
@@ -174,7 +179,8 @@ private fun LazyListScope.resultActions(
             onClick = viewModel::toggleShelf,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
+            ButtonIconLabel(
+                imageVector = if (uiState.onShelf) Icons.Filled.Star else Icons.Filled.StarBorder,
                 text = if (uiState.onShelf) {
                     stringResource(Res.string.result_shelf_remove)
                 } else {

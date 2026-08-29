@@ -20,10 +20,28 @@ class OnlineGtinLookupTest {
     }
 
     @Test
+    fun usesPolishOpenBeautyFactsFirstForGs1PolandGtins() = runBlocking {
+        val http = RecordingHttp(
+            mapOf(
+                "https://pl.openbeautyfacts.org/api/v2/product/5900017071398.json" to
+                    """{"status":1,"product":{"product_name_pl":"Żel Mirabelka","ingredients_text_pl":"Aqua, Sodium Myreth Sulfate, Cocamidopropyl Betaine, Glycerin"}}"""
+            )
+        )
+        val lookup = OnlineGtinLookup(http, Online)
+        val result: Outcome<OnlineGtinHit> = lookup.invoke("5900017071398")
+        val hit = assertIs<OnlineGtinHit.WithIngredients>((result as Outcome.Ok).value)
+        assertEquals("Żel Mirabelka", hit.name)
+        assertEquals(
+            listOf("https://pl.openbeautyfacts.org/api/v2/product/5900017071398.json"),
+            http.urls
+        )
+    }
+
+    @Test
     fun usesOpenBeautyFactsWhenTheProductHasIngredients() = runBlocking {
         val http = RecordingHttp(
             mapOf(
-                "https://world.openbeautyfacts.org/api/v2/product/5901234123457.json" to
+                "https://pl.openbeautyfacts.org/api/v2/product/5901234123457.json" to
                     """{"status":1,"product":{"product_name":"Cream","ingredients_text":"Aqua, Glycerin, Panthenol, Niacinamide"}}"""
             )
         )
