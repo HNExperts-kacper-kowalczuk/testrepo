@@ -150,7 +150,11 @@ val appModule = module {
     viewModelOf(::CompareViewModel)
 }
 
-fun initKoin(config: KoinAppDeclaration = {}) {
+fun initKoin() {
+    initKoin(config = {})
+}
+
+fun initKoin(config: KoinAppDeclaration) {
     startKoin {
         config()
         modules(platformModule(), appModule)

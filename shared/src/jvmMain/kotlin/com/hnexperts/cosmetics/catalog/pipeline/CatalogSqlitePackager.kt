@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.catalog.pipeline
 
+import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.hnexperts.cosmetics.catalog.data.CatalogWriter
 import com.hnexperts.cosmetics.data.catalogdb.CatalogDatabase
@@ -16,8 +17,9 @@ object CatalogSqlitePackager {
         Files.createDirectories(outputDir)
         val sqlite: Path = outputDir.resolve("catalog.sqlite")
         Files.deleteIfExists(sqlite)
-        val driver = JdbcSqliteDriver("jdbc:sqlite:${sqlite.toAbsolutePath()}")
+        val driver: SqlDriver = JdbcSqliteDriver("jdbc:sqlite:${sqlite.toAbsolutePath()}")
         CatalogDatabase.Schema.create(driver)
+        stampSchemaVersion(driver)
         val database = CatalogDatabase(driver)
         CatalogWriter(database).replaceAll(build.ingredients, build.products, build.meta)
         driver.close()
@@ -29,6 +31,15 @@ object CatalogSqlitePackager {
             }
         }
         return gzip
+    }
+
+    private fun stampSchemaVersion(driver: SqlDriver) {
+        val version: Long = CatalogDatabase.Schema.version
+        driver.execute(
+            identifier = null,
+            sql = "PRAGMA user_version = $version",
+            parameters = 0
+        )
     }
 
     private fun fixtureBuild(): CatalogBuild {

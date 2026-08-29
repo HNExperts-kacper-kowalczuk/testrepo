@@ -1,7 +1,6 @@
 package com.hnexperts.cosmetics.data
 
 import app.cash.sqldelight.db.SqlDriver
-import kotlinx.coroutines.CancellationException
 
 object UserSchemaGuard {
     fun ensure(driver: SqlDriver) {
@@ -12,7 +11,7 @@ object UserSchemaGuard {
     }
 
     private fun createCachedProductTable(driver: SqlDriver) {
-        executeIgnoringExisting(driver, CACHED_PRODUCT_TABLE)
+        driver.execute(identifier = null, sql = CACHED_PRODUCT_TABLE, parameters = 0)
     }
 
     private fun addProfileColumns(driver: SqlDriver) {
@@ -31,23 +30,21 @@ object UserSchemaGuard {
         SHELF_COLUMNS.forEach { column ->
             addColumn(driver, table = "user_shelf", columnSql = column)
         }
-        executeIgnoringExisting(driver, SHELF_KEY_BACKFILL)
-        executeIgnoringExisting(driver, SHELF_KEY_DEDUPE)
-        executeIgnoringExisting(driver, SHELF_KEY_UNIQUE_INDEX)
+        driver.execute(identifier = null, sql = SHELF_KEY_BACKFILL, parameters = 0)
+        driver.execute(identifier = null, sql = SHELF_KEY_DEDUPE, parameters = 0)
+        driver.execute(identifier = null, sql = SHELF_KEY_UNIQUE_INDEX, parameters = 0)
     }
 
     private fun addColumn(driver: SqlDriver, table: String, columnSql: String) {
-        executeIgnoringExisting(driver, "ALTER TABLE $table ADD COLUMN $columnSql")
-    }
-
-    private fun executeIgnoringExisting(driver: SqlDriver, sql: String) {
-        try {
-            driver.execute(identifier = null, sql = sql, parameters = 0)
-        } catch (cancelled: CancellationException) {
-            throw cancelled
-        } catch (_: Exception) {
-            // Already applied on databases created from the current schema.
+        val column: String = columnSql.substringBefore(' ')
+        if (SqliteInspect.columnExists(driver, table, column)) {
+            return
         }
+        driver.execute(
+            identifier = null,
+            sql = "ALTER TABLE $table ADD COLUMN $columnSql",
+            parameters = 0
+        )
     }
 
     private val PROFILE_COLUMNS: List<String> = listOf(
