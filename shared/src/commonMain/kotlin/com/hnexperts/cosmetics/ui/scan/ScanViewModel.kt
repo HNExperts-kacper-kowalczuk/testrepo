@@ -7,8 +7,10 @@ import com.hnexperts.cosmetics.catalog.application.ResolveGtin
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.EvaluateProduct
 import com.hnexperts.cosmetics.failure.AppFailure
+import com.hnexperts.cosmetics.scanning.application.OpenTypedIngredientReview
 import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
+import com.hnexperts.cosmetics.scanning.application.TypedIngredientReview
 import com.hnexperts.cosmetics.scanning.domain.CatalogReport
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.scanning.domain.ReportKinds
@@ -30,6 +32,7 @@ data class ScanUiState(
     val onlineNoIngredients: Boolean = false,
     val failure: AppFailure? = null,
     val navigateToResult: Boolean = false,
+    val navigateToConfirm: Boolean = false,
     val recent: List<HistoryEntry> = emptyList()
 )
 
@@ -39,7 +42,8 @@ class ScanViewModel(
     private val scanBridge: ScanBridge,
     private val history: ScanHistoryRepository,
     private val reports: ReportQueue,
-    private val pendingVerify: PendingVerifySession
+    private val pendingVerify: PendingVerifySession,
+    private val openTypedReview: OpenTypedIngredientReview
 ) : ViewModel() {
     private val state: MutableStateFlow<ScanUiState> = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = state.asStateFlow()
@@ -94,9 +98,7 @@ class ScanViewModel(
             state.update { current -> current.copy(emptyInci = true, invalidBarcode = false, failure = null) }
             return
         }
-        startWork {
-            evaluateAndOpen(inciRaw = inciRaw, source = "manual", usage = usage)
-        }
+        startWork { openTypedList(inciRaw, usage) }
     }
 
     fun refreshRecent() {
@@ -124,7 +126,32 @@ class ScanViewModel(
     }
 
     fun consumeNavigation() {
-        state.update { current -> current.copy(navigateToResult = false) }
+        state.update { current -> current.copy(navigateToResult = false, navigateToConfirm = false) }
+    }
+
+    private suspend fun openTypedList(inciRaw: String, usage: ProductUsage) {
+        val opened: TypedIngredientReview = runUiAction(::showFailure) {
+            openTypedReview.invoke(inciRaw, usage)
+        } ?: return
+        when (opened) {
+            is TypedIngredientReview.Confirm -> {
+                state.update { current ->
+                    current.copy(
+                        invalidBarcode = false,
+                        notFoundGtin = null,
+                        onlineNoIngredients = false,
+                        emptyInci = false,
+                        failure = null,
+                        navigateToConfirm = true
+                    )
+                }
+            }
+            is TypedIngredientReview.Ready -> evaluateAndOpen(
+                inciRaw = opened.inciRaw,
+                source = "manual",
+                usage = opened.usage
+            )
+        }
     }
 
     private suspend fun evaluateReady(ready: GtinResolution.ReadyToEvaluate) {
@@ -186,7 +213,7 @@ class ScanViewModel(
     }
 
     private fun showFailure(failure: AppFailure) {
-        state.update { current -> current.copy(failure = failure, navigateToResult = false) }
+        state.update { current -> current.copy(failure = failure, navigateToResult = false, navigateToConfirm = false) }
     }
 
     private fun startWork(block: suspend () -> Unit) {

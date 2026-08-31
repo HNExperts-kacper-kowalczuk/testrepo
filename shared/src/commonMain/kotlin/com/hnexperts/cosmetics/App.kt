@@ -160,6 +160,7 @@ private fun AppNavigation() {
                     ScanScreen(
                         viewModel = viewModel,
                         onResult = { navController.navigate(ResultDestination) },
+                        onConfirm = { navController.navigate(ConfirmIngredientsDestination) },
                         onOpenBarcodeCamera = { navController.navigate(CameraDestination(barcode = true)) },
                         onOpenInciCamera = { navController.navigate(CameraDestination(barcode = false)) }
                     )

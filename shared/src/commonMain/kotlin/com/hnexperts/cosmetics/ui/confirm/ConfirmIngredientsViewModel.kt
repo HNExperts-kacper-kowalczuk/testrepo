@@ -196,7 +196,7 @@ class ConfirmIngredientsViewModel(
         state.update { current ->
             current.copy(
                 draft = draft,
-                usage = verify?.usage ?: current.usage,
+                usage = draft.usage ?: verify?.usage ?: current.usage,
                 photoCount = photos,
                 canAddPhoto = photos < ReviewDraftMerger.MAX_SHOTS
             )
@@ -214,7 +214,7 @@ class ConfirmIngredientsViewModel(
             runUiAction(::showFailure) {
                 evaluateProduct.invoke(
                     inciRaw = if (matched && catalogInci != null) catalogInci else photographed,
-                    source = if (matched && verify != null) verify.source else "ocr",
+                    source = if (matched && verify != null) verify.source else draft.source,
                     productName = verify?.productName,
                     brand = verify?.brand,
                     gtin = gtin,

@@ -46,6 +46,7 @@ import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
 import com.hnexperts.cosmetics.scanning.application.LaunchIntentSession
 import com.hnexperts.cosmetics.scanning.application.PendingCaptureSession
 import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
+import com.hnexperts.cosmetics.scanning.application.OpenTypedIngredientReview
 import com.hnexperts.cosmetics.scanning.application.PrepareIngredientReview
 import com.hnexperts.cosmetics.scanning.application.SuggestReviewIngredients
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
@@ -103,6 +104,7 @@ val appModule = module {
     single<OnlineProductCache> { SqlOnlineProductCache(get(), get()) }
     single { ResolveGtin(get(), get(), get()) }
     single { PrepareIngredientReview(get()) }
+    single { OpenTypedIngredientReview(get(), get()) }
     single { SuggestReviewIngredients(get(), get()) }
     single { IngredientReviewSession() }
     single { ScanBridge() }
