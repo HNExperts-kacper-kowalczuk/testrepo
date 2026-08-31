@@ -17,8 +17,13 @@ class CatalogIndex(
     val ingredientsSorted: List<Ingredient>,
     val commentsById: Map<String, List<LocalizedText>>,
     val hazardsById: Map<String, IngredientHazard>,
-    val aliases: Map<String, String>
+    val aliases: Map<String, String>,
+    val aliasesByIngredientId: Map<String, List<String>>
 ) {
+    fun aliasesFor(ingredientId: String): List<String> {
+        return aliasesByIngredientId[ingredientId].orEmpty()
+    }
+
     fun searchIngredients(query: String): List<Ingredient> {
         val needle: String = query.trim().lowercase()
         if (needle.isEmpty()) {
@@ -79,8 +84,15 @@ class CatalogIndex(
                 ingredientsSorted = snapshot.ingredients.sortedBy { ingredient -> ingredient.inciName },
                 commentsById = snapshot.comments,
                 hazardsById = snapshot.hazards,
-                aliases = snapshot.aliases
+                aliases = snapshot.aliases,
+                aliasesByIngredientId = invertAliases(snapshot.aliases)
             )
+        }
+
+        private fun invertAliases(aliases: Map<String, String>): Map<String, List<String>> {
+            return aliases.entries
+                .groupBy({ entry -> entry.value }, { entry -> entry.key })
+                .mapValues { entry -> entry.value.distinct().sorted() }
         }
     }
 }

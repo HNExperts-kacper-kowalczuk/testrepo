@@ -30,15 +30,8 @@ import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.evaluation.application.ShareCopy
-import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.resources.Res
-import com.hnexperts.cosmetics.resources.finding_personal_avoid
-import com.hnexperts.cosmetics.resources.finding_early_list
-import com.hnexperts.cosmetics.resources.finding_rating_a11y
-import com.hnexperts.cosmetics.resources.finding_sun_caution
-import com.hnexperts.cosmetics.resources.finding_unmatched
-import com.hnexperts.cosmetics.resources.finding_usage_adjusted
 import com.hnexperts.cosmetics.resources.result_alternatives
 import com.hnexperts.cosmetics.resources.result_alternatives_source
 import com.hnexperts.cosmetics.resources.result_check_label
@@ -59,9 +52,9 @@ import com.hnexperts.cosmetics.ui.chrome.AppBackButton
 import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
-import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.ingredient.IngredientDetailSheet
 import com.hnexperts.cosmetics.ui.layout.AppLayout
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -107,6 +100,9 @@ fun ResultScreen(
             viewModel = viewModel,
             padding = padding
         )
+    }
+    uiState.selectedDetail?.let { detail ->
+        IngredientDetailSheet(detail = detail, onDismiss = viewModel::dismissDetail)
     }
 }
 
@@ -231,7 +227,11 @@ private fun LazyListScope.resultDetails(
         resultAlternatives(uiState, viewModel)
     }
     items(assessment.findings) { finding ->
-        FindingRow(finding, viewModel)
+        ResultFindingRow(
+            finding = finding,
+            commentSummary = viewModel.commentFor(finding.comments)?.summary,
+            onOpen = { viewModel.openFinding(finding) }
+        )
     }
     item {
         Text(
@@ -265,57 +265,6 @@ private fun LazyListScope.resultAlternatives(
             Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                 Text(text = alternative.product.name, style = MaterialTheme.typography.titleMedium)
                 Text(text = dangerLevelText(alternative.assessment.overall))
-            }
-        }
-    }
-}
-
-@Composable
-private fun FindingRow(finding: Finding, viewModel: ResultViewModel) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(text = finding.ingredient.displayName, style = MaterialTheme.typography.titleLarge)
-            val levelLabel: String = dangerLevelText(finding.level)
-            val levelDescription: String = stringResource(Res.string.finding_rating_a11y, levelLabel)
-            RatingBadge(
-                level = finding.level,
-                label = levelLabel,
-                contentDescription = levelDescription
-            )
-            val comment = viewModel.commentFor(finding.comments)
-            if (comment != null) {
-                Text(text = comment.summary, style = MaterialTheme.typography.bodyLarge)
-            }
-            if (finding.sunCaution()) {
-                Text(
-                    text = stringResource(Res.string.finding_sun_caution),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            if (finding.earlyListConcern()) {
-                Text(
-                    text = stringResource(Res.string.finding_early_list),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            if (finding.usageAdjusted) {
-                Text(
-                    text = stringResource(Res.string.finding_usage_adjusted),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            if (finding.personalAvoid) {
-                Text(
-                    text = stringResource(Res.string.finding_personal_avoid),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            if (finding.ingredient.id == null) {
-                Text(text = stringResource(Res.string.finding_unmatched))
             }
         }
     }
