@@ -1,17 +1,14 @@
 package com.hnexperts.cosmetics.ui.search
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,8 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.hnexperts.cosmetics.ads.AdPlacement
 import com.hnexperts.cosmetics.ads.AppScreen
 import com.hnexperts.cosmetics.catalog.domain.Product
-import com.hnexperts.cosmetics.hazards.domain.LocalizedText
-import com.hnexperts.cosmetics.i18n.systemAppLocale
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.resources.search_empty
@@ -43,12 +38,10 @@ import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.ChoiceChip
 import com.hnexperts.cosmetics.ui.common.ChoiceChipFlow
 import com.hnexperts.cosmetics.ui.common.FailureBanner
-import com.hnexperts.cosmetics.ui.common.RatingBadge
-import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.ingredient.IngredientDetailSheet
 import com.hnexperts.cosmetics.ui.layout.AppWidthColumn
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel,
@@ -126,8 +119,8 @@ fun SearchScreen(
             }
         }
     }
-    uiState.selectedIngredient?.let { hit ->
-        IngredientSheet(hit = hit, onDismiss = viewModel::dismissIngredient)
+    uiState.selectedDetail?.let { detail ->
+        IngredientDetailSheet(detail = detail, onDismiss = viewModel::dismissIngredient)
     }
 }
 
@@ -185,35 +178,6 @@ private fun IngredientResults(
                     onClickLabel = openLabel
                 ) { onOpen(hit) }
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun IngredientSheet(hit: IngredientHit, onDismiss: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(24.dp)
-        ) {
-            Text(text = hit.ingredient.inciName, style = MaterialTheme.typography.headlineSmall)
-            hit.ingredient.casNumbers?.let { cas ->
-                Text(text = cas, style = MaterialTheme.typography.bodyMedium)
-            }
-            hit.level?.let { level ->
-                RatingBadge(
-                    level = level,
-                    label = dangerLevelText(level),
-                    contentDescription = dangerLevelText(level),
-                    modifier = Modifier.padding(vertical = 12.dp)
-                )
-            }
-            val comment: LocalizedText? = hit.comments.firstOrNull { item ->
-                item.locale == systemAppLocale().tag
-            } ?: hit.comments.firstOrNull { item -> item.locale == "en" } ?: hit.comments.firstOrNull()
-            if (comment != null) {
-                Text(text = comment.summary, modifier = Modifier.padding(top = 8.dp))
-            }
         }
     }
 }

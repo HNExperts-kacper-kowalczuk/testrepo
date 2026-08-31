@@ -12,7 +12,15 @@ import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
 import com.hnexperts.cosmetics.hazards.domain.DangerLevel
 import com.hnexperts.cosmetics.hazards.domain.LocalizedText
+import com.hnexperts.cosmetics.i18n.AppLocale
+import com.hnexperts.cosmetics.i18n.CommentLocalizer
+import com.hnexperts.cosmetics.i18n.LocalePreference
+import com.hnexperts.cosmetics.i18n.systemAppLocale
 import com.hnexperts.cosmetics.ingredients.domain.Ingredient
+import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
+import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
+import com.hnexperts.cosmetics.ui.ingredient.IngredientDetail
+import com.hnexperts.cosmetics.ui.ingredient.IngredientDetailAssembler
 import com.hnexperts.cosmetics.ui.runUiAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -47,14 +55,16 @@ data class SearchUiState(
     val busy: Boolean = false,
     val failure: AppFailure? = null,
     val navigateToResult: Boolean = false,
-    val selectedIngredient: IngredientHit? = null
+    val selectedDetail: IngredientDetail? = null
 )
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class SearchViewModel(
     private val products: ProductRepository,
     private val evaluateProduct: EvaluateProduct,
-    private val catalog: CatalogGateway
+    private val catalog: CatalogGateway,
+    private val preferences: PreferencesStore,
+    private val commentLocalizer: CommentLocalizer
 ) : ViewModel() {
     private val queryText: MutableStateFlow<String> = MutableStateFlow("")
     private val searchMode: MutableStateFlow<SearchMode> = MutableStateFlow(SearchMode.PRODUCTS)
@@ -80,7 +90,7 @@ class SearchViewModel(
 
     fun setMode(mode: SearchMode) {
         searchMode.value = mode
-        navigation.update { current -> current.copy(mode = mode, selectedIngredient = null) }
+        navigation.update { current -> current.copy(mode = mode, selectedDetail = null) }
     }
 
     fun openProduct(product: Product) {
@@ -109,11 +119,51 @@ class SearchViewModel(
     }
 
     fun openIngredient(hit: IngredientHit) {
-        navigation.update { current -> current.copy(selectedIngredient = hit) }
+        openJob?.cancel()
+        openJob = viewModelScope.launch {
+            showIngredientDetail(hit)
+        }
     }
 
     fun dismissIngredient() {
-        navigation.update { current -> current.copy(selectedIngredient = null) }
+        navigation.update { current -> current.copy(selectedDetail = null) }
+    }
+
+    private suspend fun showIngredientDetail(hit: IngredientHit) {
+        val index: CatalogIndex = when (val loaded: Outcome<CatalogIndex> = catalog.awaitIndex()) {
+            is Outcome.Err -> {
+                showFailure(loaded.failure)
+                navigation.update { current -> current.copy(selectedDetail = null) }
+                return
+            }
+            is Outcome.Ok -> loaded.value
+        }
+        val comment: LocalizedText? = commentLocalizer.pick(hit.comments, commentLocale())
+        navigation.update { current ->
+            current.copy(
+                selectedDetail = IngredientDetailAssembler.fromCatalogIngredient(
+                    ingredient = hit.ingredient,
+                    index = index,
+                    comment = comment,
+                    level = hit.level
+                ),
+                failure = null
+            )
+        }
+    }
+
+    private suspend fun commentLocale(): AppLocale {
+        return when (val stored: Outcome<StoredPreferences> = preferences.load()) {
+            is Outcome.Err -> systemAppLocale()
+            is Outcome.Ok -> commentLocaleOf(stored.value)
+        }
+    }
+
+    private fun commentLocaleOf(stored: StoredPreferences): AppLocale {
+        return when (stored.localePreference) {
+            LocalePreference.PINNED -> stored.pinnedLocale ?: AppLocale.ENGLISH
+            LocalePreference.FOLLOW_SYSTEM -> systemAppLocale()
+        }
     }
 
     fun consumeNavigation() {

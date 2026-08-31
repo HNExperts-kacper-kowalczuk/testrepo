@@ -14,6 +14,7 @@ import com.hnexperts.cosmetics.evaluation.application.EvaluationSession
 import com.hnexperts.cosmetics.evaluation.application.FindLocalAlternatives
 import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.evaluation.application.ShareResultText
+import com.hnexperts.cosmetics.evaluation.domain.Finding
 import com.hnexperts.cosmetics.evaluation.domain.ProductAssessment
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.Outcome
@@ -32,6 +33,8 @@ import com.hnexperts.cosmetics.scanning.application.VerifyRequest
 import com.hnexperts.cosmetics.shelf.domain.ShelfItem
 import com.hnexperts.cosmetics.shelf.domain.ShelfKeys
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
+import com.hnexperts.cosmetics.ui.ingredient.IngredientDetail
+import com.hnexperts.cosmetics.ui.ingredient.IngredientDetailAssembler
 import kotlin.time.Clock
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -52,7 +55,8 @@ data class ResultUiState(
     val failure: AppFailure? = null,
     val navigateToCamera: Boolean = false,
     val categoryChoices: List<String> = emptyList(),
-    val categorySkipped: Boolean = false
+    val categorySkipped: Boolean = false,
+    val selectedDetail: IngredientDetail? = null
 )
 
 class ResultViewModel(
@@ -70,6 +74,7 @@ class ResultViewModel(
     val uiState: StateFlow<ResultUiState> = state.asStateFlow()
     private val shelfMutex: Mutex = Mutex()
     private var extrasJob: Job? = null
+    private var detailJob: Job? = null
 
     init {
         viewModelScope.launch { load() }
@@ -77,6 +82,32 @@ class ResultViewModel(
 
     fun commentFor(comments: List<LocalizedText>): LocalizedText? {
         return commentLocalizer.pick(comments, state.value.commentLocale)
+    }
+
+    fun openFinding(finding: Finding) {
+        detailJob?.cancel()
+        detailJob = viewModelScope.launch {
+            showFindingDetail(finding)
+        }
+    }
+
+    fun dismissDetail() {
+        detailJob?.cancel()
+        state.value = state.value.copy(selectedDetail = null)
+    }
+
+    private suspend fun showFindingDetail(finding: Finding) {
+        val index = when (val loaded = catalog.awaitIndex()) {
+            is Outcome.Err -> {
+                state.value = state.value.copy(failure = loaded.failure, selectedDetail = null)
+                return
+            }
+            is Outcome.Ok -> loaded.value
+        }
+        val comment: LocalizedText? = commentFor(finding.comments)
+        state.value = state.value.copy(
+            selectedDetail = IngredientDetailAssembler.fromFinding(finding, index, comment)
+        )
     }
 
     fun checkTheLabel() {
@@ -144,8 +175,12 @@ class ResultViewModel(
                     productId = product.id
                 )
             ) {
-                is Outcome.Err -> state.value = state.value.copy(failure = scored.failure)
-                is Outcome.Ok -> state.value = state.value.copy(assessment = scored.value, failure = null)
+                is Outcome.Err -> state.value = state.value.copy(failure = scored.failure, selectedDetail = null)
+                is Outcome.Ok -> state.value = state.value.copy(
+                    assessment = scored.value,
+                    failure = null,
+                    selectedDetail = null
+                )
             }
             loadShelfAndAlternatives(state.value.assessment ?: return@launch, state.value.commentLocale)
         }
@@ -191,7 +226,8 @@ class ResultViewModel(
                     assessment = scored.value,
                     categorySkipped = false,
                     categoryChoices = emptyList(),
-                    failure = null
+                    failure = null,
+                    selectedDetail = null
                 )
                 persistShelfIfStarred(scored.value)
                 loadShelfAndAlternatives(scored.value, state.value.commentLocale)
@@ -226,7 +262,7 @@ class ResultViewModel(
         when (scored) {
             is Outcome.Err -> state.value = state.value.copy(failure = scored.failure)
             is Outcome.Ok -> {
-                state.value = state.value.copy(assessment = scored.value, failure = null)
+                state.value = state.value.copy(assessment = scored.value, failure = null, selectedDetail = null)
                 persistShelfIfStarred(scored.value)
                 loadShelfAndAlternatives(scored.value, state.value.commentLocale)
             }
