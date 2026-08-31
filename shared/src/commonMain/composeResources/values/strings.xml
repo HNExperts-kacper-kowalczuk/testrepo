@@ -238,6 +238,9 @@
     <string name="confirm_fuzzy_prompt">Did you mean %2$s instead of “%1$s”?</string>
     <string name="confirm_fuzzy_accept">Use suggestion</string>
     <string name="confirm_fuzzy_reject">Keep original</string>
+    <string name="confirm_fuzzy_auto">Read “%1$s” as %2$s (auto-filled).</string>
+    <string name="confirm_fuzzy_change">Change</string>
+    <string name="confirm_auto_filled_note">Some names were filled in from OCR. Check them before evaluating.</string>
     <string name="confirm_pending_fuzzy">Accept or reject each suggested match before evaluating.</string>
     <string name="confirm_add">Add ingredient</string>
     <string name="confirm_remove">Remove</string>

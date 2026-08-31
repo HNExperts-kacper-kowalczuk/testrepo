@@ -31,7 +31,7 @@ class PrepareIngredientReviewTest {
     }
 
     @Test
-    fun keepsExactTokensAndMarksFuzzyAsPending() {
+    fun autoAcceptsUnambiguousLongTypoAndKeepsUnknown() {
         runBlocking {
             val draft: IngredientReviewDraft = requireOk(
                 prepareReview.invoke("Aqua, NIACINAM1DE, CompletelyUnknownStuff")
@@ -41,12 +41,26 @@ class PrepareIngredientReviewTest {
             assertEquals("AQUA", draft.tokens[0].rawText)
             assertEquals("Aqua", draft.tokens[0].suggestedName)
             assertEquals(MatchMethod.FUZZY, draft.tokens[1].matchMethod)
-            assertEquals(FuzzyDecision.PENDING, draft.tokens[1].fuzzyDecision)
+            assertEquals(FuzzyDecision.AUTO_ACCEPTED, draft.tokens[1].fuzzyDecision)
             assertEquals("NIACINAM1DE", draft.tokens[1].rawText)
             assertEquals("Niacinamide", draft.tokens[1].suggestedName)
             assertEquals(MatchMethod.UNMATCHED, draft.tokens[2].matchMethod)
+            assertFalse(draft.hasPendingFuzzy())
+            assertTrue(draft.hasAutoFilledFuzzy())
+            assertTrue(draft.toInciRaw().contains("Niacinamide"))
+        }
+    }
+
+    @Test
+    fun shortFuzzyTypoStaysPending() {
+        runBlocking {
+            val draft: IngredientReviewDraft = requireOk(prepareReview.invoke("RET1NOL"))
+            assertEquals(1, draft.tokens.size)
+            assertEquals(MatchMethod.FUZZY, draft.tokens[0].matchMethod)
+            assertEquals(FuzzyDecision.PENDING, draft.tokens[0].fuzzyDecision)
             assertTrue(draft.hasPendingFuzzy())
-            assertFalse(draft.toInciRaw().contains("Niacinamide"))
+            assertFalse(draft.hasAutoFilledFuzzy())
+            assertFalse(draft.toInciRaw().contains("Retinol"))
         }
     }
 

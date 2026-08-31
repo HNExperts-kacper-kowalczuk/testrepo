@@ -30,14 +30,18 @@ class IngredientMatcher(
     }
 
     suspend fun matchListConcurrently(inciRaw: String): List<IngredientRef> {
+        return matchDetailedListConcurrently(inciRaw).map { token -> token.reference }
+    }
+
+    suspend fun matchDetailedListConcurrently(inciRaw: String): List<MatchedToken> {
         val tokens: List<String> = tokenize(inciRaw)
         if (tokens.size >= ParallelMapper.DEFAULT_THRESHOLD) {
-            return ParallelMapper.map(tokens) { token -> matchToken(token) }
+            return ParallelMapper.map(tokens) { token -> matchDetailed(token) }
         }
         if (fuzzyIndex.size >= FUZZY_PARALLEL_THRESHOLD) {
-            return matchShortListWithParallelFuzzy(tokens)
+            return tokens.map { token -> matchDetailedParallel(token) }
         }
-        return tokens.map { token -> matchToken(token) }
+        return tokens.map { token -> matchDetailed(token) }
     }
 
     private fun expandPacked(tokens: List<String>): List<String> {
@@ -45,24 +49,23 @@ class IngredientMatcher(
     }
 
     fun matchToken(rawToken: String): IngredientRef {
+        return matchDetailed(rawToken).reference
+    }
+
+    fun matchDetailed(rawToken: String): MatchedToken {
         val early: IngredientRef? = matchWithoutFuzzy(rawToken)
         if (early != null) {
-            return early
+            return MatchedToken(reference = early)
         }
-        return finishMatch(rawToken, fuzzyIndex.find(lookupKey(rawToken)))
+        return finishMatch(rawToken, fuzzyIndex.findHit(lookupKey(rawToken)))
     }
 
-    private suspend fun matchShortListWithParallelFuzzy(tokens: List<String>): List<IngredientRef> {
-        return tokens.map { token -> matchTokenWithParallelFuzzy(token) }
-    }
-
-    private suspend fun matchTokenWithParallelFuzzy(token: String): IngredientRef {
+    private suspend fun matchDetailedParallel(token: String): MatchedToken {
         val early: IngredientRef? = matchWithoutFuzzy(token)
         if (early != null) {
-            return early
+            return MatchedToken(reference = early)
         }
-        val fuzzy: Ingredient? = fuzzyIndex.findParallel(lookupKey(token))
-        return finishMatch(token, fuzzy)
+        return finishMatch(token, fuzzyIndex.findHitParallel(lookupKey(token)))
     }
 
     private fun lookupKey(rawToken: String): String {
@@ -81,11 +84,16 @@ class IngredientMatcher(
         return null
     }
 
-    private fun finishMatch(rawToken: String, fuzzy: Ingredient?): IngredientRef {
+    private fun finishMatch(rawToken: String, fuzzy: FuzzyHit?): MatchedToken {
         if (fuzzy != null) {
-            return IngredientRef(id = fuzzy.id, displayName = fuzzy.inciName, matchedBy = MatchMethod.FUZZY)
+            val reference: IngredientRef = IngredientRef(
+                id = fuzzy.ingredient.id,
+                displayName = fuzzy.ingredient.inciName,
+                matchedBy = MatchMethod.FUZZY
+            )
+            return MatchedToken(reference = reference, fuzzy = fuzzy)
         }
-        return unmatched(rawToken)
+        return MatchedToken(reference = unmatched(rawToken))
     }
 
     private fun exactMatch(normalized: String): IngredientRef? {

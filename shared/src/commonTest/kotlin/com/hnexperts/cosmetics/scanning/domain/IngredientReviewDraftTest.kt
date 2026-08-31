@@ -13,6 +13,8 @@ class IngredientReviewDraftTest {
         assertEquals("NIACINAM1DE", pending.inciName())
         val accepted: ReviewToken = pending.copy(fuzzyDecision = FuzzyDecision.ACCEPTED)
         assertEquals("Niacinamide", accepted.inciName())
+        val autoAccepted: ReviewToken = pending.copy(fuzzyDecision = FuzzyDecision.AUTO_ACCEPTED)
+        assertEquals("Niacinamide", autoAccepted.inciName())
         val rejected: ReviewToken = pending.copy(fuzzyDecision = FuzzyDecision.REJECTED)
         assertEquals("NIACINAM1DE", rejected.inciName())
     }
@@ -43,6 +45,12 @@ class IngredientReviewDraftTest {
         assertTrue(draft.hasPendingFuzzy())
         assertEquals("NIACINAM1DE", draft.toInciRaw())
         assertFalse(draft.copy(tokens = listOf(draft.tokens[0].copy(fuzzyDecision = FuzzyDecision.ACCEPTED))).hasPendingFuzzy())
+        val autoFilled: IngredientReviewDraft = draft.copy(
+            tokens = listOf(draft.tokens[0].copy(fuzzyDecision = FuzzyDecision.AUTO_ACCEPTED))
+        )
+        assertFalse(autoFilled.hasPendingFuzzy())
+        assertTrue(autoFilled.hasAutoFilledFuzzy())
+        assertEquals("Niacinamide", autoFilled.toInciRaw())
     }
 
     private fun token(
