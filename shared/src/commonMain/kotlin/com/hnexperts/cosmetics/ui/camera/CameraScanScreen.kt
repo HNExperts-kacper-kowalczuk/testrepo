@@ -185,6 +185,12 @@ private fun CameraControls(
                     onClick = viewModel::captureStill,
                     enabled = uiState.permission == CameraPermissionStatus.GRANTED && !uiState.busy
                 )
+                GalleryStillButton(
+                    enabled = !uiState.busy,
+                    onFrame = viewModel::onGalleryStill,
+                    onEmpty = viewModel::onGalleryStillEmpty,
+                    onCancel = viewModel::onGalleryCancelled
+                )
             } else {
                 GalleryBarcodeButton(
                     enabled = !uiState.busy,

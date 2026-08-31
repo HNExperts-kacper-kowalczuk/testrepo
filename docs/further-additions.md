@@ -202,7 +202,7 @@ A later “supporter” IAP is cleaner than putting paywalls on safety data.
 
 Catalog scale, four-corner INCI OCR, and Fitatu-inspired UI: **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done). Bundled catalog through share/gallery polish: **[plan-next-phases.md](plan-next-phases.md)** (phases 1–5, shipped).
 
-Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–26 in **[plan-after-twenty.md](plan-after-twenty.md)** and **[plan-after-twenty-three.md](plan-after-twenty-three.md)** are shipped. Next slice: **[plan-after-twenty-six.md](plan-after-twenty-six.md)** (typed INCI confirm, Result unmatched pick, gallery INCI).
+Phases 6–15 in **[plan-further-improvements.md](plan-further-improvements.md)** and 16–20 in **[plan-after-fifteen.md](plan-after-fifteen.md)** are **shipped**. Phases 21–26 in **[plan-after-twenty.md](plan-after-twenty.md)** and **[plan-after-twenty-three.md](plan-after-twenty-three.md)** are shipped. Phases 27–29 in **[plan-after-twenty-six.md](plan-after-twenty-six.md)** (typed INCI confirm, Result unmatched pick, gallery INCI) are this stack.
 
 Still out of git: real Remove-ads IAP, production AdMob / sync URLs, vegan/cruelty as safety scores, foldables, CJK OCR.
 

@@ -4,8 +4,6 @@ import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.domain.CameraFrame
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.usePinned
 import platform.AVFoundation.AVCaptureConnection
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVCaptureDeviceInput
@@ -184,24 +182,5 @@ private class PhotoDelegate(
                 rotationDegrees = 0
             )
         )
-    }
-}
-
-@OptIn(ExperimentalForeignApi::class)
-private fun NSData.toByteArray(): ByteArray {
-    val size: Int = length.toInt()
-    val result = ByteArray(size)
-    if (size == 0) {
-        return result
-    }
-    memcpyBytes(result, this)
-    return result
-}
-
-@OptIn(ExperimentalForeignApi::class)
-private fun memcpyBytes(target: ByteArray, data: NSData) {
-    val pointer = data.bytes ?: return
-    target.usePinned { pinned ->
-        platform.posix.memcpy(pinned.addressOf(0), pointer, data.length)
     }
 }

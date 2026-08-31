@@ -207,8 +207,9 @@
     <string name="camera_title_barcode">Skanuj kod kreskowy</string>
     <string name="camera_title_inci">Skanuj skład</string>
     <string name="camera_gallery">Wybierz z galerii</string>
+    <string name="camera_gallery_inci">Wybierz zdjęcie składu</string>
     <string name="camera_hint_barcode">Skieruj aparat na kod EAN lub UPC. Kodów spoza katalogu szukamy online, gdy jest połączenie. Reklamy nie pojawiają się na tym ekranie.</string>
-    <string name="camera_hint_inci">Wypłaszcz etykietę, a potem zrób zdjęcie bloku INCI / składu.</string>
+    <string name="camera_hint_inci">Wypłaszcz etykietę, a potem zrób zdjęcie bloku INCI / składu albo wybierz zdjęcie z galerii.</string>
     <string name="camera_capture">Zrób zdjęcie składu</string>
     <string name="crop_title">Zaznacz listę składników</string>
     <string name="crop_hint">Przeciągnij narożnik albo wybierz go i użyj strzałek. Umieść je wokół listy zaczynającej się od „Ingredients” lub „Skład”.</string>
