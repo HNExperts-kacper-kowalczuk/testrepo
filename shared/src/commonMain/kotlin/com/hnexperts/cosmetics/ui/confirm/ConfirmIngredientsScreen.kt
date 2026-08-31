@@ -41,6 +41,7 @@ import com.hnexperts.cosmetics.resources.confirm_fuzzy_change
 import com.hnexperts.cosmetics.resources.confirm_fuzzy_prompt
 import com.hnexperts.cosmetics.resources.confirm_fuzzy_reject
 import com.hnexperts.cosmetics.resources.confirm_pending_fuzzy
+import com.hnexperts.cosmetics.resources.confirm_pick_ingredient
 import com.hnexperts.cosmetics.resources.confirm_raw_label
 import com.hnexperts.cosmetics.resources.confirm_remove
 import com.hnexperts.cosmetics.resources.confirm_title
@@ -120,6 +121,7 @@ fun ConfirmIngredientsScreen(
                         onAcceptFuzzy = { viewModel.acceptFuzzy(token.key) },
                         onChangeAutoFilled = { viewModel.changeAutoFilled(token.key) },
                         onRejectFuzzy = { viewModel.rejectFuzzy(token.key) },
+                        onPickIngredient = { viewModel.openPicker(token.key) },
                         onRemove = { viewModel.removeToken(token.key) }
                     )
                 }
@@ -153,6 +155,14 @@ fun ConfirmIngredientsScreen(
             }
         }
     }
+    uiState.picker?.let { picker ->
+        ConfirmIngredientPickerSheet(
+            picker = picker,
+            onQueryChange = viewModel::updatePickerQuery,
+            onPick = viewModel::pickSuggestion,
+            onDismiss = viewModel::dismissPicker
+        )
+    }
 }
 
 @Composable
@@ -163,6 +173,7 @@ private fun TokenEditor(
     onAcceptFuzzy: () -> Unit,
     onChangeAutoFilled: () -> Unit,
     onRejectFuzzy: () -> Unit,
+    onPickIngredient: () -> Unit,
     onRemove: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
@@ -183,6 +194,11 @@ private fun TokenEditor(
             onChangeAutoFilled = onChangeAutoFilled,
             onRejectFuzzy = onRejectFuzzy
         )
+        if (token.canPickFromCatalog()) {
+            TextButton(onClick = onPickIngredient, enabled = enabled) {
+                Text(stringResource(Res.string.confirm_pick_ingredient))
+            }
+        }
         AppIconButton(
             imageVector = Icons.Filled.Delete,
             contentDescription = stringResource(Res.string.confirm_remove),

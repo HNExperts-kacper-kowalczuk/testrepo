@@ -122,6 +122,14 @@ class IngredientMatcherTest {
     }
 
     @Test
+    fun suggestReturnsNearbyCatalogNamesForATypo() {
+        val hits: List<FuzzyHit> = matcher.suggest("NIACINAM1DE", limit = 5)
+        assertTrue(hits.isNotEmpty())
+        assertEquals("niacinamide", hits.first().ingredient.id)
+        assertEquals(1, hits.first().distance)
+    }
+
+    @Test
     fun doesNotFuzzyMatchShortUnknownTokens() {
         val ref: IngredientRef = matcher.matchToken("XYZ")
         assertEquals(MatchMethod.UNMATCHED, ref.matchedBy)

@@ -175,6 +175,7 @@
     <string name="a11y_open_result">Otwórz wynik</string>
     <string name="a11y_open_product">Otwórz produkt</string>
     <string name="a11y_open_ingredient">Otwórz składnik</string>
+    <string name="a11y_pick_ingredient">Wybierz %1$s</string>
 
     <string name="usage_prompt">Jak używasz tego produktu?</string>
     <string name="usage_leave_on">Leave-on</string>
@@ -241,7 +242,12 @@
     <string name="confirm_fuzzy_auto">Odczytano „%1$s” jako %2$s (uzupełnione automatycznie).</string>
     <string name="confirm_fuzzy_change">Zmień</string>
     <string name="confirm_auto_filled_note">Niektóre nazwy uzupełniono z OCR. Sprawdź je przed oceną.</string>
-    <string name="confirm_pending_fuzzy">Zaakceptuj lub odrzuć każdą podpowiedź przed oceną.</string>
+    <string name="confirm_pending_fuzzy">Zaakceptuj, odrzuć lub wybierz nazwę z bazy dla każdej podpowiedzi przed oceną.</string>
+    <string name="confirm_pick_ingredient">Wybierz składnik</string>
+    <string name="confirm_suggestions_empty">Brak pasujących nazw. Spróbuj innej pisowni.</string>
+    <string name="confirm_suggestion_nearby">Podobne nazwy</string>
+    <string name="confirm_suggestion_search">Wyniki wyszukiwania</string>
+    <string name="confirm_suggestions_working">Szukam nazw…</string>
     <string name="confirm_add">Dodaj składnik</string>
     <string name="confirm_remove">Usuń</string>
     <string name="confirm_evaluate">Oceń skład</string>

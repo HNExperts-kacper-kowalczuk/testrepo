@@ -31,6 +31,19 @@ data class ReviewToken(
         }
         return rawText
     }
+
+    fun canPickFromCatalog(): Boolean {
+        return fuzzyDecision == FuzzyDecision.PENDING || matchMethod == MatchMethod.UNMATCHED
+    }
+
+    fun withCatalogPick(id: String, inciName: String): ReviewToken {
+        return copy(
+            suggestedName = inciName,
+            matchedIngredientId = id,
+            matchMethod = MatchMethod.EXACT,
+            fuzzyDecision = FuzzyDecision.NOT_APPLICABLE
+        )
+    }
 }
 
 data class IngredientReviewDraft(

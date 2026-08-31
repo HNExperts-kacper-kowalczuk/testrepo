@@ -23,7 +23,22 @@ internal class FuzzyIngredientIndex(
         if (normalized.length < MIN_FUZZY_LENGTH) {
             return null
         }
-        return hitFrom(topTwo(normalized, names + aliases))
+        return hitFrom(topN(normalized, names + aliases, UNIQUE_RIVAL_LIMIT))
+    }
+
+    fun findHits(normalized: String, limit: Int): List<FuzzyHit> {
+        if (normalized.length < MIN_FUZZY_LENGTH || limit <= 0) {
+            return emptyList()
+        }
+        val ranked: List<RankedName> = topN(normalized, names + aliases, limit)
+        val unique: Boolean = ranked.size == 1
+        return ranked.map { item ->
+            FuzzyHit(
+                ingredient = item.indexed.ingredient,
+                distance = item.distance,
+                unique = unique
+            )
+        }
     }
 
     suspend fun findParallel(normalized: String): Ingredient? {
@@ -42,11 +57,15 @@ internal class FuzzyIngredientIndex(
             items = candidates.chunked(fuzzyChunkSize(candidates.size)),
             threshold = 2,
             workerCount = ParallelMapper.DEFAULT_WORKER_COUNT
-        ) { chunk -> topTwo(normalized, chunk) }
-        return hitFrom(bestTwoDistinct(chunkHits.flatten()))
+        ) { chunk -> topN(normalized, chunk, UNIQUE_RIVAL_LIMIT) }
+        return hitFrom(bestDistinct(chunkHits.flatten(), UNIQUE_RIVAL_LIMIT))
     }
 
-    private fun topTwo(normalized: String, candidates: List<IndexedName>): List<RankedName> {
+    private fun topN(
+        normalized: String,
+        candidates: List<IndexedName>,
+        limit: Int
+    ): List<RankedName> {
         val maxDistance: Int = maxDistanceFor(normalized)
         val ranked: MutableList<RankedName> = mutableListOf()
         for (candidate in candidates) {
@@ -57,12 +76,12 @@ internal class FuzzyIngredientIndex(
             if (distance > maxDistance) {
                 continue
             }
-            insertRanked(ranked, RankedName(candidate, distance))
+            insertRanked(ranked, RankedName(candidate, distance), limit)
         }
         return ranked
     }
 
-    private fun insertRanked(ranked: MutableList<RankedName>, incoming: RankedName) {
+    private fun insertRanked(ranked: MutableList<RankedName>, incoming: RankedName, limit: Int) {
         val sameId: Int = ranked.indexOfFirst { item ->
             item.indexed.ingredient.id == incoming.indexed.ingredient.id
         }
@@ -72,7 +91,7 @@ internal class FuzzyIngredientIndex(
         }
         ranked.add(incoming)
         ranked.sortBy { item -> item.distance }
-        trimToTopTwo(ranked)
+        trimToLimit(ranked, limit)
     }
 
     private fun replaceIfCloser(ranked: MutableList<RankedName>, index: Int, incoming: RankedName) {
@@ -83,16 +102,16 @@ internal class FuzzyIngredientIndex(
         ranked.sortBy { item -> item.distance }
     }
 
-    private fun trimToTopTwo(ranked: MutableList<RankedName>) {
-        while (ranked.size > 2) {
+    private fun trimToLimit(ranked: MutableList<RankedName>, limit: Int) {
+        while (ranked.size > limit) {
             ranked.removeAt(ranked.lastIndex)
         }
     }
 
-    private fun bestTwoDistinct(ranked: List<RankedName>): List<RankedName> {
+    private fun bestDistinct(ranked: List<RankedName>, limit: Int): List<RankedName> {
         val compact: MutableList<RankedName> = mutableListOf()
         for (item in ranked.sortedBy { rankedName -> rankedName.distance }) {
-            insertRanked(compact, item)
+            insertRanked(compact, item, limit)
         }
         return compact
     }
@@ -127,6 +146,7 @@ internal class FuzzyIngredientIndex(
 
     private companion object {
         const val MIN_FUZZY_LENGTH: Int = 5
+        const val UNIQUE_RIVAL_LIMIT: Int = 2
         const val PARALLEL_CANDIDATE_THRESHOLD: Int = 256
     }
 }

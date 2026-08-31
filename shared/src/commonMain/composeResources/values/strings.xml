@@ -175,6 +175,7 @@
     <string name="a11y_open_result">Open result</string>
     <string name="a11y_open_product">Open product</string>
     <string name="a11y_open_ingredient">Open ingredient</string>
+    <string name="a11y_pick_ingredient">Choose %1$s</string>
 
     <string name="usage_prompt">How is this product used?</string>
     <string name="usage_leave_on">Leave-on</string>
@@ -241,7 +242,12 @@
     <string name="confirm_fuzzy_auto">Read “%1$s” as %2$s (auto-filled).</string>
     <string name="confirm_fuzzy_change">Change</string>
     <string name="confirm_auto_filled_note">Some names were filled in from OCR. Check them before evaluating.</string>
-    <string name="confirm_pending_fuzzy">Accept or reject each suggested match before evaluating.</string>
+    <string name="confirm_pending_fuzzy">Accept, reject, or pick a catalog name for each suggested match before evaluating.</string>
+    <string name="confirm_pick_ingredient">Pick an ingredient</string>
+    <string name="confirm_suggestions_empty">No catalog names match yet. Try another spelling.</string>
+    <string name="confirm_suggestion_nearby">Close matches</string>
+    <string name="confirm_suggestion_search">Search results</string>
+    <string name="confirm_suggestions_working">Looking up names…</string>
     <string name="confirm_add">Add ingredient</string>
     <string name="confirm_remove">Remove</string>
     <string name="confirm_evaluate">Evaluate list</string>

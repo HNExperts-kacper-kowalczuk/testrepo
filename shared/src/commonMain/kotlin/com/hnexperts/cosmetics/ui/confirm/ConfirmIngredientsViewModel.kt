@@ -8,21 +8,35 @@ import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
 import com.hnexperts.cosmetics.scanning.application.IngredientReviewSession
 import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
+import com.hnexperts.cosmetics.scanning.application.SuggestReviewIngredients
 import com.hnexperts.cosmetics.scanning.application.VerifyRequest
 import com.hnexperts.cosmetics.scanning.domain.CatalogReport
 import com.hnexperts.cosmetics.scanning.domain.FuzzyDecision
 import com.hnexperts.cosmetics.scanning.domain.InciTokenSet
 import com.hnexperts.cosmetics.scanning.domain.IngredientReviewDraft
+import com.hnexperts.cosmetics.scanning.domain.IngredientSuggestion
 import com.hnexperts.cosmetics.scanning.domain.ReportKinds
 import com.hnexperts.cosmetics.scanning.domain.ReportQueue
 import com.hnexperts.cosmetics.scanning.domain.ReviewDraftMerger
+import com.hnexperts.cosmetics.scanning.domain.ReviewSuggestionLists
 import com.hnexperts.cosmetics.scanning.domain.ReviewToken
 import com.hnexperts.cosmetics.ui.runUiAction
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+data class ConfirmPickerState(
+    val tokenKey: Long,
+    val rawText: String,
+    val query: String = "",
+    val nearby: List<IngredientSuggestion> = emptyList(),
+    val search: List<IngredientSuggestion> = emptyList(),
+    val busy: Boolean = false
+)
 
 data class ConfirmUiState(
     val draft: IngredientReviewDraft? = null,
@@ -32,17 +46,20 @@ data class ConfirmUiState(
     val photoCount: Int = 1,
     val canAddPhoto: Boolean = true,
     val navigateToResult: Boolean = false,
-    val navigateToCamera: Boolean = false
+    val navigateToCamera: Boolean = false,
+    val picker: ConfirmPickerState? = null
 )
 
 class ConfirmIngredientsViewModel(
     private val reviewSession: IngredientReviewSession,
     private val pendingVerify: PendingVerifySession,
     private val evaluateProduct: EvaluateProduct,
-    private val reports: ReportQueue
+    private val reports: ReportQueue,
+    private val suggestReviewIngredients: SuggestReviewIngredients
 ) : ViewModel() {
     private val state: MutableStateFlow<ConfirmUiState> = MutableStateFlow(ConfirmUiState())
     val uiState: StateFlow<ConfirmUiState> = state.asStateFlow()
+    private var suggestJob: Job? = null
 
     init {
         viewModelScope.launch { loadDraft() }
@@ -94,6 +111,37 @@ class ConfirmIngredientsViewModel(
             )
             draft.copy(tokens = draft.tokens + token, nextKey = draft.nextKey + 1L)
         }
+    }
+
+    fun openPicker(key: Long) {
+        val token: ReviewToken = tokenByKey(key) ?: return
+        if (!token.canPickFromCatalog()) {
+            return
+        }
+        startSuggestionLoad(
+            picker = ConfirmPickerState(tokenKey = key, rawText = token.rawText, busy = true),
+            debounceMs = 0L
+        )
+    }
+
+    fun updatePickerQuery(query: String) {
+        val picker: ConfirmPickerState = state.value.picker ?: return
+        startSuggestionLoad(
+            picker = picker.copy(query = query),
+            debounceMs = QUERY_DEBOUNCE_MS
+        )
+    }
+
+    fun pickSuggestion(suggestion: IngredientSuggestion) {
+        val picker: ConfirmPickerState = state.value.picker ?: return
+        cancelSuggestions()
+        replaceToken(picker.tokenKey) { token -> token.withCatalogPick(suggestion.id, suggestion.inciName) }
+        state.update { current -> current.copy(picker = null) }
+    }
+
+    fun dismissPicker() {
+        cancelSuggestions()
+        state.update { current -> current.copy(picker = null) }
     }
 
     fun setUsage(usage: ProductUsage) {
@@ -204,6 +252,55 @@ class ConfirmIngredientsViewModel(
         }
     }
 
+    private fun startSuggestionLoad(picker: ConfirmPickerState, debounceMs: Long) {
+        cancelSuggestions()
+        state.update { current -> current.copy(picker = picker, failure = null) }
+        suggestJob = viewModelScope.launch {
+            if (debounceMs > 0L) {
+                delay(debounceMs)
+            }
+            loadSuggestions(picker.tokenKey, picker.rawText, picker.query)
+        }
+    }
+
+    private suspend fun loadSuggestions(tokenKey: Long, rawText: String, query: String) {
+        val lists: ReviewSuggestionLists? = runUiAction(::showFailure) {
+            suggestReviewIngredients.invoke(rawText, query)
+        }
+        state.update { current -> applySuggestionLists(current, tokenKey, query, lists) }
+    }
+
+    private fun applySuggestionLists(
+        current: ConfirmUiState,
+        tokenKey: Long,
+        query: String,
+        lists: ReviewSuggestionLists?
+    ): ConfirmUiState {
+        val picker: ConfirmPickerState = current.picker ?: return current
+        if (picker.tokenKey != tokenKey || picker.query != query) {
+            return current
+        }
+        if (lists == null) {
+            return current.copy(picker = picker.copy(busy = false))
+        }
+        return current.copy(
+            picker = picker.copy(
+                nearby = lists.nearby,
+                search = lists.search,
+                busy = false
+            )
+        )
+    }
+
+    private fun tokenByKey(key: Long): ReviewToken? {
+        return state.value.draft?.tokens?.firstOrNull { token -> token.key == key }
+    }
+
+    private fun cancelSuggestions() {
+        suggestJob?.cancel()
+        suggestJob = null
+    }
+
     private fun replaceToken(key: Long, transform: (ReviewToken) -> ReviewToken) {
         mutateDraft { draft ->
             draft.copy(tokens = draft.tokens.map { token -> if (token.key == key) transform(token) else token })
@@ -219,5 +316,9 @@ class ConfirmIngredientsViewModel(
 
     private fun showFailure(failure: AppFailure) {
         state.update { current -> current.copy(failure = failure) }
+    }
+
+    private companion object {
+        const val QUERY_DEBOUNCE_MS: Long = 250L
     }
 }
