@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FlashOff
-import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +40,7 @@ import com.hnexperts.cosmetics.resources.scan_looking_up
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
 import com.hnexperts.cosmetics.scanning.domain.ScannerMode
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.AppBackButton
 import com.hnexperts.cosmetics.ui.chrome.AppIconButton
 import com.hnexperts.cosmetics.ui.common.BusyStatus
@@ -172,7 +169,7 @@ private fun CameraControls(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             AppIconButton(
-                imageVector = if (uiState.torchOn) Icons.Filled.FlashOn else Icons.Filled.FlashOff,
+                imageVector = if (uiState.torchOn) AppActionIcons.FlashOn else AppActionIcons.FlashOff,
                 contentDescription = if (uiState.torchOn) {
                     stringResource(Res.string.camera_torch_on)
                 } else {
@@ -183,7 +180,7 @@ private fun CameraControls(
             )
             if (uiState.mode == ScannerMode.INGREDIENT_LIST) {
                 AppIconButton(
-                    imageVector = Icons.Filled.PhotoCamera,
+                    imageVector = AppActionIcons.Camera,
                     contentDescription = stringResource(Res.string.camera_capture),
                     onClick = viewModel::captureStill,
                     enabled = uiState.permission == CameraPermissionStatus.GRANTED && !uiState.busy

@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DocumentScanner
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +29,7 @@ import com.hnexperts.cosmetics.resources.scan_title
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.ui.a11y.screenHeading
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.BusyStatus
 import com.hnexperts.cosmetics.ui.common.FailureBanner
@@ -72,7 +70,7 @@ fun ScanScreen(
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
         ) {
             ButtonIconLabel(
-                imageVector = Icons.Filled.QrCodeScanner,
+                imageVector = AppActionIcons.Barcode,
                 text = stringResource(Res.string.scan_open_barcode)
             )
         }
@@ -82,7 +80,7 @@ fun ScanScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             ButtonIconLabel(
-                imageVector = Icons.Filled.DocumentScanner,
+                imageVector = AppActionIcons.Document,
                 text = stringResource(Res.string.scan_open_inci)
             )
         }
@@ -128,7 +126,7 @@ private fun NotFoundCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 ButtonIconLabel(
-                    imageVector = Icons.Filled.DocumentScanner,
+                    imageVector = AppActionIcons.Document,
                     text = stringResource(Res.string.scan_open_inci)
                 )
             }

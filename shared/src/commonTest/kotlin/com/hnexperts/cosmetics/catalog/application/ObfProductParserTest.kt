@@ -63,6 +63,24 @@ class ObfProductParserTest {
     }
 
     @Test
+    fun usesStructuredIngredientsWhenTextFieldsAreMissing() {
+        val hit: OnlineGtinHit = ObfProductParser.parse(
+            gtin = "5901234123457",
+            body = """{"status":1,"product":{
+              "product_name_pl":"Krem",
+              "ingredients":[
+                {"text":"Aqua"},
+                {"id":"en:glycerin"},
+                {"text":"Panthenol"},
+                {"text":"Niacinamide"}
+              ]
+            }}"""
+        )
+        val found = assertIs<OnlineGtinHit.WithIngredients>(hit)
+        assertEquals("Aqua, glycerin, Panthenol, Niacinamide", found.inciRaw)
+    }
+
+    @Test
     fun prefersEnglishIngredientText() {
         val hit: OnlineGtinHit = ObfProductParser.parse(
             gtin = "1",

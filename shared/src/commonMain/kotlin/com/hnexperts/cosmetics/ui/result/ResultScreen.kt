@@ -11,9 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +54,7 @@ import com.hnexperts.cosmetics.resources.result_unknown_count
 import com.hnexperts.cosmetics.resources.result_usage_pick
 import com.hnexperts.cosmetics.resources.share_scanned_at
 import com.hnexperts.cosmetics.resources.share_scanned_product
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.AppBackButton
 import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
@@ -169,7 +168,7 @@ private fun LazyListScope.resultActions(
             modifier = Modifier.fillMaxWidth()
         ) {
             ButtonIconLabel(
-                imageVector = Icons.Filled.PhotoCamera,
+                imageVector = AppActionIcons.Camera,
                 text = stringResource(Res.string.result_check_label)
             )
         }
@@ -180,7 +179,7 @@ private fun LazyListScope.resultActions(
             modifier = Modifier.fillMaxWidth()
         ) {
             ButtonIconLabel(
-                imageVector = if (uiState.onShelf) Icons.Filled.Star else Icons.Filled.StarBorder,
+                imageVector = Icons.Filled.Star,
                 text = if (uiState.onShelf) {
                     stringResource(Res.string.result_shelf_remove)
                 } else {

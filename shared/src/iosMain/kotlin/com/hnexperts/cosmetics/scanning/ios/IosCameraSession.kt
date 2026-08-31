@@ -45,6 +45,7 @@ class IosCameraSession(
     private val session: AVCaptureSession = AVCaptureSession()
     private val photoOutput: AVCapturePhotoOutput = AVCapturePhotoOutput()
     private var previewLayer: AVCaptureVideoPreviewLayer? = null
+    private var previewContainer: IosPreviewContainer? = null
     private var lastNonce: Int = 0
     private val metadataDelegate = MetadataDelegate(
         onBarcode = onBarcode,
@@ -68,6 +69,7 @@ class IosCameraSession(
         view.layer.addSublayer(layer)
         view.previewLayer = layer
         previewLayer = layer
+        previewContainer = view
         view.syncLayerFrame()
     }
 
@@ -78,6 +80,9 @@ class IosCameraSession(
         started = true
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT.toLong(), 0u)) {
             session.startRunning()
+            dispatch_async(dispatch_get_main_queue()) {
+                previewContainer?.syncLayerFrame()
+            }
         }
     }
 
@@ -130,6 +135,7 @@ class IosCameraSession(
     fun release() {
         session.stopRunning()
         previewLayer?.removeFromSuperlayer()
+        previewContainer = null
     }
 }
 

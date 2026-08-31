@@ -19,8 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,6 +64,7 @@ import com.hnexperts.cosmetics.resources.crop_use
 import com.hnexperts.cosmetics.resources.scan_working
 import com.hnexperts.cosmetics.scanning.domain.QuadCorner
 import com.hnexperts.cosmetics.scanning.domain.SelectionQuad
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.AppBackButton
 import com.hnexperts.cosmetics.ui.chrome.AppIconButton
 import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
@@ -264,13 +264,13 @@ private fun CropControls(
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             AppIconButton(
-                imageVector = Icons.Filled.RestartAlt,
+                imageVector = Icons.Filled.Refresh,
                 contentDescription = stringResource(Res.string.crop_reset),
                 onClick = viewModel::resetQuad,
                 enabled = !uiState.busy
             )
             AppIconButton(
-                imageVector = Icons.Filled.PhotoCamera,
+                imageVector = AppActionIcons.Camera,
                 contentDescription = stringResource(Res.string.crop_retake),
                 onClick = onRetake,
                 enabled = !uiState.busy

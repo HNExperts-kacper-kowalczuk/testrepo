@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,6 +13,7 @@ import com.hnexperts.cosmetics.evaluation.application.ShareCopy
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.result_share
 import com.hnexperts.cosmetics.resources.result_share_image
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.AppIconButton
 import org.jetbrains.compose.resources.stringResource
 
@@ -33,7 +33,7 @@ fun ResultShareActions(
             onClick = { viewModel.share(copy) }
         )
         AppIconButton(
-            imageVector = Icons.Filled.Image,
+            imageVector = AppActionIcons.Image,
             contentDescription = stringResource(Res.string.result_share_image),
             onClick = { viewModel.shareImage(copy) }
         )
