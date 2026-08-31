@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import androidx.compose.ui.viewinterop.UIKitView
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
@@ -20,7 +22,7 @@ import platform.AVFoundation.AVAuthorizationStatusRestricted
 import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVMediaTypeVideo
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, ExperimentalComposeUiApi::class)
 @Composable
 actual fun CameraPreviewHost(
     mode: ScannerMode,
@@ -63,7 +65,8 @@ actual fun CameraPreviewHost(
             view
         },
         modifier = modifier,
-        update = { view -> session.layout(view) }
+        update = { view -> session.layout(view) },
+        properties = UIKitInteropProperties(placedAsOverlay = enabled)
     )
 }
 

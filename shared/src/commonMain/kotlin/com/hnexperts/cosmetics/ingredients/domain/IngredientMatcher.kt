@@ -17,9 +17,12 @@ class IngredientMatcher(
         InciNormalizer.normalize(alias) to ingredient
     }.toMap()
     private val fuzzyIndex: FuzzyIngredientIndex = FuzzyIngredientIndex(ingredients, aliasToIngredient)
+    private val packedSplitter: PackedInciSplitter = PackedInciSplitter(
+        byNormalizedName.keys + aliasToIngredient.keys
+    )
 
     fun tokenize(inciRaw: String): List<String> {
-        return tokenizer.tokenize(inciRaw)
+        return expandPacked(tokenizer.tokenize(inciRaw))
     }
 
     fun matchList(inciRaw: String): List<IngredientRef> {
@@ -35,6 +38,10 @@ class IngredientMatcher(
             return matchShortListWithParallelFuzzy(tokens)
         }
         return tokens.map { token -> matchToken(token) }
+    }
+
+    private fun expandPacked(tokens: List<String>): List<String> {
+        return tokens.flatMap { token -> packedSplitter.split(token) ?: listOf(token) }
     }
 
     fun matchToken(rawToken: String): IngredientRef {

@@ -18,6 +18,18 @@ class PolishProductOverlayTest {
     }
 
     @Test
+    fun includesManufacturerPublishedPolishGtins() {
+        assertTrue(PolishProductOverlay.products.size >= 8)
+        assertNotNull(product("5901887049449"))
+        assertNotNull(product("5901887007210"))
+        assertNotNull(product("5901887009924"))
+        val mint = product("5901887049449")
+        assertEquals("Ziaja", mint.product.brand)
+        assertTrue(mint.product.verified)
+        assertTrue(mint.product.inciRaw.contains("Decyl Glucoside"))
+    }
+
+    @Test
     fun everyOverlayRowHasAUsableInciAndGs1PolandGtin() {
         assertTrue(PolishProductOverlay.dump.region == "PL")
         assertTrue(PolishProductOverlay.products.isNotEmpty())

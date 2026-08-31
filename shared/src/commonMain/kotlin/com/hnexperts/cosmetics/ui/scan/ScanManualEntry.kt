@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +29,7 @@ import com.hnexperts.cosmetics.resources.scan_inci_action
 import com.hnexperts.cosmetics.resources.scan_inci_label
 import com.hnexperts.cosmetics.resources.scan_invalid_barcode
 import com.hnexperts.cosmetics.resources.scan_more_ways
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.motion.Reveal
@@ -106,7 +106,7 @@ internal fun ManualEntrySection(viewModel: ScanViewModel, uiState: ScanUiState) 
                 modifier = Modifier.fillMaxWidth()
             ) {
                 ButtonIconLabel(
-                    imageVector = Icons.Filled.DocumentScanner,
+                    imageVector = AppActionIcons.Document,
                     text = stringResource(Res.string.scan_inci_action)
                 )
             }

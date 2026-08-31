@@ -146,4 +146,35 @@ class IngredientMatcherTest {
         val contains: List<IngredientRef> = matcher.matchList("Aqua, Parfum. Contains: Limonene, Linalool")
         assertEquals(listOf("aqua", "parfum", "limonene", "linalool"), contains.map { ref -> ref.id })
     }
+
+    @Test
+    fun splitsPackedSpaceSeparatedListIntoKnownIngredients() {
+        val refs: List<IngredientRef> = matcher.matchList("AQUA ALCOHOL DENAT. GLYCERIN")
+        assertEquals(listOf("aqua", "alcohol-denat", "glycerin"), refs.map { ref -> ref.id })
+        assertTrue(refs.none { ref -> ref.matchedBy == MatchMethod.UNMATCHED })
+    }
+
+    @Test
+    fun packedUnknownWordKeepsTheBlobUnmatched() {
+        val refs: List<IngredientRef> = matcher.matchList("AQUA COMPLETELYUNKNOWNSTUFF GLYCERIN")
+        assertEquals(1, refs.size)
+        assertEquals(MatchMethod.UNMATCHED, refs[0].matchedBy)
+    }
+
+    @Test
+    fun splitsBulletAndNewlineSeparatedLists() {
+        val bullets: List<IngredientRef> = matcher.matchList("Aqua • Glycerin • Niacinamide")
+        assertEquals(listOf("aqua", "glycerin", "niacinamide"), bullets.map { ref -> ref.id })
+        val lines: List<IngredientRef> = matcher.matchList("Aqua\nGlycerin\nNiacinamide")
+        assertEquals(listOf("aqua", "glycerin", "niacinamide"), lines.map { ref -> ref.id })
+    }
+
+    @Test
+    fun packedSplitDoesNotBreakCompoundSlashNames() {
+        val refs: List<IngredientRef> = matcher.matchList("Aqua Caprylic/Capric Triglyceride Glycerin")
+        assertEquals(
+            listOf("aqua", "caprylic-capric-triglyceride", "glycerin"),
+            refs.map { ref -> ref.id }
+        )
+    }
 }

@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ListItem
@@ -49,6 +47,7 @@ import com.hnexperts.cosmetics.resources.a11y_open_result
 import com.hnexperts.cosmetics.scanning.domain.HistoryEntry
 import com.hnexperts.cosmetics.shelf.domain.ShelfItem
 import com.hnexperts.cosmetics.ui.a11y.screenHeading
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
@@ -194,7 +193,7 @@ private fun CompareBar(uiState: HistoryUiState, onCompare: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             ButtonIconLabel(
-                imageVector = Icons.AutoMirrored.Filled.CompareArrows,
+                imageVector = AppActionIcons.Compare,
                 text = stringResource(Res.string.compare_action)
             )
         }

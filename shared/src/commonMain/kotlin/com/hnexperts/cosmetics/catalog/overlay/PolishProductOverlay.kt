@@ -8,17 +8,13 @@ import com.hnexperts.cosmetics.catalog.pipeline.ObfProductRecord
 /**
  * Curated GS1 Poland (590) barcodes that Open Beauty Facts often lacks.
  * Manufacturer INCI when the brand publishes it; otherwise a labelled
- * 400 ml transcript with [ObfProductRecord.verified] false — the pack wins.
+ * transcript with [ObfProductRecord.verified] false — the pack wins.
  */
 object PolishProductOverlay {
     const val SOURCE_MANUFACTURER: String = "pl-manufacturer"
     const val SOURCE_LABEL: String = "pl-label"
 
-    val records: List<ObfProductRecord> = listOf(
-        bambinoRodzinaMirabelka400(),
-        ziajaAntyperspirantSensitiv(),
-        ziajaAntyperspirantSoft()
-    )
+    val records: List<ObfProductRecord> = listOf(bambinoRodzinaMirabelka400()) + PolishZiajaOverlay.records
 
     val dump: ObfProductDump = ObfProductDump(
         source = "pl-curated",
@@ -43,51 +39,10 @@ object PolishProductOverlay {
         )
     }
 
-    private fun ziajaAntyperspirantSensitiv(): ObfProductRecord {
-        return ObfProductRecord(
-            id = "pl-ziaja-5901887019367",
-            name = "Ziaja anty-perspirant w kremie Sensitiv 60 ml",
-            brand = "Ziaja",
-            category = "deodorant",
-            inciRaw = ZIAJA_SENSITIV_INCI,
-            usage = "LEAVE_ON",
-            source = SOURCE_MANUFACTURER,
-            verified = true,
-            gtins = listOf("5901887019367")
-        )
-    }
-
-    private fun ziajaAntyperspirantSoft(): ObfProductRecord {
-        return ObfProductRecord(
-            id = "pl-ziaja-5901887019374",
-            name = "Ziaja anty-perspirant w kremie Soft 60 ml",
-            brand = "Ziaja",
-            category = "deodorant",
-            inciRaw = ZIAJA_SOFT_INCI,
-            usage = "LEAVE_ON",
-            source = SOURCE_MANUFACTURER,
-            verified = true,
-            gtins = listOf("5901887019374")
-        )
-    }
-
     private const val BAMBINO_MIRABELKA_400_INCI: String =
         "Aqua, Sodium Myreth Sulfate, Coco-Glucoside, Cocamidopropyl Betaine, " +
             "Glycerin, Sodium Chloride, Sodium Cocoamphoacetate, Glycine Soja Oil, " +
             "Panthenol, Pantolactone, Glyceryl Oleate, Tocopherol, " +
             "Hydrogenated Palm Glycerides Citrate, Lactic Acid, Citric Acid, " +
             "Disodium EDTA, Sodium Benzoate, Parfum"
-
-    private const val ZIAJA_SENSITIV_INCI: String =
-        "Aqua (Water), Aluminum Chlorohydrate, Dimethicone, Steareth-2, " +
-            "PPG-15 Stearyl Ether, Steareth-21, Parfum (Fragrance), Allantoin, " +
-            "Citronellyl Methylcrotonate, Glyceryl Caprylate, Alpha-Isomethyl Ionone, " +
-            "Coumarin, Linalool"
-
-    private const val ZIAJA_SOFT_INCI: String =
-        "Aqua (Water), Aluminum Chlorohydrate, Steareth-2, PPG-15 Stearyl Ether, " +
-            "Dimethicone, Steareth-21, Parfum (Fragrance), Citronellyl Methylcrotonate, " +
-            "Glyceryl Caprylate, Citrus Aurantium Peel Oil, Limonene, Hexyl Cinnamal, " +
-            "Linalyl Acetate, Alpha-Isomethyl Ionone, Acetyl Cedrene, Linalool, " +
-            "Vanillin, Pinene, Coumarin"
 }

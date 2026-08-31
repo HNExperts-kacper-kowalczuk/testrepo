@@ -3,6 +3,7 @@ package com.hnexperts.cosmetics.catalog.application
 import com.hnexperts.cosmetics.catalog.domain.GtinNormalizer
 import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -41,7 +42,7 @@ object ObfProductParser {
         if (status != 1 && product.isEmpty()) {
             return OnlineGtinHit.NotFound(gtin)
         }
-        val inci: String? = bestInci(product, gtin)
+        val inci: String? = bestInci(product, gtin) ?: ingredientsFromArray(product)
         val name: String? = bestName(product, gtin)
         if (inci == null) {
             return OnlineGtinHit.MissingIngredients(gtin, name)
@@ -81,10 +82,44 @@ object ObfProductParser {
 
     private fun preferredInciKeys(gtin: String): List<String> {
         return if (GtinNormalizer.isGs1Poland(gtin)) {
-            listOf("ingredients_text_pl", "ingredients_text", "ingredients_text_en")
+            listOf(
+                "ingredients_text_pl",
+                "ingredients_text_with_allergens_pl",
+                "ingredients_text",
+                "ingredients_text_with_allergens",
+                "ingredients_text_en"
+            )
         } else {
-            listOf("ingredients_text_en", "ingredients_text")
+            listOf(
+                "ingredients_text_en",
+                "ingredients_text",
+                "ingredients_text_with_allergens"
+            )
         }
+    }
+
+    private fun ingredientsFromArray(product: JsonObject): String? {
+        val array = try {
+            product["ingredients"]?.jsonArray
+        } catch (notArray: Exception) {
+            null
+        } ?: return null
+        val names: List<String> = array.mapNotNull(::ingredientText)
+        if (names.size < 2) {
+            return null
+        }
+        return names.joinToString(", ")
+    }
+
+    private fun ingredientText(element: JsonElement): String? {
+        val obj: JsonObject = try {
+            element.jsonObject
+        } catch (notObject: Exception) {
+            return null
+        }
+        val text: String = stringField(obj, "text") ?: stringField(obj, "id") ?: return null
+        val cleaned: String = text.removePrefix("en:").replace('-', ' ').trim()
+        return cleaned.ifEmpty { null }
     }
 
     private fun preferredNameKeys(gtin: String): List<String> {

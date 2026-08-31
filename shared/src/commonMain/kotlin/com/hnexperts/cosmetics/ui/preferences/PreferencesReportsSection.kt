@@ -3,7 +3,6 @@ package com.hnexperts.cosmetics.ui.preferences
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,6 +16,7 @@ import com.hnexperts.cosmetics.resources.prefs_reports_empty
 import com.hnexperts.cosmetics.resources.prefs_reports_send
 import com.hnexperts.cosmetics.resources.prefs_reports_send_unavailable
 import com.hnexperts.cosmetics.resources.prefs_reports_sent
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.ButtonIconLabel
 import com.hnexperts.cosmetics.ui.common.StatusAnnouncement
 import org.jetbrains.compose.resources.stringResource
@@ -40,7 +40,7 @@ fun PreferencesReportsSection(
         modifier = Modifier.fillMaxWidth()
     ) {
         ButtonIconLabel(
-            imageVector = Icons.Filled.ContentCopy,
+            imageVector = AppActionIcons.Copy,
             text = stringResource(Res.string.prefs_reports_copy)
         )
     }

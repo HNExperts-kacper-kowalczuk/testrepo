@@ -2,11 +2,8 @@ package com.hnexperts.cosmetics.ui.camera
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.scanning.android.AndroidCameraSession
+import com.hnexperts.cosmetics.scanning.android.AndroidPreviewContainer
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import com.hnexperts.cosmetics.scanning.domain.CameraFrame
 import com.hnexperts.cosmetics.scanning.domain.CameraPermissionStatus
@@ -80,28 +78,17 @@ actual fun CameraPreviewHost(
     }
     AndroidView(
         factory = { viewContext ->
-            createPreviewView(viewContext).also { preview ->
-                session.attachPreview(preview)
+            AndroidPreviewContainer(viewContext).also { container ->
+                session.attachPreview(container.previewView)
             }
         },
         modifier = modifier,
-        update = { preview ->
+        update = { container ->
             if (granted) {
                 session.bindWhenReady(mode, torchOn)
             }
         }
     )
-}
-
-private fun createPreviewView(context: android.content.Context): PreviewView {
-    return PreviewView(context).apply {
-        implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-        scaleType = PreviewView.ScaleType.FILL_CENTER
-        layoutParams = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-    }
 }
 
 private fun permissionStatus(context: android.content.Context, granted: Boolean): CameraPermissionStatus {

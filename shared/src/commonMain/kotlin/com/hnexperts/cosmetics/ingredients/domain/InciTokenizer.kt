@@ -9,7 +9,8 @@ class InciTokenizer(
         .sortedByDescending { exception -> exception.length }
 
     fun tokenize(inciRaw: String): List<String> {
-        val normalized: String = InciNormalizer.normalize(inciRaw)
+        val withBreaks: String = inciRaw.replace(LINE_BREAKS, ",")
+        val normalized: String = InciNormalizer.normalize(withBreaks)
         if (normalized.isEmpty()) {
             return emptyList()
         }
@@ -42,6 +43,7 @@ class InciTokenizer(
     }
 
     private companion object {
-        val TOKEN_SPLIT: Regex = Regex("[,\\n;]+")
+        val TOKEN_SPLIT: Regex = Regex("[,;•·|]+")
+        val LINE_BREAKS: Regex = Regex("[\\r\\n]+")
     }
 }

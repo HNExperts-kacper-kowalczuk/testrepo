@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +44,7 @@ import com.hnexperts.cosmetics.resources.confirm_title
 import com.hnexperts.cosmetics.resources.confirm_unknown
 import com.hnexperts.cosmetics.scanning.domain.FuzzyDecision
 import com.hnexperts.cosmetics.scanning.domain.ReviewToken
+import com.hnexperts.cosmetics.ui.chrome.AppActionIcons
 import com.hnexperts.cosmetics.ui.chrome.AppBackButton
 import com.hnexperts.cosmetics.ui.chrome.AppIconButton
 import com.hnexperts.cosmetics.ui.common.FailureBanner
@@ -123,7 +123,7 @@ fun ConfirmIngredientsScreen(
                 )
                 if (uiState.canAddPhoto) {
                     AppIconButton(
-                        imageVector = Icons.Filled.AddAPhoto,
+                        imageVector = AppActionIcons.Camera,
                         contentDescription = stringResource(Res.string.confirm_add_photo),
                         onClick = viewModel::addAnotherPhoto,
                         enabled = !uiState.busy
