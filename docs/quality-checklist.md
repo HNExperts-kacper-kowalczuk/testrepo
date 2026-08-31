@@ -103,5 +103,5 @@ Shared code must stay in `commonMain` or honest `expect`/`actual`. No Android-on
 
 1. `./scripts/check-quality.sh`
 2. Mentally walk 1–11 against the diff.
-3. `./gradlew :shared:jvmTest` (and `:androidApp:assembleDebug` if Android/UI/Gradle changed).
+3. `./gradlew :shared:jvmTest`. Do **not** assemble, copy, or commit `releases/*.apk` (or any APK) unless the user explicitly asked for a sideload build.
 4. Only then `git commit`.

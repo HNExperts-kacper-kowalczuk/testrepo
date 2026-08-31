@@ -123,5 +123,5 @@ Keep the existing allergen / microplastics / annex lines. EN/PL keys. Stamp unch
 - `./scripts/check-quality.sh` then `:shared:jvmTest`
 - EN/PL key parity; files ≤ 500 lines; rethrow `CancellationException`; no `catch (Throwable)`
 - Do not call live OBF/CosIng from unit tests
-- Rebuild `releases/inci-scan-debug.apk` when UI or catalog packing changes (phase 23 is UI + fixture)
+- Do not assemble or commit `releases/*.apk` unless explicitly asked
 - Walk [quality-checklist.md](quality-checklist.md) points 1–11 before commit

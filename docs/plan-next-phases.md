@@ -206,4 +206,4 @@ Phase 1 is the gate: without CosIng-scale matching, verify-label and encyclopedi
 - `:shared:jvmTest` and `./scripts/check-quality.sh`
 - EN/PL key parity; files ≤ 500 lines; no `catch (Throwable)`
 - Do not call live OBF/CosIng from unit tests
-- Rebuild `releases/inci-scan-debug.apk` when UI or catalog packing changes
+- Do not assemble or commit `releases/*.apk` unless explicitly asked
