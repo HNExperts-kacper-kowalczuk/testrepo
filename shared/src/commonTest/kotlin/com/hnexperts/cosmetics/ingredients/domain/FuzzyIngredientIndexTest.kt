@@ -56,6 +56,33 @@ class FuzzyIngredientIndexTest {
         assertNull(index.findHit("XYZ"))
     }
 
+    @Test
+    fun findHitsReturnsDistinctNeighborsRankedByDistance() {
+        val index: FuzzyIngredientIndex = FuzzyIngredientIndex(
+            ingredients = listOf(named("left", "AAAAAAAA"), named("right", "AAAAAAAB")),
+            aliasToIngredient = emptyMap()
+        )
+        val hits: List<FuzzyHit> = index.findHits("AAAAAAAC", limit = 5)
+        assertEquals(2, hits.size)
+        assertEquals(setOf("left", "right"), hits.map { hit -> hit.ingredient.id }.toSet())
+        assertTrue(hits.all { hit -> hit.distance == 1 })
+        assertFalse(hits.first().unique)
+    }
+
+    @Test
+    fun findHitsCollapsesAliasOfTheSameIngredient() {
+        val ingredient: Ingredient = named("only", "Niacinamide")
+        val index: FuzzyIngredientIndex = FuzzyIngredientIndex(
+            ingredients = listOf(ingredient),
+            aliasToIngredient = mapOf("NYACINAMIDE" to ingredient)
+        )
+        val hits: List<FuzzyHit> = index.findHits("NIACINAM1DE", limit = 5)
+        assertEquals(1, hits.size)
+        assertEquals("only", hits[0].ingredient.id)
+        assertEquals(1, hits[0].distance)
+        assertTrue(hits[0].unique)
+    }
+
     private fun named(id: String, inciName: String): Ingredient {
         return Ingredient(id = id, inciName = inciName, casNumbers = null, functionTags = emptyList())
     }

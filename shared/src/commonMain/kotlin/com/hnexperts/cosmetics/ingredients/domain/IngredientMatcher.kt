@@ -52,6 +52,14 @@ class IngredientMatcher(
         return matchDetailed(rawToken).reference
     }
 
+    fun suggest(rawToken: String, limit: Int): List<FuzzyHit> {
+        val key: String = lookupKey(rawToken)
+        if (key.isEmpty() || limit <= 0) {
+            return emptyList()
+        }
+        return fuzzyIndex.findHits(key, limit)
+    }
+
     fun matchDetailed(rawToken: String): MatchedToken {
         val early: IngredientRef? = matchWithoutFuzzy(rawToken)
         if (early != null) {

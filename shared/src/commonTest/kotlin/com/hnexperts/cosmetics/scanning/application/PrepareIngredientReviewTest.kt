@@ -64,6 +64,20 @@ class PrepareIngredientReviewTest {
         }
     }
 
+    @Test
+    fun autoAcceptsUniqueDistanceTwoTypo() {
+        runBlocking {
+            val draft: IngredientReviewDraft = requireOk(prepareReview.invoke("NIAC1NAM1DE"))
+            assertEquals(1, draft.tokens.size)
+            assertEquals(MatchMethod.FUZZY, draft.tokens[0].matchMethod)
+            assertEquals(FuzzyDecision.AUTO_ACCEPTED, draft.tokens[0].fuzzyDecision)
+            assertEquals("NIAC1NAM1DE", draft.tokens[0].rawText)
+            assertEquals("Niacinamide", draft.tokens[0].suggestedName)
+            assertFalse(draft.hasPendingFuzzy())
+            assertTrue(draft.toInciRaw().contains("Niacinamide"))
+        }
+    }
+
     private fun requireOk(outcome: Outcome<IngredientReviewDraft>): IngredientReviewDraft {
         assertTrue(outcome is Outcome.Ok, outcome.toString())
         return outcome.value

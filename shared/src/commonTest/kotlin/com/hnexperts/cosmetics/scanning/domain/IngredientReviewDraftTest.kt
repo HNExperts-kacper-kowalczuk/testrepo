@@ -26,6 +26,31 @@ class IngredientReviewDraftTest {
     }
 
     @Test
+    fun catalogPickUsesCatalogNameAndClearsPending() {
+        val pending: ReviewToken = token(method = MatchMethod.FUZZY, decision = FuzzyDecision.PENDING)
+        assertTrue(pending.canPickFromCatalog())
+        val picked: ReviewToken = pending.withCatalogPick("glycerin", "Glycerin")
+        assertEquals("Glycerin", picked.inciName())
+        assertEquals("NIACINAM1DE", picked.rawText)
+        assertEquals(MatchMethod.EXACT, picked.matchMethod)
+        assertEquals(FuzzyDecision.NOT_APPLICABLE, picked.fuzzyDecision)
+        assertFalse(picked.canPickFromCatalog())
+    }
+
+    @Test
+    fun unmatchedTokenCanPickFromCatalog() {
+        val unknown: ReviewToken = ReviewToken(
+            key = 1L,
+            rawText = "CompletelyUnknownStuff",
+            suggestedName = "CompletelyUnknownStuff",
+            matchedIngredientId = null,
+            matchMethod = MatchMethod.UNMATCHED,
+            fuzzyDecision = FuzzyDecision.NOT_APPLICABLE
+        )
+        assertTrue(unknown.canPickFromCatalog())
+    }
+
+    @Test
     fun toInciRawSkipsBlankAndPendingUsesRaw() {
         val draft = IngredientReviewDraft(
             rawText = "NIACINAM1DE,  ",
