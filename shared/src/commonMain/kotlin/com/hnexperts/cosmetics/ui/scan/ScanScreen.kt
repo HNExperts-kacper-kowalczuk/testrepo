@@ -42,6 +42,7 @@ import org.jetbrains.compose.resources.stringResource
 fun ScanScreen(
     viewModel: ScanViewModel,
     onResult: () -> Unit,
+    onConfirm: () -> Unit,
     onOpenBarcodeCamera: () -> Unit,
     onOpenInciCamera: () -> Unit
 ) {
@@ -53,6 +54,12 @@ fun ScanScreen(
     LaunchedEffect(uiState.navigateToResult) {
         if (uiState.navigateToResult) {
             onResult()
+            viewModel.consumeNavigation()
+        }
+    }
+    LaunchedEffect(uiState.navigateToConfirm) {
+        if (uiState.navigateToConfirm) {
+            onConfirm()
             viewModel.consumeNavigation()
         }
     }

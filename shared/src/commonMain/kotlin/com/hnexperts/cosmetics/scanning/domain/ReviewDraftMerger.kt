@@ -17,7 +17,9 @@ object ReviewDraftMerger {
         return IngredientReviewDraft(
             rawText = tokens.joinToString(", ") { token -> token.inciName() },
             tokens = tokens,
-            nextKey = nextKey
+            nextKey = nextKey,
+            usage = existing.usage ?: incoming.usage,
+            source = existing.source
         )
     }
 }

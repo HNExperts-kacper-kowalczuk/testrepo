@@ -1,5 +1,6 @@
 package com.hnexperts.cosmetics.scanning.domain
 
+import com.hnexperts.cosmetics.catalog.domain.ProductUsage
 import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
 
 enum class FuzzyDecision {
@@ -44,12 +45,21 @@ data class ReviewToken(
             fuzzyDecision = FuzzyDecision.NOT_APPLICABLE
         )
     }
+
+    fun needsReview(): Boolean {
+        if (fuzzyDecision == FuzzyDecision.PENDING || fuzzyDecision == FuzzyDecision.AUTO_ACCEPTED) {
+            return true
+        }
+        return matchMethod == MatchMethod.UNMATCHED && rawText.isNotBlank()
+    }
 }
 
 data class IngredientReviewDraft(
     val rawText: String,
     val tokens: List<ReviewToken>,
-    val nextKey: Long
+    val nextKey: Long,
+    val usage: ProductUsage? = null,
+    val source: String = "ocr"
 ) {
     fun toInciRaw(): String {
         return tokens.map { token -> token.inciName() }.filter { name -> name.isNotBlank() }.joinToString(", ")
@@ -61,5 +71,9 @@ data class IngredientReviewDraft(
 
     fun hasAutoFilledFuzzy(): Boolean {
         return tokens.any { token -> token.fuzzyDecision == FuzzyDecision.AUTO_ACCEPTED }
+    }
+
+    fun needsReview(): Boolean {
+        return tokens.any { token -> token.needsReview() }
     }
 }

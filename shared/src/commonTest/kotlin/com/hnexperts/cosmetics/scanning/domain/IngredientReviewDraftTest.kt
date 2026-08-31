@@ -48,6 +48,9 @@ class IngredientReviewDraftTest {
             fuzzyDecision = FuzzyDecision.NOT_APPLICABLE
         )
         assertTrue(unknown.canPickFromCatalog())
+        assertTrue(unknown.needsReview())
+        val exact: ReviewToken = token(method = MatchMethod.EXACT, decision = FuzzyDecision.NOT_APPLICABLE)
+        assertFalse(exact.needsReview())
     }
 
     @Test
