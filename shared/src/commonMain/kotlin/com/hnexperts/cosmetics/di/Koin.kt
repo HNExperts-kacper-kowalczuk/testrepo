@@ -49,6 +49,7 @@ import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
 import com.hnexperts.cosmetics.scanning.application.OpenTypedIngredientReview
 import com.hnexperts.cosmetics.scanning.application.PrepareIngredientReview
 import com.hnexperts.cosmetics.scanning.application.SuggestReviewIngredients
+import com.hnexperts.cosmetics.scanning.application.ReplaceUnmatchedIngredient
 import com.hnexperts.cosmetics.scanning.application.ScanBridge
 import com.hnexperts.cosmetics.scanning.data.SqlHistoryRepository
 import com.hnexperts.cosmetics.scanning.data.SqlReportQueue
@@ -106,6 +107,7 @@ val appModule = module {
     single { PrepareIngredientReview(get()) }
     single { OpenTypedIngredientReview(get(), get()) }
     single { SuggestReviewIngredients(get(), get()) }
+    single { ReplaceUnmatchedIngredient(get()) }
     single { IngredientReviewSession() }
     single { ScanBridge() }
     single { PendingCaptureSession() }

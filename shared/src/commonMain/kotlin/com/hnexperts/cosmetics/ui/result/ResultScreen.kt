@@ -54,6 +54,7 @@ import com.hnexperts.cosmetics.ui.common.BannerAdSlot
 import com.hnexperts.cosmetics.ui.common.FailureBanner
 import com.hnexperts.cosmetics.ui.common.UsagePicker
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
+import com.hnexperts.cosmetics.ui.confirm.ConfirmIngredientPickerSheet
 import com.hnexperts.cosmetics.ui.ingredient.IngredientDetailSheet
 import com.hnexperts.cosmetics.ui.layout.AppLayout
 import org.jetbrains.compose.resources.pluralStringResource
@@ -103,6 +104,14 @@ fun ResultScreen(
     }
     uiState.selectedDetail?.let { detail ->
         IngredientDetailSheet(detail = detail, onDismiss = viewModel::dismissDetail)
+    }
+    uiState.picker?.let { picker ->
+        ConfirmIngredientPickerSheet(
+            picker = picker,
+            onQueryChange = viewModel::updatePickerQuery,
+            onPick = viewModel::pickUnmatched,
+            onDismiss = viewModel::dismissPicker
+        )
     }
 }
 
@@ -230,7 +239,12 @@ private fun LazyListScope.resultDetails(
         ResultFindingRow(
             finding = finding,
             commentSummary = viewModel.commentFor(finding.comments)?.summary,
-            onOpen = { viewModel.openFinding(finding) }
+            onOpen = { viewModel.openFinding(finding) },
+            onPickUnmatched = if (finding.ingredient.id == null) {
+                { viewModel.openUnmatchedPicker(finding) }
+            } else {
+                null
+            }
         )
     }
     item {
