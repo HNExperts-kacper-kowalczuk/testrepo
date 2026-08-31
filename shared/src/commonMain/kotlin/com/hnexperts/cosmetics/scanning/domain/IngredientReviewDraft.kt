@@ -6,7 +6,12 @@ enum class FuzzyDecision {
     NOT_APPLICABLE,
     PENDING,
     ACCEPTED,
+    AUTO_ACCEPTED,
     REJECTED
+}
+
+fun FuzzyDecision.appliesSuggestion(): Boolean {
+    return this == FuzzyDecision.ACCEPTED || this == FuzzyDecision.AUTO_ACCEPTED
 }
 
 data class ReviewToken(
@@ -18,10 +23,7 @@ data class ReviewToken(
     val fuzzyDecision: FuzzyDecision
 ) {
     fun inciName(): String {
-        if (matchMethod == MatchMethod.FUZZY && fuzzyDecision == FuzzyDecision.REJECTED) {
-            return rawText
-        }
-        if (matchMethod == MatchMethod.FUZZY && fuzzyDecision != FuzzyDecision.ACCEPTED) {
+        if (matchMethod == MatchMethod.FUZZY && !fuzzyDecision.appliesSuggestion()) {
             return rawText
         }
         if (suggestedName.isNotBlank() && matchedIngredientId != null && fuzzyDecision != FuzzyDecision.REJECTED) {
@@ -42,5 +44,9 @@ data class IngredientReviewDraft(
 
     fun hasPendingFuzzy(): Boolean {
         return tokens.any { token -> token.fuzzyDecision == FuzzyDecision.PENDING }
+    }
+
+    fun hasAutoFilledFuzzy(): Boolean {
+        return tokens.any { token -> token.fuzzyDecision == FuzzyDecision.AUTO_ACCEPTED }
     }
 }

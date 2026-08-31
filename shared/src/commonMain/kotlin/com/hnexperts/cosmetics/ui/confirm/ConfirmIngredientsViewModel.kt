@@ -64,6 +64,10 @@ class ConfirmIngredientsViewModel(
         replaceToken(key) { token -> token.copy(fuzzyDecision = FuzzyDecision.ACCEPTED) }
     }
 
+    fun changeAutoFilled(key: Long) {
+        replaceToken(key) { token -> token.copy(fuzzyDecision = FuzzyDecision.PENDING) }
+    }
+
     fun rejectFuzzy(key: Long) {
         replaceToken(key) { token ->
             token.copy(

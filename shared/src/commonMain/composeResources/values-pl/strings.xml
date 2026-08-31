@@ -238,6 +238,9 @@
     <string name="confirm_fuzzy_prompt">Czy chodziło o %2$s zamiast „%1$s”?</string>
     <string name="confirm_fuzzy_accept">Użyj podpowiedzi</string>
     <string name="confirm_fuzzy_reject">Zostaw oryginał</string>
+    <string name="confirm_fuzzy_auto">Odczytano „%1$s” jako %2$s (uzupełnione automatycznie).</string>
+    <string name="confirm_fuzzy_change">Zmień</string>
+    <string name="confirm_auto_filled_note">Niektóre nazwy uzupełniono z OCR. Sprawdź je przed oceną.</string>
     <string name="confirm_pending_fuzzy">Zaakceptuj lub odrzuć każdą podpowiedź przed oceną.</string>
     <string name="confirm_add">Dodaj składnik</string>
     <string name="confirm_remove">Usuń</string>

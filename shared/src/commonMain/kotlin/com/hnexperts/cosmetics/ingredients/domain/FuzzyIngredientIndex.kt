@@ -16,61 +16,94 @@ internal class FuzzyIngredientIndex(
     val size: Int = names.size + aliases.size
 
     fun find(normalized: String): Ingredient? {
+        return findHit(normalized)?.ingredient
+    }
+
+    fun findHit(normalized: String): FuzzyHit? {
         if (normalized.length < MIN_FUZZY_LENGTH) {
             return null
         }
-        return bestOf(normalized, names + aliases)
+        return hitFrom(topTwo(normalized, names + aliases))
     }
 
     suspend fun findParallel(normalized: String): Ingredient? {
+        return findHitParallel(normalized)?.ingredient
+    }
+
+    suspend fun findHitParallel(normalized: String): FuzzyHit? {
         if (normalized.length < MIN_FUZZY_LENGTH) {
             return null
         }
         val candidates: List<IndexedName> = names + aliases
         if (candidates.size < PARALLEL_CANDIDATE_THRESHOLD) {
-            return bestOf(normalized, candidates)
+            return findHit(normalized)
         }
-        val chunkHits: List<IndexedName?> = ParallelMapper.map(
+        val chunkHits: List<List<RankedName>> = ParallelMapper.map(
             items = candidates.chunked(fuzzyChunkSize(candidates.size)),
             threshold = 2,
             workerCount = ParallelMapper.DEFAULT_WORKER_COUNT
-        ) { chunk -> bestIndexed(normalized, chunk) }
-        return closest(chunkHits.filterNotNull(), normalized)?.ingredient
+        ) { chunk -> topTwo(normalized, chunk) }
+        return hitFrom(bestTwoDistinct(chunkHits.flatten()))
     }
 
-    private fun bestOf(normalized: String, candidates: List<IndexedName>): Ingredient? {
-        return bestIndexed(normalized, candidates)?.ingredient
-    }
-
-    private fun bestIndexed(normalized: String, candidates: List<IndexedName>): IndexedName? {
+    private fun topTwo(normalized: String, candidates: List<IndexedName>): List<RankedName> {
         val maxDistance: Int = maxDistanceFor(normalized)
-        var best: IndexedName? = null
-        var bestDistance: Int = maxDistance + 1
+        val ranked: MutableList<RankedName> = mutableListOf()
         for (candidate in candidates) {
             if (abs(normalized.length - candidate.normalized.length) > maxDistance) {
                 continue
             }
             val distance: Int = Levenshtein.distance(normalized, candidate.normalized)
-            if (distance < bestDistance && distance <= maxDistance) {
-                best = candidate
-                bestDistance = distance
+            if (distance > maxDistance) {
+                continue
             }
+            insertRanked(ranked, RankedName(candidate, distance))
         }
-        return best
+        return ranked
     }
 
-    private fun closest(hits: List<IndexedName>, normalized: String): IndexedName? {
-        val maxDistance: Int = maxDistanceFor(normalized)
-        var best: IndexedName? = null
-        var bestDistance: Int = maxDistance + 1
-        for (hit in hits) {
-            val distance: Int = Levenshtein.distance(normalized, hit.normalized)
-            if (distance < bestDistance && distance <= maxDistance) {
-                best = hit
-                bestDistance = distance
-            }
+    private fun insertRanked(ranked: MutableList<RankedName>, incoming: RankedName) {
+        val sameId: Int = ranked.indexOfFirst { item ->
+            item.indexed.ingredient.id == incoming.indexed.ingredient.id
         }
-        return best
+        if (sameId >= 0) {
+            replaceIfCloser(ranked, sameId, incoming)
+            return
+        }
+        ranked.add(incoming)
+        ranked.sortBy { item -> item.distance }
+        trimToTopTwo(ranked)
+    }
+
+    private fun replaceIfCloser(ranked: MutableList<RankedName>, index: Int, incoming: RankedName) {
+        if (incoming.distance >= ranked[index].distance) {
+            return
+        }
+        ranked[index] = incoming
+        ranked.sortBy { item -> item.distance }
+    }
+
+    private fun trimToTopTwo(ranked: MutableList<RankedName>) {
+        while (ranked.size > 2) {
+            ranked.removeAt(ranked.lastIndex)
+        }
+    }
+
+    private fun bestTwoDistinct(ranked: List<RankedName>): List<RankedName> {
+        val compact: MutableList<RankedName> = mutableListOf()
+        for (item in ranked.sortedBy { rankedName -> rankedName.distance }) {
+            insertRanked(compact, item)
+        }
+        return compact
+    }
+
+    private fun hitFrom(ranked: List<RankedName>): FuzzyHit? {
+        val best: RankedName = ranked.firstOrNull() ?: return null
+        return FuzzyHit(
+            ingredient = best.indexed.ingredient,
+            distance = best.distance,
+            unique = ranked.size == 1
+        )
     }
 
     private fun maxDistanceFor(normalized: String): Int {
@@ -85,6 +118,11 @@ internal class FuzzyIngredientIndex(
     private data class IndexedName(
         val ingredient: Ingredient,
         val normalized: String
+    )
+
+    private data class RankedName(
+        val indexed: IndexedName,
+        val distance: Int
     )
 
     private companion object {

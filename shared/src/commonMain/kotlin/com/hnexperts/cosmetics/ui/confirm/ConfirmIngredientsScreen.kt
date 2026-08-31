@@ -32,9 +32,12 @@ import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
 import com.hnexperts.cosmetics.resources.Res
 import com.hnexperts.cosmetics.resources.confirm_add
 import com.hnexperts.cosmetics.resources.confirm_add_photo
+import com.hnexperts.cosmetics.resources.confirm_auto_filled_note
 import com.hnexperts.cosmetics.resources.confirm_empty
 import com.hnexperts.cosmetics.resources.confirm_evaluate
 import com.hnexperts.cosmetics.resources.confirm_fuzzy_accept
+import com.hnexperts.cosmetics.resources.confirm_fuzzy_auto
+import com.hnexperts.cosmetics.resources.confirm_fuzzy_change
 import com.hnexperts.cosmetics.resources.confirm_fuzzy_prompt
 import com.hnexperts.cosmetics.resources.confirm_fuzzy_reject
 import com.hnexperts.cosmetics.resources.confirm_pending_fuzzy
@@ -96,6 +99,12 @@ fun ConfirmIngredientsScreen(
                 Text(text = stringResource(Res.string.confirm_empty))
                 return@Column
             }
+            if (draft.hasAutoFilledFuzzy()) {
+                Text(
+                    text = stringResource(Res.string.confirm_auto_filled_note),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
             if (draft.hasPendingFuzzy()) {
                 Text(
                     text = stringResource(Res.string.confirm_pending_fuzzy),
@@ -109,6 +118,7 @@ fun ConfirmIngredientsScreen(
                         enabled = !uiState.busy,
                         onRawChange = { text -> viewModel.updateRaw(token.key, text) },
                         onAcceptFuzzy = { viewModel.acceptFuzzy(token.key) },
+                        onChangeAutoFilled = { viewModel.changeAutoFilled(token.key) },
                         onRejectFuzzy = { viewModel.rejectFuzzy(token.key) },
                         onRemove = { viewModel.removeToken(token.key) }
                     )
@@ -145,13 +155,13 @@ fun ConfirmIngredientsScreen(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TokenEditor(
     token: ReviewToken,
     enabled: Boolean,
     onRawChange: (String) -> Unit,
     onAcceptFuzzy: () -> Unit,
+    onChangeAutoFilled: () -> Unit,
     onRejectFuzzy: () -> Unit,
     onRemove: () -> Unit
 ) {
@@ -166,7 +176,33 @@ private fun TokenEditor(
         if (token.matchMethod == MatchMethod.UNMATCHED) {
             Text(text = stringResource(Res.string.confirm_unknown), style = MaterialTheme.typography.bodySmall)
         }
-        if (token.fuzzyDecision == FuzzyDecision.PENDING) {
+        FuzzyDecisionActions(
+            token = token,
+            enabled = enabled,
+            onAcceptFuzzy = onAcceptFuzzy,
+            onChangeAutoFilled = onChangeAutoFilled,
+            onRejectFuzzy = onRejectFuzzy
+        )
+        AppIconButton(
+            imageVector = Icons.Filled.Delete,
+            contentDescription = stringResource(Res.string.confirm_remove),
+            onClick = onRemove,
+            enabled = enabled
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FuzzyDecisionActions(
+    token: ReviewToken,
+    enabled: Boolean,
+    onAcceptFuzzy: () -> Unit,
+    onChangeAutoFilled: () -> Unit,
+    onRejectFuzzy: () -> Unit
+) {
+    when (token.fuzzyDecision) {
+        FuzzyDecision.PENDING -> {
             Text(
                 text = stringResource(Res.string.confirm_fuzzy_prompt, token.rawText, token.suggestedName),
                 style = MaterialTheme.typography.bodyMedium
@@ -180,11 +216,20 @@ private fun TokenEditor(
                 }
             }
         }
-        AppIconButton(
-            imageVector = Icons.Filled.Delete,
-            contentDescription = stringResource(Res.string.confirm_remove),
-            onClick = onRemove,
-            enabled = enabled
-        )
+        FuzzyDecision.AUTO_ACCEPTED -> {
+            Text(
+                text = stringResource(Res.string.confirm_fuzzy_auto, token.rawText, token.suggestedName),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = onChangeAutoFilled, enabled = enabled) {
+                    Text(stringResource(Res.string.confirm_fuzzy_change))
+                }
+                TextButton(onClick = onRejectFuzzy, enabled = enabled) {
+                    Text(stringResource(Res.string.confirm_fuzzy_reject))
+                }
+            }
+        }
+        FuzzyDecision.NOT_APPLICABLE, FuzzyDecision.ACCEPTED, FuzzyDecision.REJECTED -> Unit
     }
 }

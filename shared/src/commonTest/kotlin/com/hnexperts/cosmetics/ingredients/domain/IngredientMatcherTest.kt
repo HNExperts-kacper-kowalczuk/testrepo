@@ -113,9 +113,12 @@ class IngredientMatcherTest {
 
     @Test
     fun fuzzyMatchesOcrTypo() {
-        val ref: IngredientRef = matcher.matchToken("NIACINAM1DE")
+        val detailed: MatchedToken = matcher.matchDetailed("NIACINAM1DE")
+        val ref: IngredientRef = detailed.reference
         assertEquals("niacinamide", ref.id)
         assertEquals(MatchMethod.FUZZY, ref.matchedBy)
+        assertEquals(1, detailed.fuzzy?.distance)
+        assertEquals(true, detailed.fuzzy?.unique)
     }
 
     @Test

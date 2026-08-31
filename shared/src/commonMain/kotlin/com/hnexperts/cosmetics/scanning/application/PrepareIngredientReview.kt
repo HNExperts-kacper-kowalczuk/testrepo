@@ -4,8 +4,12 @@ import com.hnexperts.cosmetics.catalog.application.CatalogGateway
 import com.hnexperts.cosmetics.failure.AppFailure
 import com.hnexperts.cosmetics.failure.FailureCatcher
 import com.hnexperts.cosmetics.failure.Outcome
+import com.hnexperts.cosmetics.ingredients.domain.FuzzyHit
 import com.hnexperts.cosmetics.ingredients.domain.IngredientRef
+import com.hnexperts.cosmetics.ingredients.domain.InciNormalizer
 import com.hnexperts.cosmetics.ingredients.domain.MatchMethod
+import com.hnexperts.cosmetics.ingredients.domain.MatchedToken
+import com.hnexperts.cosmetics.scanning.domain.FuzzyAutoAccept
 import com.hnexperts.cosmetics.scanning.domain.FuzzyDecision
 import com.hnexperts.cosmetics.scanning.domain.IngredientReviewDraft
 import com.hnexperts.cosmetics.scanning.domain.ReviewToken
@@ -30,27 +34,30 @@ class PrepareIngredientReview(
         }
         return FailureCatcher.ocr("ocr.prepareReview") {
             val rawTokens: List<String> = index.matcher.tokenize(trimmed)
-            val references: List<IngredientRef> = index.matcher.matchListConcurrently(trimmed)
-            toDraft(trimmed, rawTokens, references)
+            val matches: List<MatchedToken> = index.matcher.matchDetailedListConcurrently(trimmed)
+            toDraft(trimmed, rawTokens, matches)
         }
     }
 
     private fun toDraft(
         rawText: String,
         rawTokens: List<String>,
-        references: List<IngredientRef>
+        matches: List<MatchedToken>
     ): IngredientReviewDraft {
         val tokens: List<ReviewToken> = rawTokens.mapIndexed { index, raw ->
-            val reference: IngredientRef = references.getOrElse(index) {
-                IngredientRef(id = null, displayName = raw, matchedBy = MatchMethod.UNMATCHED)
+            val matched: MatchedToken = matches.getOrElse(index) {
+                MatchedToken(
+                    reference = IngredientRef(id = null, displayName = raw, matchedBy = MatchMethod.UNMATCHED)
+                )
             }
+            val reference: IngredientRef = matched.reference
             ReviewToken(
                 key = index.toLong() + 1L,
                 rawText = raw,
                 suggestedName = reference.displayName,
                 matchedIngredientId = reference.id,
                 matchMethod = reference.matchedBy,
-                fuzzyDecision = fuzzyDecisionOf(reference.matchedBy)
+                fuzzyDecision = fuzzyDecisionOf(matched, raw)
             )
         }
         return IngredientReviewDraft(
@@ -60,11 +67,12 @@ class PrepareIngredientReview(
         )
     }
 
-    private fun fuzzyDecisionOf(method: MatchMethod): FuzzyDecision {
-        return if (method == MatchMethod.FUZZY) {
-            FuzzyDecision.PENDING
-        } else {
-            FuzzyDecision.NOT_APPLICABLE
+    private fun fuzzyDecisionOf(matched: MatchedToken, raw: String): FuzzyDecision {
+        if (matched.reference.matchedBy != MatchMethod.FUZZY) {
+            return FuzzyDecision.NOT_APPLICABLE
         }
+        val hit: FuzzyHit = matched.fuzzy ?: return FuzzyDecision.PENDING
+        val normalizedLength: Int = InciNormalizer.stripNanoSuffix(InciNormalizer.normalize(raw)).length
+        return FuzzyAutoAccept.decision(hit, normalizedLength)
     }
 }
