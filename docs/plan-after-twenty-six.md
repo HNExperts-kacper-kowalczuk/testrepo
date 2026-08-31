@@ -10,20 +10,20 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 
 ---
 
-## Current baseline (after PR #46)
+## Current baseline (after PR #46; 27–29 stacked)
 
 | Area | Today |
 | --- | --- |
 | OCR confirm | Unique distance 1–2 auto-fill; pending/unknown can pick from nearby + catalog search |
-| Typed / pasted INCI | Scan “More ways” calls `EvaluateProduct` directly — no auto-accept, no suggestions, typos score as unknown |
-| Result unknowns | Unmatched findings show a chip; the shopper cannot attach a catalog name without re-pasting |
-| Gallery | Barcode camera can pick a photo; ingredient-list camera cannot |
+| Typed / pasted INCI | **27:** Scan “More ways” uses confirm when names need review; exact lists still evaluate in one tap |
+| Result unknowns | **28:** unmatched findings can pick a catalog name and re-score |
+| Gallery | **29 (this PR):** ingredient-list camera can pick a label photo and open crop |
 
 ---
 
 ## Phase 27 — Typed INCI uses the confirm review
 
-**PR:** `cursor/phase-27-typed-inci-confirm-4039` (this PR)  
+**PR:** `cursor/phase-27-typed-inci-confirm-4039` (**#47**)  
 **Outcome:** Pasting or typing a list on Scan gets the same auto-accept and catalog picker as OCR. A list that is already all exact/alias matches still evaluates in one tap.
 
 ### 27.1 Behaviour
@@ -46,7 +46,7 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 
 ## Phase 28 — Pick unmatched names on Result
 
-**PR:** `cursor/phase-28-result-unmatched-pick-4039`  
+**PR:** `cursor/phase-28-result-unmatched-pick-4039` (**#48**)  
 **Depends on:** 27 (same picker + suggest use case).  
 **Outcome:** An unknown finding can be attached to a catalog ingredient and the formula re-scored, without leaving Result.
 
@@ -68,7 +68,7 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 
 ## Phase 29 — Gallery photo of the ingredient list
 
-**PR:** `cursor/phase-29-gallery-inci-4039`  
+**PR:** `cursor/phase-29-gallery-inci-4039` (this PR)  
 **Depends on:** 27 not required.  
 **Outcome:** A shopper can pick a label photo (or a screenshot of a listing) and crop/OCR it the same way as a camera still. Works even when camera permission is denied.
 
@@ -104,9 +104,9 @@ Related: [further-additions.md](further-additions.md), [plan.md](plan.md), [qual
 ## Implementation order (one PR each)
 
 ```
-27 typed INCI uses confirm review   ← this PR
+27 typed INCI uses confirm review
 28 pick unmatched names on Result
-29 gallery photo of the ingredient list
+29 gallery photo of the ingredient list   ← this PR
 ```
 
 ---

@@ -575,7 +575,7 @@ Each phase should leave the app **installable**. Camera and ads are add-ons on t
 
 ## 19. Further additions (not v1 scope)
 
-Recommended next capabilities — usage type (leave-on vs rinse-off), verify pack vs catalog, structured allergen/children profiles, colour-safe ratings, shelf/compare, encyclopedia — are listed with priority in **[further-additions.md](further-additions.md)**. Phases 1–26 are shipped. The next code slice is **[plan-after-twenty-six.md](plan-after-twenty-six.md)**. Store secrets, IAP, and vegan/cruelty-as-scores stay out of git; see **[further-additions.md](further-additions.md)**.
+Recommended next capabilities — usage type (leave-on vs rinse-off), verify pack vs catalog, structured allergen/children profiles, colour-safe ratings, shelf/compare, encyclopedia — are listed with priority in **[further-additions.md](further-additions.md)**. Phases 1–29 are shipped (or in this stack: 27 **#47**, 28 **#48**, 29 this PR). Store secrets, IAP, and vegan/cruelty-as-scores stay out of git; see **[further-additions.md](further-additions.md)**.
 
 Catalog OCR/UI tracks A–D are specified in **[plan-catalog-ocr-ui.md](plan-catalog-ocr-ui.md)** (largely done).
 

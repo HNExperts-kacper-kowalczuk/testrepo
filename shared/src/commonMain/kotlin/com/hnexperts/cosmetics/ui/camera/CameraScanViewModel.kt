@@ -114,9 +114,23 @@ class CameraScanViewModel(
     }
 
     fun onStillCaptured(frame: CameraFrame) {
-        pendingCapture.publish(frame)
-        performScanHaptic()
-        state.update { current -> current.copy(navigateToCrop = true, failure = null) }
+        openCrop(frame)
+    }
+
+    fun onGalleryStill(frame: CameraFrame) {
+        if (state.value.mode != ScannerMode.INGREDIENT_LIST) {
+            return
+        }
+        openCrop(frame)
+    }
+
+    fun onGalleryStillEmpty() {
+        showFailure(
+            AppFailure.Camera(
+                operation = "ocr.gallery",
+                detail = "Could not read that photo as an ingredient-list still"
+            )
+        )
     }
 
     fun consumeNavigation() {
@@ -172,6 +186,12 @@ class CameraScanViewModel(
         }
         lastAcceptElapsedMs = elapsed
         return true
+    }
+
+    private fun openCrop(frame: CameraFrame) {
+        pendingCapture.publish(frame)
+        performScanHaptic()
+        state.update { current -> current.copy(navigateToCrop = true, failure = null) }
     }
 
     private fun showFailure(failure: AppFailure) {

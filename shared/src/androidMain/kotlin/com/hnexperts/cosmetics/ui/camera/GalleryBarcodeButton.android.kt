@@ -2,10 +2,7 @@ package com.hnexperts.cosmetics.ui.camera
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -17,6 +14,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.hnexperts.cosmetics.scanning.android.AndroidBarcodeMapper
+import com.hnexperts.cosmetics.scanning.android.AndroidGalleryImages
 import com.hnexperts.cosmetics.scanning.domain.BarcodePayload
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -56,7 +54,7 @@ actual fun GalleryBarcodeButton(
 
 private suspend fun decodeGalleryBarcode(context: Context, uri: Uri): BarcodePayload? {
     val bitmap: Bitmap = try {
-        softwareArgb8888(decodeGalleryBitmap(context, uri))
+        AndroidGalleryImages.decodeArgb8888(context, uri)
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (_: Exception) {
@@ -87,23 +85,4 @@ private suspend fun decodeGalleryBarcode(context: Context, uri: Uri): BarcodePay
             scanner.close()
         }
     }
-}
-
-private fun decodeGalleryBitmap(context: Context, uri: Uri): Bitmap {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        return ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
-    }
-    @Suppress("DEPRECATION")
-    return MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-}
-
-private fun softwareArgb8888(bitmap: Bitmap): Bitmap {
-    if (bitmap.config != Bitmap.Config.HARDWARE && bitmap.config == Bitmap.Config.ARGB_8888) {
-        return bitmap
-    }
-    val copy: Bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false) ?: return bitmap
-    if (bitmap.config == Bitmap.Config.HARDWARE) {
-        bitmap.recycle()
-    }
-    return copy
 }

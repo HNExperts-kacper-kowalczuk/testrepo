@@ -207,8 +207,9 @@
     <string name="camera_title_barcode">Scan barcode</string>
     <string name="camera_title_inci">Scan ingredient list</string>
     <string name="camera_gallery">Pick from gallery</string>
+    <string name="camera_gallery_inci">Pick a photo of the ingredient list</string>
     <string name="camera_hint_barcode">Point at an EAN or UPC barcode. Missing catalog codes are looked up online when you have a connection. Ads stay off this screen.</string>
-    <string name="camera_hint_inci">Flatten the label, then capture a still of the INCI / skład block.</string>
+    <string name="camera_hint_inci">Flatten the label, then capture a still of the INCI / skład block, or pick a photo.</string>
     <string name="camera_capture">Capture list</string>
     <string name="crop_title">Select the ingredient list</string>
     <string name="crop_hint">Drag a corner, or select a corner and use the arrows. Place them around the list that starts at “Ingredients” or “Skład”.</string>

@@ -12,11 +12,12 @@ import org.jetbrains.compose.resources.stringResource
 fun GalleryBarcodeIconButton(
     enabled: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentDescription: String = stringResource(Res.string.camera_gallery)
 ) {
     AppIconButton(
         imageVector = AppActionIcons.Gallery,
-        contentDescription = stringResource(Res.string.camera_gallery),
+        contentDescription = contentDescription,
         onClick = onClick,
         enabled = enabled,
         modifier = modifier

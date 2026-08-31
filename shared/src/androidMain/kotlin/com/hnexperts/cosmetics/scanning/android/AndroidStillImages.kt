@@ -19,6 +19,10 @@ internal object AndroidStillImages {
         return constrain(rotated, maxEdge)
     }
 
+    fun fromGalleryBitmap(bitmap: Bitmap): CameraFrame {
+        return encode(constrain(bitmap, CROP_MAX_EDGE))
+    }
+
     fun encode(bitmap: Bitmap): CameraFrame {
         val output = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, output)
