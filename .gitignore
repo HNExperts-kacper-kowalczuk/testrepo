@@ -17,5 +17,9 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 
+# Sideload APKs are built locally; do not commit them
+*.apk
+*.aab
+
 # Generated candidate catalog data (large; rebuilt by :shared:ingestCatalogSources)
 catalog/ingest/
