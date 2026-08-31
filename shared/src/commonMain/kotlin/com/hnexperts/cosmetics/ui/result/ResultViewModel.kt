@@ -29,10 +29,14 @@ import com.hnexperts.cosmetics.platform.sharePngBytes
 import com.hnexperts.cosmetics.preferences.domain.PreferencesStore
 import com.hnexperts.cosmetics.preferences.domain.StoredPreferences
 import com.hnexperts.cosmetics.scanning.application.PendingVerifySession
+import com.hnexperts.cosmetics.scanning.application.ReplaceUnmatchedIngredient
+import com.hnexperts.cosmetics.scanning.application.SuggestReviewIngredients
 import com.hnexperts.cosmetics.scanning.application.VerifyRequest
+import com.hnexperts.cosmetics.scanning.domain.IngredientSuggestion
 import com.hnexperts.cosmetics.shelf.domain.ShelfItem
 import com.hnexperts.cosmetics.shelf.domain.ShelfKeys
 import com.hnexperts.cosmetics.shelf.domain.UserShelf
+import com.hnexperts.cosmetics.ui.confirm.ConfirmPickerState
 import com.hnexperts.cosmetics.ui.ingredient.IngredientDetail
 import com.hnexperts.cosmetics.ui.ingredient.IngredientDetailAssembler
 import kotlin.time.Clock
@@ -56,7 +60,8 @@ data class ResultUiState(
     val navigateToCamera: Boolean = false,
     val categoryChoices: List<String> = emptyList(),
     val categorySkipped: Boolean = false,
-    val selectedDetail: IngredientDetail? = null
+    val selectedDetail: IngredientDetail? = null,
+    val picker: ConfirmPickerState? = null
 )
 
 class ResultViewModel(
@@ -68,13 +73,24 @@ class ResultViewModel(
     private val products: ProductRepository,
     private val catalog: CatalogGateway,
     private val evaluateProduct: EvaluateProduct,
-    private val dispatchers: AppDispatchers
+    private val dispatchers: AppDispatchers,
+    private val suggestReviewIngredients: SuggestReviewIngredients,
+    private val replaceUnmatched: ReplaceUnmatchedIngredient
 ) : ViewModel() {
     private val state: MutableStateFlow<ResultUiState> = MutableStateFlow(ResultUiState())
     val uiState: StateFlow<ResultUiState> = state.asStateFlow()
     private val shelfMutex: Mutex = Mutex()
     private var extrasJob: Job? = null
     private var detailJob: Job? = null
+    private val catalogPicker: ResultCatalogPicker = ResultCatalogPicker(
+        suggestReviewIngredients = suggestReviewIngredients,
+        replaceUnmatched = replaceUnmatched,
+        state = state,
+        scope = viewModelScope,
+        rescore = { current, inciRaw ->
+            rescoreAssessment(current = current, inciRaw = inciRaw, closePicker = true)
+        }
+    )
 
     init {
         viewModelScope.launch { load() }
@@ -94,6 +110,23 @@ class ResultViewModel(
     fun dismissDetail() {
         detailJob?.cancel()
         state.value = state.value.copy(selectedDetail = null)
+    }
+
+    fun openUnmatchedPicker(finding: Finding) {
+        catalogPicker.open(finding)
+    }
+
+    fun updatePickerQuery(query: String) {
+        catalogPicker.updateQuery(query)
+    }
+
+    fun pickUnmatched(suggestion: IngredientSuggestion) {
+        extrasJob?.cancel()
+        extrasJob = viewModelScope.launch { catalogPicker.applySuggestion(suggestion) }
+    }
+
+    fun dismissPicker() {
+        catalogPicker.dismiss()
     }
 
     private suspend fun showFindingDetail(finding: Finding) {
@@ -207,32 +240,11 @@ class ResultViewModel(
     }
 
     private suspend fun applyChosenCategory(current: ProductAssessment, category: String) {
-        val source: String = session.currentSource()
-        val scored: Outcome<ProductAssessment> = evaluateProduct.invoke(
-            inciRaw = current.inciRaw,
-            source = source,
-            productName = current.productName,
-            brand = current.brand,
-            gtin = current.gtin,
-            usage = current.usage,
-            packVerified = current.packVerified,
+        rescoreAssessment(
+            current = current,
             category = category,
-            productId = current.productId
+            clearCategoryPicker = true
         )
-        when (scored) {
-            is Outcome.Err -> state.value = state.value.copy(failure = scored.failure)
-            is Outcome.Ok -> {
-                state.value = state.value.copy(
-                    assessment = scored.value,
-                    categorySkipped = false,
-                    categoryChoices = emptyList(),
-                    failure = null,
-                    selectedDetail = null
-                )
-                persistShelfIfStarred(scored.value)
-                loadShelfAndAlternatives(scored.value, state.value.commentLocale)
-            }
-        }
     }
 
     fun setUsage(usage: ProductUsage) {
@@ -247,26 +259,7 @@ class ResultViewModel(
     }
 
     private suspend fun applyChosenUsage(current: ProductAssessment, usage: ProductUsage) {
-        val source: String = session.currentSource()
-        val scored: Outcome<ProductAssessment> = evaluateProduct.invoke(
-            inciRaw = current.inciRaw,
-            source = source,
-            productName = current.productName,
-            brand = current.brand,
-            gtin = current.gtin,
-            usage = usage,
-            packVerified = current.packVerified,
-            category = current.category,
-            productId = current.productId
-        )
-        when (scored) {
-            is Outcome.Err -> state.value = state.value.copy(failure = scored.failure)
-            is Outcome.Ok -> {
-                state.value = state.value.copy(assessment = scored.value, failure = null, selectedDetail = null)
-                persistShelfIfStarred(scored.value)
-                loadShelfAndAlternatives(scored.value, state.value.commentLocale)
-            }
-        }
+        rescoreAssessment(current = current, usage = usage)
     }
 
     private suspend fun persistShelfIfStarred(assessment: ProductAssessment) {
@@ -408,6 +401,46 @@ class ResultViewModel(
         return when (stored.localePreference) {
             LocalePreference.PINNED -> stored.pinnedLocale ?: AppLocale.ENGLISH
             LocalePreference.FOLLOW_SYSTEM -> systemAppLocale()
+        }
+    }
+
+    private suspend fun rescoreAssessment(
+        current: ProductAssessment,
+        inciRaw: String = current.inciRaw,
+        usage: ProductUsage = current.usage,
+        category: String? = current.category,
+        clearCategoryPicker: Boolean = false,
+        closePicker: Boolean = false
+    ) {
+        val source: String = session.currentSource()
+        val scored: Outcome<ProductAssessment> = evaluateProduct.invoke(
+            inciRaw = inciRaw,
+            source = source,
+            productName = current.productName,
+            brand = current.brand,
+            gtin = current.gtin,
+            usage = usage,
+            packVerified = current.packVerified,
+            category = category,
+            productId = current.productId
+        )
+        when (scored) {
+            is Outcome.Err -> state.value = state.value.copy(
+                failure = scored.failure,
+                picker = if (closePicker) null else state.value.picker?.copy(busy = false)
+            )
+            is Outcome.Ok -> {
+                state.value = state.value.copy(
+                    assessment = scored.value,
+                    categorySkipped = if (clearCategoryPicker) false else state.value.categorySkipped,
+                    categoryChoices = if (clearCategoryPicker) emptyList() else state.value.categoryChoices,
+                    failure = null,
+                    selectedDetail = null,
+                    picker = if (closePicker) null else state.value.picker
+                )
+                persistShelfIfStarred(scored.value)
+                loadShelfAndAlternatives(scored.value, state.value.commentLocale)
+            }
         }
     }
 }

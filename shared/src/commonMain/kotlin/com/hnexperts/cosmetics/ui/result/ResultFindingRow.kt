@@ -11,6 +11,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import com.hnexperts.cosmetics.resources.finding_rating_a11y
 import com.hnexperts.cosmetics.resources.finding_sun_caution
 import com.hnexperts.cosmetics.resources.finding_unmatched
 import com.hnexperts.cosmetics.resources.finding_usage_adjusted
+import com.hnexperts.cosmetics.resources.confirm_pick_ingredient
 import com.hnexperts.cosmetics.ui.common.RatingBadge
 import com.hnexperts.cosmetics.ui.common.dangerLevelText
 import org.jetbrains.compose.resources.stringResource
@@ -34,7 +36,8 @@ import org.jetbrains.compose.resources.stringResource
 fun ResultFindingRow(
     finding: Finding,
     commentSummary: String?,
-    onOpen: () -> Unit
+    onOpen: () -> Unit,
+    onPickUnmatched: (() -> Unit)? = null
 ) {
     val openLabel: String = stringResource(Res.string.a11y_open_ingredient)
     Card(
@@ -54,6 +57,14 @@ fun ResultFindingRow(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null
             )
+        }
+        if (onPickUnmatched != null) {
+            TextButton(
+                onClick = onPickUnmatched,
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+            ) {
+                Text(stringResource(Res.string.confirm_pick_ingredient))
+            }
         }
     }
 }
